@@ -1,0 +1,47 @@
+{
+    "env": {
+      "browser": true,
+      "es2023": true
+    },
+    "extends": [
+      "eslint:recommended",
+      "plugin:react/recommended",
+      "plugin:@typescript-eslint/recommended",
+      "prettier"
+    ],
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+      "project": "./tsconfig.json",
+      "ecmaVersion": "latest",
+      "sourceType": "module",
+      "createDefaultProgram": true
+    },
+    "plugins": [
+      "react",
+      "@typescript-eslint",
+      "prettier"
+    ],
+    "settings": {
+      "react": {
+        "version": "detect"
+      },
+      "import/resolver": {
+        "typescript": {}
+      }
+    },
+    "rules": {
+      "prettier/prettier": [
+        "error",
+        {
+          "singleQuote": false,
+          "bracketSameLine": false,
+          "endOfLine": "auto"
+        }
+      ],
+      "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx", ".tsx"] }],
+      "quotes": ["error", "double"],
+      "semi": ["error", "always"],
+      "indent": ["error", "tab"]
+    }
+  }
+  
