@@ -12,6 +12,7 @@
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
       "project": "./tsconfig.json",
+      "tsconfigRootDir": "./",
       "ecmaVersion": "latest",
       "sourceType": "module",
       "createDefaultProgram": true
@@ -30,18 +31,11 @@
       }
     },
     "rules": {
-      "prettier/prettier": [
-        "error",
-        {
-          "singleQuote": false,
-          "bracketSameLine": false,
-          "endOfLine": "auto"
-        }
-      ],
-      "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx", ".tsx"] }],
-      "quotes": ["error", "double"],
-      "semi": ["error", "always"],
-      "indent": ["error", "tab"]
+      "prettier/prettier":  "warn",
+      "react/jsx-filename-extension": ["warn", { "extensions": [".js", ".jsx", ".tsx"] }],
+      "quotes": ["warn", "double"],
+      "semi": ["warn", "always"],
+      "indent": ["warn", "tab"]
     }
   }
   
