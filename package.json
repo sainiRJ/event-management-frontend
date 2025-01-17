@@ -11,12 +11,24 @@
     "postinstall": "husky install",
     "check-types": "tsc --noemit",
     "run-eslint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "lint": "npm run-eslint && npm check-types",
+    "lint": "npm run run-eslint && npm run check-types",
     "format": "prettier --check \"src/**/*.ts\"",
-    "start": "react-scripts start",
+    "start": "cross-env BROWSER=none react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "prepare": "husky install"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "src/**/*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
   },
   "eslintConfig": {
     "extends": [
@@ -41,13 +53,15 @@
     "@types/react-dom": "^19.0.3",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
+    "cross-env": "^7.0.3",
     "eslint": "^8.0.0",
+    "eslint-config-prettier": "^10.0.1",
     "eslint-import-resolver-typescript": "^2.5.0",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-react": "^7.0.0",
-    "husky": "^9.1.7",
-    "lint-staged": "^15.3.0",
+    "husky": "^8.0.0",
+    "lint-staged": "^15.4.1",
     "prettier": "^2.5.0",
-    "typescript": "^4.5.0"
+    "typescript": "^4.9.5"
   }
 }
