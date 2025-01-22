@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import { css } from "@emotion/react";
+import {css} from "@emotion/react";
 
 import {createStyles} from "../../customTypes/StyleTypes";
 
@@ -12,7 +12,7 @@ const Style = () => {
 			height: 100vh;
 			display: flex;
 			align-items: center;
-			z-index: 1000;
+			z-index: 9000;
 		`,
 		sideNavStyles: css`
 			height: auto;
