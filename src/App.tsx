@@ -5,9 +5,7 @@ import HeaderTab from "./components/layouts/Header";
 import CustomSideNav from "./components/CustomSideNav";
 import {BsChevronRight, BsChevronLeft} from "react-icons/bs";
 import {BrowserRouter, Routes, Route} from "react-router-dom";
-import AddNewBooking from "./components/Booking/AddNewBooking/AddNewBooking";
-import BookingTable from "./components/Booking/BookingTable";
-
+import BookingPage from "./components/Booking/BookingPage";
 function App() {
 	const [showSideNav, setShowSideNav] = React.useState(false);
 
@@ -28,7 +26,7 @@ function App() {
 							top: "50%",
 							right: showSideNav ? "50px" : "0px",
 							transition: "right 0.3s ease",
-							zIndex: 9001,
+							zIndex: 9000,
 						}}
 					>
 						{showSideNav ? (
@@ -40,7 +38,7 @@ function App() {
 				</div>
 				{showSideNav && <CustomSideNav />}
 				<Routes>
-					<Route path="/booking" element={<BookingTable />} />
+					<Route path="/booking" element={<BookingPage />} />
 				</Routes>
 			</Container>
 		</CustomProvider>
