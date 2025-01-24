@@ -1,0 +1,29 @@
+import featureFlagConfig from "@config/featureFlagConfig";
+
+/**
+ * @description
+ * Environment variables used in the application
+ */
+const env = {
+	BITOOL_BASE_URL: process.env.NEXT_PUBLIC_BITOOL_BASE_URL,
+	BITOOL_API_SERVER_TIMEOUT: process.env.NEXT_PUBLIC_BITOOL_API_SERVER_TIMEOUT,
+	MS_CLARITY_PROJECT_ID: process.env.NEXT_PUBLIC_MS_CLARITY_PROJECT_ID,
+	BITOOL_ROR_VERSION_API_BASE_URL:
+		process.env.NEXT_PUBLIC_BITOOL_ROR_VERSION_API_BASE_URL,
+	BITOOL_ROR_VERSION_APP_BASE_URL:
+		process.env.NEXT_PUBLIC_BITOOL_ROR_VERSION_APP_BASE_URL,
+
+	// AWS S3 Bucket Configuration
+	AWS_S3_BUCKET_SERVER_BASE_URL:
+		process.env.NEXT_PUBLIC_AWS_S3_BUCKET_SERVER_BASE_URL,
+	AWS_S3_BUCKET_SERVER_TIMEOUT:
+		process.env.NEXT_PUBLIC_AWS_S3_BUCKET_SERVER_TIMEOUT,
+
+	FEATURE_FLAG_CONFIG: featureFlagConfig,
+
+	// Finance dashboard
+	FINANCE_DASHBOARD_PROJECT_URL:
+		process.env.NEXT_PUBLIC_BITOOL_FINANCE_DASHBOARD_PROJECT_URL,
+};
+
+export default env;

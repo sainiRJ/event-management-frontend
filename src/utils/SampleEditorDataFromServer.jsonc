@@ -1,0 +1,69 @@
+{
+	"time": 1722942015899,
+	"blocks": [
+		{
+			"id": "fFzdGAbawO",
+			"type": "header",
+			"data": {
+				"text": "Steps to Reproduce:-",
+				"level": 6,
+			},
+		},
+		{
+			"id": "P_2Cuz-vcM",
+			"type": "list",
+			"data": {
+				"style": "unordered",
+				"items": [],
+			},
+		},
+		{
+			"id": "IgMNws2Q81",
+			"type": "header",
+			"data": {
+				"text": "Expected Result:-",
+				"level": 6,
+			},
+		},
+		{
+			"id": "a1VdqvsUt6",
+			"type": "header",
+			"data": {
+				"text": "Actual Result:-",
+				"level": 6,
+			},
+		},
+		{
+			"id": "NRbdhdhQNO",
+			"type": "attaches",
+			"data": {
+				"file": {
+					// url is the attachment id
+					"url": "f8f4a49f-f9ec-4729-8f30-5fc70c45ace7",
+					"name": "thanks.gif",
+					"type": "image/gif",
+					"size": 431284,
+				},
+				"title": "",
+			},
+		},
+		{
+			"id": "GakQ4IuWSM",
+			"type": "image",
+			"data": {
+				"caption": "",
+				"withBorder": false,
+				"withBackground": false,
+				"stretched": false,
+				"file": {
+					// url is the attachment id
+					"url": "3ceebd37-f8ab-4da2-aa7c-6639e81126d5",
+					"name": "thanks.gif",
+					"type": "image/gif",
+					"size": 431284,
+				},
+			},
+		},
+	],
+	"version": "2.30.3",
+}
