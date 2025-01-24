@@ -4,10 +4,10 @@ import {Navbar, Nav, Button, Dropdown, Whisper} from "rsuite";
 import AdminIcon from "@rsuite/icons/Admin";
 import NoticeIcon from "@rsuite/icons/Notice";
 import HeaderPopover from "../HeaderPopover/HeaderPopover";
-
+import "./Header.css";
 const HeaderTab = () => (
 	<>
-		<Navbar>
+		<Navbar className="custom-navbar">
 			<Navbar.Brand href="#">RSUITE</Navbar.Brand>
 			<Nav pullRight>
 				<Whisper
