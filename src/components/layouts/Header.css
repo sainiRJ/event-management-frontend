@@ -1,0 +1,19 @@
+.custom-navbar {
+	background-color: #41729f;
+	color: white;
+}
+
+.custom-navbar .rs-navbar-brand {
+	color: white;
+}
+
+.custom-navbar .rs-nav-item,
+.custom-navbar .rs-dropdown {
+	color: white;
+}
+
+.custom-navbar .rs-nav-item:hover,
+.custom-navbar .rs-dropdown:hover {
+	background-color: #41729f;
+	color: white;
+}
