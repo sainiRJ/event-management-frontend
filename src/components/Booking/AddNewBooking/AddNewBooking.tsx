@@ -9,12 +9,17 @@ import {
 	Input,
 	DatePicker,
 } from "rsuite";
+import {createBooking} from "../../../store/booking/ThunkActions";
+import {iErrorResponse} from "../../../customTypes/CommonServiceTypes";
+import {useAppDispatch} from "../../../store/Hooks";
+import {iCreateBookingDTO} from "../../../customTypes/appDataTypes/bookingTypes";
 
 const AddNewBooking = () => {
 	const [open, setOpen] = React.useState(false);
 	const [formValue, setFormValue] = React.useState({});
 	const handleOpen = () => setOpen(true);
 	const handleClose = () => setOpen(false);
+	const dispatch = useAppDispatch();
 
 	const eventTypes = [
 		{label: "Wedding", value: "wedding"},
@@ -42,8 +47,31 @@ const AddNewBooking = () => {
 		budget: NumberType().min(0, "Budget must be a positive number."),
 	});
 
-	const handleSubmit = () => {
+	const handleSubmit = async () => {
 		console.log("Form Value:", formValue);
+		const payload: iCreateBookingDTO = {
+			customerName: "saini",
+			phoneNumber: "9874512568",
+			email: "rajeshpushpakar01@gmail.com",
+			eventDateTime: "2025-01-25T21:39:00Z", // Correct field name and format
+			eventType: "Wedding", // Add this if needed
+			venueAddress: "E-3/67 vinay enclave laxmi vihar prem nagar 3rd",
+			decorationTheme: "Classic", // Add this if needed
+			budget: "5000",
+		};
+
+		try {
+			const response = await dispatch(createBooking(payload));
+			if (response.meta.requestStatus === "fulfilled") {
+				console.log("response data ", response);
+			} else {
+				// Handle errors
+				const errorResponse = response.payload;
+				console.error("errorMessage", errorResponse);
+			}
+		} catch (error) {
+			console.error("An unexpected error occurred.");
+		}
 		handleClose();
 	};
 

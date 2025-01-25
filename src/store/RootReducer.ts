@@ -1,6 +1,6 @@
 import {combineReducers} from "@reduxjs/toolkit";
 
-import exampleReducer from "@/store/example/ExampleSlice";
+import exampleReducer from "./example/ExampleSlice";
 
 // Combine multiple reducers into a single root reducer
 const rootReducer = combineReducers({

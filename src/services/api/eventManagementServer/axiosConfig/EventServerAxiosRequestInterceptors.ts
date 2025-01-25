@@ -1,6 +1,6 @@
 import {AxiosInstance} from "axios";
 
-import AppUtil from "@/utils/AppUtil";
+import AppUtil from "../../../../utils/AppUtil";
 
 import type {AxiosRequestHeaders, InternalAxiosRequestConfig} from "axios";
 /**

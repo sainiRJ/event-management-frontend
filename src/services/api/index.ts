@@ -1,5 +1,4 @@
-import {injectStore as bitoolServerInjectStore} from "@/services/api/eventManagementServer/axiosConfig/index";
-import {injectStore as bitoolRoRServerInjectStore} from "@/services/api/eventManagementServer/axiosConfig/index";
+import {injectStore as eventManagementServerInjectStore} from "./eventManagementServer/axiosConfig/index";
 
 /**
  * NOTE: Currently we're not using redux in this project.
@@ -21,6 +20,5 @@ type StoreType = any;
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const injectStore = (store: StoreType): void => {
-	bitoolServerInjectStore(store);
-	bitoolRoRServerInjectStore(store);
+	eventManagementServerInjectStore(store);
 };
