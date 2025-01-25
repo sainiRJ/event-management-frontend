@@ -9,7 +9,7 @@ import {AxiosError, AxiosInstance, AxiosResponse} from "axios";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type StoreType = any;
 
-import {httpStatusCodes} from "@/customTypes/NetworkTypes";
+import {httpStatusCodes} from "../../../../customTypes/NetworkTypes";
 
 /**
  * Mapping all the responseInterceptors defined as closures inside this function

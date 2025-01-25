@@ -1,33 +1,9 @@
-import {apiServer, injectStore} from "./axiosConfig";
-import ProjectService from "./ProjectService";
-import ModifyProjectValueService from "./ModifyProjectValueService";
-import ModifyStartDateValueService from "./ModifyStartDateValueService";
 import EmployeeService from "./EmployeeService";
-import TimeLogService from "./TimeLogService";
+import BookingService from "./BookingService";
 import UserService from "./UserService";
-import ExportReportService from "./ExportReportService";
-import AttachmentService from "./AttachmentService";
-import OptimizedProjectService from "./OptimizedProjectService";
-
-const optimizedProjectService = OptimizedProjectService(apiServer);
-const projectService = ProjectService(apiServer);
+import {apiServer} from "./axiosConfig";
 const employeeService = EmployeeService(apiServer);
-const modifyProjectValueSlice = ModifyProjectValueService(apiServer);
-const modifyStartDateValueSlice = ModifyStartDateValueService(apiServer);
-const timeLogService = TimeLogService(apiServer);
 const userService = UserService(apiServer);
-const exportReportService = ExportReportService(apiServer);
-const attachmentService = AttachmentService(apiServer);
+const bookingService = BookingService(apiServer);
 
-export {
-	injectStore,
-	optimizedProjectService,
-	projectService,
-	employeeService,
-	modifyProjectValueSlice,
-	modifyStartDateValueSlice,
-	timeLogService,
-	userService,
-	exportReportService,
-	attachmentService,
-};
+export {bookingService, employeeService, userService};

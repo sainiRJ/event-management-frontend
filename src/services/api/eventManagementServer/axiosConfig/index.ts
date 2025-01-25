@@ -9,9 +9,9 @@ import axios from "axios";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type StoreType = any;
 
-import AxiosResponseInterceptors from "@/services/api/commonInterceptors/AxiosResponseInterceptors";
-import EventServerAxiosResponseInterceptors from "@/services/api/eventManagementServer/axiosConfig/EventServerAxiosResponseInterceptors";
-import EventServerAxiosRequestInterceptors from "@/services/api/eventManagementServer/axiosConfig/EventServerAxiosRequestInterceptors";
+import AxiosResponseInterceptors from "../../commonInterceptors/AxiosResponseInterceptors";
+import EventServerAxiosResponseInterceptors from "./EventServerAxiosResponseInterceptors";
+import EventServerAxiosRequestInterceptors from "./EventServerAxiosRequestInterceptors";
 
 import {axiosRequestConfig} from "./AxiosServiceConstants";
 

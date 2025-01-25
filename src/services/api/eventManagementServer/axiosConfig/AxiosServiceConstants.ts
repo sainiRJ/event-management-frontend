@@ -1,6 +1,7 @@
 import {AxiosRequestConfig} from "axios";
+import config from "../../../../config";
 
-import config from "@/config";
+
 
 /**
  * The base url of the api server's endpoint needs to be configured here.
@@ -8,14 +9,15 @@ import config from "@/config";
  * NOTE: This has to be manged by a build flavour configuration files
  * such as environment fils or via a remote configuration manger.
  */
-const API_SERVER_BASE_URL = config.BITOOL_BASE_URL;
+const API_SERVER_BASE_URL = config.EVENT_MANAGEMENT_BASE_URL;
+
 /**
  * The request timeout of the api server needs to be configured here.
  *
  * NOTE: This has to be manged by a build flavour configuration files
  * such as environment fils  or via a remote configuration manger.
  */
-const API_SERVER_REQUEST_TIMEOUT = config.BITOOL_API_SERVER_TIMEOUT;
+const API_SERVER_REQUEST_TIMEOUT = config.EVENT_MANAGEMENT_API_SERVER_TIMEOUT;
 
 /**
  * All basic axios request-configurations needs to be set here.
@@ -61,74 +63,6 @@ export const apiEndpoints = Object.freeze({
 		authenticate: "",
 	},
 
-	project: {
-		optimized: {
-			getProjectSummary: (projectId: string) => {
-				return `/project/optimized/${projectId}`;
-			},
-
-			getProjectInfo: (projectId: string) => {
-				return `/optimized-projects/project-info/${projectId}`;
-			},
-
-			getProjectPlan: (projectId: string) => {
-				return `/optimized-projects/project-plan/${projectId}`;
-			},
-
-			getProjectResourceAllocationDetails: (projectId: string) => {
-				return `/optimized-projects/resource-allocation-details/${projectId}`;
-			},
-		},
-
-		getProjectSummary: (projectId: string) => {
-			return `/project/${projectId}`;
-		},
-
-		updateTask: (projectId: string, taskId: string) => {
-			return `/project/${projectId}/${taskId}`;
-		},
-
-		updateAssignees: (projectId: string, taskId: string) => {
-			return `/project/${projectId}/${taskId}/assignees`;
-		},
-
-		bulkTaskUpdate: (projectId: string) => {
-			return `/project/${projectId}/bulk-task`;
-		},
-
-		bulkTaskCreate: (projectId: string) => {
-			return `/project/${projectId}/bulk-task`;
-		},
-
-		bulkTaskDelete: (projectId: string) => {
-			return `/project/${projectId}/bulk-task`;
-		},
-
-		addOrUpdateRoles: (projectId: string) => {
-			return `/project/${projectId}/addOrUpdateRoles`;
-		},
-
-		updateGSheetSyncStatus: (projectId: string) => {
-			return `/project/${projectId}/gsheet-sync-disable-status`;
-		},
-
-		updateProjectTaskOrder: (projectId: string, taskId: string) => {
-			return `projects/${projectId}/tasks/${taskId}/order`;
-		},
-
-		getAllBugTypes: () => {
-			return `/projects/getAllBugTypes`;
-		},
-
-		createProjectBug: (projectId: string) => {
-			return `project/${projectId}/bug`;
-		},
-
-		getTaskDescription: (projectId: string, taskId: string) => {
-			return `/projects/${projectId}/task/${taskId}/description`;
-		},
-	},
-
 	employee: {
 		getAllEmployeeDetailsWithRoles: () => {
 			return `/employee/getAllEmployeeDetailsWithRoles`;
@@ -137,15 +71,9 @@ export const apiEndpoints = Object.freeze({
 			return `/employee/add-capabilities`;
 		},
 	},
-	attachment: {
-		issueBulkPresignedUploadUrls: (projectId: string) => {
-			return `/attachment/${projectId}/bulk-presigned-upload-urls`;
-		},
-		issueBulkPresignedFetchUrls: (projectId: string) => {
-			return `/attachment/${projectId}/bulk-presigned-fetch-urls`;
-		},
-		updateAttachmentStatus: (attachmentId: string) => {
-			return `/attachment/${attachmentId}/attachment-status`;
+	booking: {
+		createBooking: () => {
+			return "booking/createBooking";
 		},
 	},
 
@@ -155,57 +83,10 @@ export const apiEndpoints = Object.freeze({
 		},
 	},
 
-	modifyValue: {
-		modifyProjectValue: (projectId: string, taskId: string) => {
-			return `/modifyValue/${projectId}/${taskId}`;
-		},
-	},
-
-	timeLog: {
-		addUpdateTimeLog: (projectId: string, taskId: string) => {
-			return `/timelog/projects/${projectId}/tasks/${taskId}/logs`;
-		},
-
-		getTimeLogDetails: (projectId: string, taskId: string) => {
-			return `/timelog/projects/${projectId}/tasks/${taskId}/logs`;
-		},
-
-		getProjectTimelogReportDetails: (projectId: string) => {
-			return `/timelog/projects/${projectId}`;
-		},
-		getProjectTimelogReportTotalLoggedHours: (projectId: string) => {
-			return `/timelog/projects/${projectId}/summary`;
-		},
-		getTimelogSummaryEmployeeLoggedHours: (projectId: string) => {
-			return `/timelog/projects/${projectId}/summary/totalloggedhours`;
-		},
-	},
-
 	user: {
 		userProfileDetails: () => {
 			return `/user/me/profile`;
 		},
 	},
 
-	exportReport: {
-		exportReportPage: (projectId: string) => {
-			return `/reports/projects/${projectId}/timelog/csv`;
-		},
-
-		getMultiProjectList: () => {
-			return `/projects`;
-		},
-
-		getProjectsStatusOptions: () => {
-			return `/projects/status-options`;
-		},
-
-		getroleIdsForProject: (projectId: string) => {
-			return `/projects/${projectId}/roleIds`;
-		},
-
-		getEmployeeIdsForProject: (projectId: string) => {
-			return `/projects/${projectId}/employeeIds`;
-		},
-	},
 });

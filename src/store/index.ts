@@ -1,7 +1,7 @@
 import {configureStore} from "@reduxjs/toolkit";
 import {createLogger} from "redux-logger";
 
-import rootReducer from "@store/RootReducer";
+import rootReducer from "./RootReducer";
 
 // Redux logger
 const reduxLogger = createLogger({

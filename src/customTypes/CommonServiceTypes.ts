@@ -38,6 +38,18 @@ interface iServiceError {
 	message: string;
 	validationErrors?: ValidationErrorsType | null;
 }
+interface iErrorResponse {
+	message: {
+	  error:{
+		message: string;
+	  validationErrors:{
+		body: {
+			message:string
+			  }
+	  }
+	  }  
+	};
+  }
 
 interface iServiceSuccess {
 	message: string;
@@ -118,4 +130,5 @@ export type {
 	ValidationErrorsType,
 	NullablePaginationInfo,
 	iGenericThunkUnwrapException,
+	iErrorResponse,
 };
