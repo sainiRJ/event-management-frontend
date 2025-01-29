@@ -1,7 +1,6 @@
 import {AxiosRequestConfig} from "axios";
-import config from "../../../../config";
-
-
+import config from "../../../../config/index";
+import {setArgs} from "@craco/craco/dist/lib/args";
 
 /**
  * The base url of the api server's endpoint needs to be configured here.
@@ -73,7 +72,7 @@ export const apiEndpoints = Object.freeze({
 	},
 	booking: {
 		createBooking: () => {
-			return "booking/createBooking";
+			return "booking/create";
 		},
 	},
 
@@ -88,5 +87,9 @@ export const apiEndpoints = Object.freeze({
 			return `/user/me/profile`;
 		},
 	},
-
+	service: {
+		getAllServices: () => {
+			return `/service/all`;
+		},
+	},
 });

@@ -9,24 +9,23 @@ import {
 	Input,
 	DatePicker,
 } from "rsuite";
+import {iService} from "@/customTypes/appDataTypes/serviceTypes";
 import {createBooking} from "../../../store/booking/ThunkActions";
-import {iErrorResponse} from "../../../customTypes/CommonServiceTypes";
 import {useAppDispatch} from "../../../store/Hooks";
 import {iCreateBookingDTO} from "../../../customTypes/appDataTypes/bookingTypes";
 
-const AddNewBooking = () => {
+interface AddNewBookingProps {
+	serviceList: iService[];
+}
+
+const AddNewBooking: React.FC<AddNewBookingProps> = ({serviceList}) => {
 	const [open, setOpen] = React.useState(false);
-	const [formValue, setFormValue] = React.useState({});
+	const [formValue, setFormValue] = React.useState<Partial<iCreateBookingDTO>>(
+		{},
+	);
 	const handleOpen = () => setOpen(true);
 	const handleClose = () => setOpen(false);
 	const dispatch = useAppDispatch();
-
-	const eventTypes = [
-		{label: "Wedding", value: "wedding"},
-		{label: "Birthday", value: "birthday"},
-		{label: "Corporate Event", value: "corporate"},
-		{label: "Other", value: "other"},
-	];
 
 	const decorationThemes = [
 		{label: "Floral", value: "floral"},
@@ -42,22 +41,23 @@ const AddNewBooking = () => {
 		email: StringType()
 			.isEmail("Please enter a valid email address.")
 			.isRequired("Email is required."),
-		eventDate: StringType().isRequired("Event date is required."),
+		eventDateTime: StringType().isRequired("Event date and time is required."),
 		venueAddress: StringType().isRequired("Venue address is required."),
 		budget: NumberType().min(0, "Budget must be a positive number."),
 	});
 
 	const handleSubmit = async () => {
-		console.log("Form Value:", formValue);
+		console.log("formValue", formValue);
 		const payload: iCreateBookingDTO = {
-			customerName: "saini",
-			phoneNumber: "9874512568",
-			email: "rajeshpushpakar01@gmail.com",
-			eventDateTime: "2025-01-25T21:39:00Z", // Correct field name and format
-			eventType: "Wedding", // Add this if needed
-			venueAddress: "E-3/67 vinay enclave laxmi vihar prem nagar 3rd",
-			decorationTheme: "Classic", // Add this if needed
-			budget: "5000",
+			customerName: formValue.customerName || "",
+			phoneNumber: formValue.phoneNumber || "",
+			email: formValue.email || "",
+			eventDateTime: formValue.eventDateTime ?? "", // Ensure it's included in the correct format
+			service: formValue.service || "", // Replace eventType with services
+			venueAddress: formValue.venueAddress || "",
+			decorationTheme: formValue.decorationTheme || "",
+			budget: formValue.budget || "0",
+			additionalNotes: formValue.additionalNotes || "",
 		};
 
 		try {
@@ -65,9 +65,7 @@ const AddNewBooking = () => {
 			if (response.meta.requestStatus === "fulfilled") {
 				console.log("response data ", response);
 			} else {
-				// Handle errors
-				const errorResponse = response.payload;
-				console.error("errorMessage", errorResponse);
+				console.error("errorMessage", response.payload);
 			}
 		} catch (error) {
 			console.error("An unexpected error occurred.");
@@ -104,21 +102,42 @@ const AddNewBooking = () => {
 							<Form.ControlLabel>Email Address</Form.ControlLabel>
 							<Form.Control name="email" type="email" />
 						</Form.Group>
-						<Form.Group controlId="eventDate">
-							<Form.ControlLabel>Event Date</Form.ControlLabel>
-							<DatePicker name="eventDate" block />
-						</Form.Group>
-						<Form.Group controlId="eventTime">
-							<Form.ControlLabel>Event Time</Form.ControlLabel>
-							<Form.Control name="eventTime" type="time" />
-						</Form.Group>
-						<Form.Group controlId="eventType">
-							<Form.ControlLabel>Event Type</Form.ControlLabel>
+						<Form.Group controlId="service">
+							<Form.ControlLabel>Service</Form.ControlLabel>
 							<SelectPicker
-								data={eventTypes}
-								name="eventType"
+								data={serviceList.map((service) => ({
+									label: service.service_name,
+									value: service.id,
+								}))}
+								name="service"
 								block
-								placeholder="Select Event Type"
+								placeholder="Select a Service"
+								value={formValue.service}
+								onChange={(value) =>
+									setFormValue((prev) => ({
+										...prev,
+										service: value ?? undefined,
+									}))
+								}
+							/>
+						</Form.Group>
+						<Form.Group controlId="eventDateTime">
+							<Form.ControlLabel>Event Date & Time</Form.ControlLabel>
+							<DatePicker
+								name="eventDateTime"
+								block
+								format="yyyy-MM-dd HH:mm"
+								value={
+									formValue.eventDateTime
+										? new Date(formValue.eventDateTime)
+										: null
+								}
+								onChange={(value) =>
+									setFormValue((prev) => ({
+										...prev,
+										eventDateTime: value ? value.toISOString() : "",
+									}))
+								}
 							/>
 						</Form.Group>
 						<Form.Group controlId="venueAddress">
@@ -136,6 +155,13 @@ const AddNewBooking = () => {
 								name="decorationTheme"
 								block
 								placeholder="Select Theme"
+								value={formValue.decorationTheme}
+								onChange={(value) =>
+									setFormValue((prev) => ({
+										...prev,
+										decorationTheme: value ?? undefined,
+									}))
+								}
 							/>
 						</Form.Group>
 						<Form.Group controlId="additionalNotes">

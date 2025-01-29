@@ -13,12 +13,12 @@ import {APIResponse, httpStatusCodes} from "@/customTypes/NetworkTypes";
  */
 function buildResult<SuccessResultType>(
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	error: any,
+	data: iGenericResponse<SuccessResultType> | null,
 	httpStatusCode: httpStatusCodes,
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	message: any,
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	data: iGenericResponse<SuccessResultType> | null,
+	error: any,
 ): APIResponse<SuccessResultType> {
 	return {
 		error: error || null,
