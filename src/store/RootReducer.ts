@@ -2,10 +2,12 @@ import {combineReducers} from "@reduxjs/toolkit";
 
 import exampleReducer from "./example/ExampleSlice";
 import serviceReducer from "./services/ServicesSlice";
+import statusReducer from "./status/StatusSlice";
 
 // Combine multiple reducers into a single root reducer
 const rootReducer = combineReducers({
 	serviceReducer,
+	statusReducer,
 });
 export type RootState = ReturnType<typeof rootReducer>;
 
