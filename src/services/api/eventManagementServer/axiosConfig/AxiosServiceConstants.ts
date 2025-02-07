@@ -92,4 +92,9 @@ export const apiEndpoints = Object.freeze({
 			return `/service/all`;
 		},
 	},
+	status: {
+		getAllStatus: () => {
+			return "/status/all";
+		},
+	},
 });
