@@ -1,7 +1,6 @@
 import React, {useState, useEffect} from "react";
 import {Table, Placeholder} from "rsuite";
-import {mockUsers, User} from "./mock"; // Import the mock function and User interface
-import AddNewBooking from "./AddNewBooking/AddNewBooking";
+import {mockUsers, User} from "./mock";
 
 const {Column, HeaderCell, Cell} = Table;
 

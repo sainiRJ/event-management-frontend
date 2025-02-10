@@ -45,6 +45,25 @@ const Style = () => {
 				}
 			}
 		`,
+		buttonToolbarStyles: css`
+			display: flex;
+			justify-content: flex-end; /* Align buttons to the right */
+			margin-bottom: 20px;
+		`,
+
+		buttonStyle: css`
+				background-color: #007bff; /* Primary color */
+				color: white;
+				padding: 10px 20px;
+				border-radius: 5px;
+				border: none;
+				cursor: pointer;
+
+				&:hover {
+					background-color: #0056b3; /* Darker shade on hover */
+				}
+			}
+		`,
 	});
 };
 
