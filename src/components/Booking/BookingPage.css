@@ -1,50 +1,55 @@
 /* BookingPage.css */
 
-/* Set a general background color and padding for the whole page */
 .booking-page {
-    background-color: #f4f7fc; /* Light background color */
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 100vh;
-  }
-  
-  /* Wrapper for the content (AddNewBooking + BookingTable) */
-  .booking-container {
-    width: 100%;
-    max-width: 1200px;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-  }
-  
-  /* Style for AddNewBooking section */
-  .add-new-booking {
-    background-color: #ffffff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-  
-  /* Style for BookingTable section */
-  .booking-table {
-    background-color: #ffffff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    overflow-x: auto;
-  }
-  
-  /* Add responsiveness for smaller screens */
-  @media (max-width: 768px) {
-    .booking-container {
-      padding: 10px;
-    }
-  
-    .add-new-booking, .booking-table {
-      padding: 15px;
-    }
-  }
-  
+	background-color: #f4f7fc; 
+	padding: 20px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	min-height: 100vh;
+}
+.rs-stack {
+	display: flex;
+	flex-direction: row-reverse;
+}
+
+/* Wrapper for the content (AddNewBooking + BookingTable) */
+.booking-container {
+	width: 100%;
+	max-width: 1200px;
+	padding: 20px;
+	display: flex;
+	flex-direction: column;
+	gap: 30px;
+}
+
+/* Style for AddNewBooking section */
+.add-new-booking {
+	background-color: #63768d;
+	color: #ffffff;
+	padding: 10px;
+	margin: 8px;
+	border-radius: 2px;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Style for BookingTable section */
+.booking-table {
+	background-color: #ffffff;
+	padding: 20px;
+	border-radius: 8px;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+	overflow-x: auto;
+}
+
+/* Add responsiveness for smaller screens */
+@media (max-width: 768px) {
+	.booking-container {
+		padding: 10px;
+	}
+
+	.add-new-booking,
+	.booking-table {
+		padding: 15px;
+	}
+}

@@ -1,10 +1,10 @@
 import React from "react";
-import {Button, CustomProvider, Container} from "rsuite";
+import {CustomProvider, Container} from "rsuite";
 import "rsuite/dist/rsuite.min.css";
 import HeaderTab from "./components/layouts/Header";
 import CustomSideNav from "./components/CustomSideNav";
 import {BsChevronRight, BsChevronLeft} from "react-icons/bs";
-import {BrowserRouter, Routes, Route} from "react-router-dom";
+import {Routes, Route} from "react-router-dom";
 import BookingPage from "./components/Booking/BookingPage";
 function App() {
 	const [showSideNav, setShowSideNav] = React.useState(false);
