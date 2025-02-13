@@ -6,6 +6,7 @@ interface ModalComponentProps {
 	onClose: () => void;
 	onSubmit: () => void;
 	title: string;
+	size: string;
 	children: React.ReactNode;
 }
 
@@ -14,10 +15,11 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
 	onClose,
 	onSubmit,
 	title,
+	size,
 	children,
 }) => {
 	return (
-		<Modal size="xl" open={open} onClose={onClose}>
+		<Modal size={size} open={open} onClose={onClose}>
 			<Modal.Header>
 				<Modal.Title>{title}</Modal.Title>
 			</Modal.Header>
