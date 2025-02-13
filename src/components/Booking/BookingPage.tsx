@@ -64,6 +64,7 @@ const BookingPage = () => {
 				onClose={() => setIsModalOpen(false)}
 				onSubmit={handleSubmit}
 				title="Add New Booking"
+				size="lg"
 			>
 				<BookingForm
 					formValue={formValue}
@@ -74,7 +75,6 @@ const BookingPage = () => {
 					}))}
 					decorationThemes={decorationThemes}
 				/>
-				<button onClick={handleSubmit}>Submit</button>
 			</Modal>
 		</div>
 	);
