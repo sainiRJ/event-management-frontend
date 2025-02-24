@@ -2,6 +2,7 @@ import React, {useState, useEffect} from "react";
 import {useAppDispatch, useAppSelector} from "../../store/Hooks";
 import {fetchServices} from "@/store/services/ThunkActions";
 import {fetchStatus} from "@/store/status/ThunkActions";
+import {createBooking} from "@/store/booking/ThunkActions";
 import {RootState} from "@store/index";
 import BookingTable from "./BookingTable";
 import Modal from "../Modal/Modal";
@@ -17,13 +18,15 @@ const BookingPage = () => {
 	const [formValue, setFormValue] = useState({
 		customerName: "",
 		phoneNumber: "",
-		email: "",
-		service: null,
+		serviceId: null,
 		eventDateTime: null,
 		venueAddress: "",
 		decorationTheme: null,
 		budget: "",
+		eventName: "",
 		additionalNotes: "",
+		paymentStatusId: "",
+		bookingStatusId: "",
 	});
 
 	useEffect(() => {
@@ -43,8 +46,22 @@ const BookingPage = () => {
 		(state: RootState) => state.serviceReducer,
 	);
 
-	const handleSubmit = () => {
+	const bookingStatuses = statusList
+		.filter((status) => status.context === "booking")
+		.map((status) => ({label: status.name, value: status.id}));
+
+	const paymentStatuses = statusList
+		.filter((status) => status.context === "payment")
+		.map((status) => ({label: status.name, value: status.id}));
+
+	console.log("Booking Statuses:", bookingStatuses);
+	console.log("Payment Statuses:", paymentStatuses);
+
+	const handleSubmit = async () => {
 		console.log("Submitting Form:", formValue);
+		const response = await dispatch(createBooking(formValue));
+		console.log("response", response);
+
 		setIsModalOpen(false);
 	};
 
@@ -70,10 +87,12 @@ const BookingPage = () => {
 					formValue={formValue}
 					setFormValue={setFormValue}
 					serviceList={serviceList.map((service) => ({
-						label: service.service_name,
+						label: service.serviceName,
 						value: service.id,
 					}))}
 					decorationThemes={decorationThemes}
+					bookingStatuses={bookingStatuses}
+					paymentStatuses={paymentStatuses}
 				/>
 			</Modal>
 		</div>

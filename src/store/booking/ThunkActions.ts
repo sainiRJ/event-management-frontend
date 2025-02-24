@@ -62,3 +62,4 @@ export const createBooking = createAsyncThunk<
 		});
 	}
 });
+
