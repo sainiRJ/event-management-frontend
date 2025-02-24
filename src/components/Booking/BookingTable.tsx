@@ -76,13 +76,13 @@ const BookingTable = () => {
 						height={400} // Fixed height
 						data={data}
 					>
-						<Column width={200} fixed resizable>
+						<Column width={200} resizable>
 							<HeaderCell>DATE & TIME</HeaderCell>
 							<Cell>
 								{(rowData) => (rowData ? rowData.time : renderNoDataMessage())}
 							</Cell>
 						</Column>
-						<Column width={200} fixed resizable>
+						<Column width={200} resizable>
 							<HeaderCell>Customer Name</HeaderCell>
 							<Cell>
 								{(rowData) =>
@@ -90,7 +90,7 @@ const BookingTable = () => {
 								}
 							</Cell>
 						</Column>
-						<Column width={300} fixed resizable>
+						<Column width={300} resizable>
 							<HeaderCell>Address</HeaderCell>
 							<Cell>
 								{(rowData) =>

@@ -4,12 +4,15 @@ import InputField from "../../common/InputField";
 import SelectField from "../../common/Select";
 import DatePickerField from "../../common/DatePicker";
 import {bookingValidationSchema} from "../../validations/BookingValidationSchema";
+import {iCreateBookingDTO} from "../../customTypes/appDataTypes/bookingTypes";
 
 interface BookingFormProps {
-	formValue: any;
+	formValue: iCreateBookingDTO;
 	setFormValue: (value: any) => void;
 	serviceList: {label: string; value: string}[];
 	decorationThemes: {label: string; value: string}[];
+	bookingStatuses: {label: string; value: string}[];
+	paymentStatuses: {label: string; value: string}[];
 }
 
 const BookingForm: React.FC<BookingFormProps> = ({
@@ -17,6 +20,8 @@ const BookingForm: React.FC<BookingFormProps> = ({
 	setFormValue,
 	serviceList,
 	decorationThemes,
+	bookingStatuses,
+	paymentStatuses,
 }) => {
 	return (
 		<Form
@@ -54,11 +59,12 @@ const BookingForm: React.FC<BookingFormProps> = ({
 				<Row gutter={16}>
 					<Col xs={12}>
 						<InputField
-							name="email"
-							label="Email Address"
-							type="email"
-							value={formValue.email}
-							onChange={(value) => setFormValue({...formValue, email: value})}
+							name="eventName"
+							label="Event Name"
+							value={formValue.eventName}
+							onChange={(value) =>
+								setFormValue({...formValue, eventName: value})
+							}
 						/>
 					</Col>
 					<Col xs={12}>
@@ -66,8 +72,10 @@ const BookingForm: React.FC<BookingFormProps> = ({
 							name="service"
 							label="Service"
 							data={serviceList}
-							value={formValue.service}
-							onChange={(value) => setFormValue({...formValue, service: value})}
+							value={formValue.serviceId}
+							onChange={(value) =>
+								setFormValue({...formValue, serviceId: value})
+							}
 						/>
 					</Col>
 				</Row>
@@ -114,6 +122,31 @@ const BookingForm: React.FC<BookingFormProps> = ({
 							type="number"
 							value={formValue.budget}
 							onChange={(value) => setFormValue({...formValue, budget: value})}
+						/>
+					</Col>
+				</Row>
+
+				<Row gutter={16}>
+					<Col xs={12}>
+						<SelectField
+							name="Booking Status"
+							label="Booking Status"
+							data={bookingStatuses}
+							value={formValue.bookingStatusId}
+							onChange={(value) =>
+								setFormValue({...formValue, bookingStatusId: value})
+							}
+						/>
+					</Col>
+					<Col xs={12}>
+						<SelectField
+							name="Payment Status"
+							label="Payment Status"
+							data={paymentStatuses}
+							value={formValue.paymentStatusId}
+							onChange={(value) =>
+								setFormValue({...formValue, paymentStatusId: value})
+							}
 						/>
 					</Col>
 				</Row>
