@@ -1,6 +1,9 @@
 import React, {useState, useEffect} from "react";
+import {useAppDispatch, useAppSelector} from "../../store/Hooks";
 import {Table, Placeholder} from "rsuite";
 import {mockUsers, User} from "./mock";
+import {getAllBookings} from "@/store/booking/ThunkActions";
+import {RootState} from "@/store";
 
 const {Column, HeaderCell, Cell} = Table;
 
@@ -20,12 +23,33 @@ const BookingTableWrapper = ({children}: {children: React.ReactNode}) => {
 	);
 };
 
+const formatDate = (dateString: string) => {
+	const date = new Date(dateString);
+	return new Intl.DateTimeFormat("en-GB", {
+		day: "2-digit",
+		month: "short",
+		year: "numeric",
+		hour: "2-digit",
+		minute: "2-digit",
+		hour12: true,
+	}).format(date);
+};
+
 const BookingTable = () => {
 	const [loading, setLoading] = useState(true);
-	const [data, setData] = useState<User[]>([]);
+	const [data, setData] = useState<any[]>([]);
+	const {bookingList} = useAppSelector(
+		(state: RootState) => state.bookingReducer,
+	);
+	const dispatch = useAppDispatch();
 
 	useEffect(() => {
-		const fetchedData = mockUsers(0); // Simulate fetching mock data
+		dispatch(getAllBookings());
+	}, [dispatch]);
+
+	useEffect(() => {
+		console.log("bookingList", bookingList);
+		const fetchedData = bookingList; // Simulate fetching mock data
 		setTimeout(() => {
 			if (fetchedData && Array.isArray(fetchedData) && fetchedData.length > 0) {
 				setData(fetchedData);
@@ -35,7 +59,9 @@ const BookingTable = () => {
 				setLoading(false); // Stop loading when no data
 			}
 		}, 1000); // Simulate loading delay
-	}, []);
+	}, [bookingList]);
+
+	console.log("data of bookings ", bookingList);
 
 	const renderLoading = () => (
 		<div
@@ -79,7 +105,17 @@ const BookingTable = () => {
 						<Column width={200} resizable>
 							<HeaderCell>DATE & TIME</HeaderCell>
 							<Cell>
-								{(rowData) => (rowData ? rowData.time : renderNoDataMessage())}
+								{(rowData) =>
+									rowData.eventDate ? formatDate(rowData.eventDate) : "No Date"
+								}
+							</Cell>
+						</Column>
+						<Column width={200} resizable>
+							<HeaderCell>Event Name</HeaderCell>
+							<Cell>
+								{(rowData) =>
+									rowData ? rowData.eventName : renderNoDataMessage()
+								}
 							</Cell>
 						</Column>
 						<Column width={200} resizable>
@@ -94,7 +130,7 @@ const BookingTable = () => {
 							<HeaderCell>Address</HeaderCell>
 							<Cell>
 								{(rowData) =>
-									rowData ? rowData.address : renderNoDataMessage()
+									rowData ? rowData.location : renderNoDataMessage()
 								}
 							</Cell>
 						</Column>
@@ -107,16 +143,10 @@ const BookingTable = () => {
 							</Cell>
 						</Column>
 						<Column width={200} resizable>
-							<HeaderCell>Email</HeaderCell>
-							<Cell>
-								{(rowData) => (rowData ? rowData.email : renderNoDataMessage())}
-							</Cell>
-						</Column>
-						<Column width={200} resizable>
 							<HeaderCell>Event Type</HeaderCell>
 							<Cell>
 								{(rowData) =>
-									rowData ? rowData.eventType : renderNoDataMessage()
+									rowData ? rowData.serviceName : renderNoDataMessage()
 								}
 							</Cell>
 						</Column>
@@ -124,7 +154,39 @@ const BookingTable = () => {
 							<HeaderCell>Budget</HeaderCell>
 							<Cell>
 								{(rowData) =>
-									rowData ? rowData.budget : renderNoDataMessage()
+									rowData ? rowData.totalCost : renderNoDataMessage()
+								}
+							</Cell>
+						</Column>
+						<Column width={150} resizable>
+							<HeaderCell>Advance Payment</HeaderCell>
+							<Cell>
+								{(rowData) =>
+									rowData ? rowData.advancePayment : renderNoDataMessage()
+								}
+							</Cell>
+						</Column>
+						<Column width={150} resizable>
+							<HeaderCell>Booking Status</HeaderCell>
+							<Cell>
+								{(rowData) =>
+									rowData ? rowData.bookingStatus : renderNoDataMessage()
+								}
+							</Cell>
+						</Column>
+						<Column width={150} resizable>
+							<HeaderCell>Payment Status</HeaderCell>
+							<Cell>
+								{(rowData) =>
+									rowData ? rowData.paymentStatus : renderNoDataMessage()
+								}
+							</Cell>
+						</Column>
+						<Column width={200} resizable>
+							<HeaderCell>Booked At</HeaderCell>
+							<Cell>
+								{(rowData) =>
+									rowData.bookedAt ? formatDate(rowData.bookedAt) : "No Date"
 								}
 							</Cell>
 						</Column>

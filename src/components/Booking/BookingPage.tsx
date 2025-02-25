@@ -23,6 +23,7 @@ const BookingPage = () => {
 		venueAddress: "",
 		decorationTheme: null,
 		budget: "",
+		advancePayment: "",
 		eventName: "",
 		additionalNotes: "",
 		paymentStatusId: "",

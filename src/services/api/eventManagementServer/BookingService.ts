@@ -40,8 +40,41 @@ function BookingService(apiServer: AxiosInstance) {
 
 		return result;
 	};
+
+	const getAllBookings = async (): Promise<APIResponse<
+		iCreateBookingDTO[]
+	> | null> => {
+		let result = null;
+
+		await apiServer
+			.get(apiEndpoints.booking.getAllBooking())
+			.then(
+				//on fullfilled
+				(value) => {
+					result = NetworkUtil.buildResult<iCreateBookingDTO[]>(
+						value.data,
+						value.status,
+						null,
+						null,
+					);
+				},
+				// onRejected
+				(reason) => {
+					const {response} = reason;
+					const {status, data} = response;
+
+					result = NetworkUtil.buildResult<null>(data, status, data, null);
+				},
+			)
+			.catch((error) => {
+				throw error;
+			});
+
+		return result;
+	};
 	return {
 		createBooking,
+		getAllBookings,
 	};
 }
 
