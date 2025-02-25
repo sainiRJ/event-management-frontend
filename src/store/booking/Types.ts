@@ -20,6 +20,7 @@ export interface iBooking {
 	decorationTheme: string | null;
 	additionalNotes?: string;
 	budget: string;
+	advancePayment: string;
 }
 
 export interface iBookingState {

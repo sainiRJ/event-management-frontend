@@ -74,6 +74,9 @@ export const apiEndpoints = Object.freeze({
 		createBooking: () => {
 			return "booking/create";
 		},
+		getAllBooking: () => {
+			return "booking/all";
+		},
 	},
 
 	allStatus: {

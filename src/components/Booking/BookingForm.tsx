@@ -128,6 +128,20 @@ const BookingForm: React.FC<BookingFormProps> = ({
 
 				<Row gutter={16}>
 					<Col xs={12}>
+						<InputField
+							name="advancePayment"
+							label="Advance Payment"
+							type="number"
+							value={formValue.advancePayment}
+							onChange={(value) =>
+								setFormValue({...formValue, advancePayment: value})
+							}
+						/>
+					</Col>
+				</Row>
+
+				<Row gutter={16}>
+					<Col xs={12}>
 						<SelectField
 							name="Booking Status"
 							label="Booking Status"
