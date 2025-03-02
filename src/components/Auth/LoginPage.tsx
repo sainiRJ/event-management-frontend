@@ -5,7 +5,6 @@ import "./Auth.css";
 
 const LoginPage: React.FC = () => {
 	const navigate = useNavigate();
-	const [loginMethod, setLoginMethod] = useState<"email" | "phone">("email");
 	const [formData, setFormData] = useState({
 		emailOrPhone: "",
 		password: "",
@@ -31,10 +30,7 @@ const LoginPage: React.FC = () => {
 				headers: {
 					"Content-Type": "application/json",
 				},
-				body: JSON.stringify({
-					emailOrPhone: formData.emailOrPhone,
-					password: formData.password,
-				}),
+				body: JSON.stringify(formData),
 			});
 
 			if (!response.ok) {
@@ -56,51 +52,46 @@ const LoginPage: React.FC = () => {
 	return (
 		<div className="auth-container">
 			<div className="auth-box">
-				<h2>Login</h2>
-				{error && <div className="error-message">{error}</div>}
-
-				<div className="login-method-toggle">
-					<button
-						className={loginMethod === "email" ? "active" : ""}
-						onClick={() => setLoginMethod("email")}
-					>
-						Email
-					</button>
-					<button
-						className={loginMethod === "phone" ? "active" : ""}
-						onClick={() => setLoginMethod("phone")}
-					>
-						Phone
-					</button>
+				<div className="auth-header">
+					<h2>Welcome Back!</h2>
+					<p>Please sign in to continue</p>
 				</div>
 
-				<form onSubmit={handleSubmit}>
+				{error && <div className="error-message">{error}</div>}
+
+				<form onSubmit={handleSubmit} className="auth-form">
 					<div className="form-group">
-						<label>{loginMethod === "email" ? "Email" : "Phone Number"}</label>
-						<input
-							type={loginMethod === "email" ? "email" : "tel"}
-							name="emailOrPhone"
-							value={formData.emailOrPhone}
-							onChange={handleInputChange}
-							placeholder={
-								loginMethod === "email"
-									? "Enter your email"
-									: "Enter your phone number"
-							}
-							required
-						/>
+						<label>Email or Phone Number</label>
+						<div className="input-container">
+							<i className="fas fa-user input-icon"></i>
+							<input
+								type="text"
+								name="emailOrPhone"
+								value={formData.emailOrPhone}
+								onChange={handleInputChange}
+								placeholder="Enter your email or phone number"
+								required
+							/>
+						</div>
 					</div>
 
 					<div className="form-group">
 						<label>Password</label>
-						<input
-							type="password"
-							name="password"
-							value={formData.password}
-							onChange={handleInputChange}
-							placeholder="Enter your password"
-							required
-						/>
+						<div className="input-container">
+							<i className="fas fa-lock input-icon"></i>
+							<input
+								type="password"
+								name="password"
+								value={formData.password}
+								onChange={handleInputChange}
+								placeholder="Enter your password"
+								required
+							/>
+						</div>
+					</div>
+
+					<div className="forgot-password">
+						<a href="/forgot-password">Forgot Password?</a>
 					</div>
 
 					<button type="submit" className="submit-btn">
