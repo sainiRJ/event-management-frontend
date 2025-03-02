@@ -1,11 +1,6 @@
 import React, {useState} from "react";
 import {useNavigate} from "react-router-dom";
-import {
-	createUserWithEmailAndPassword,
-	signInWithPopup,
-	GoogleAuthProvider,
-} from "firebase/auth";
-import {auth} from "../../config/firebase";
+import {GOOGLE_AUTH_URL} from "../../config/oauth";
 import "./Auth.css";
 
 const SignupPage: React.FC = () => {
@@ -37,25 +32,33 @@ const SignupPage: React.FC = () => {
 		}
 
 		try {
-			await createUserWithEmailAndPassword(
-				auth,
-				formData.email,
-				formData.password,
-			);
+			const response = await fetch("/api/auth/signup", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					name: formData.name,
+					email: formData.email,
+					phone: formData.phone,
+					password: formData.password,
+				}),
+			});
+
+			if (!response.ok) {
+				throw new Error("Signup failed");
+			}
+
+			const data = await response.json();
+			localStorage.setItem("token", data.token);
 			navigate("/dashboard");
 		} catch (err: any) {
 			setError(err.message);
 		}
 	};
 
-	const handleGoogleSignUp = async () => {
-		try {
-			const provider = new GoogleAuthProvider();
-			await signInWithPopup(auth, provider);
-			navigate("/dashboard");
-		} catch (err: any) {
-			setError(err.message);
-		}
+	const handleGoogleSignUp = () => {
+		window.location.href = GOOGLE_AUTH_URL;
 	};
 
 	return (
@@ -134,7 +137,11 @@ const SignupPage: React.FC = () => {
 					<span>OR</span>
 				</div>
 
-				<button className="google-btn" onClick={handleGoogleSignUp}>
+				<button 
+					className="google-btn"
+					onClick={handleGoogleSignUp}
+				>
+					<img src="/google-icon.svg" alt="Google" />
 					Continue with Google
 				</button>
 
