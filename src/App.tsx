@@ -9,6 +9,7 @@ import BookingPage from "./components/Booking/BookingPage";
 import LoginPage from "./components/Auth/LoginPage";
 import SignupPage from "./components/Auth/SignupPage";
 import OAuthCallback from "./components/Auth/OAuthCallback";
+import AuthGuard from "./Authguard";
 
 function App() {
 	const [showSideNav, setShowSideNav] = React.useState(false);
@@ -42,8 +43,22 @@ function App() {
 				</div>
 				{showSideNav && <CustomSideNav />}
 				<Routes>
-					<Route path="/booking" element={<BookingPage />} />
-					<Route path="/login" element={<LoginPage />} />
+					<Route
+						path="/booking"
+						element={
+							<AuthGuard requireAuth={true}>
+								<BookingPage />
+							</AuthGuard>
+						}
+					/>
+					<Route
+						path="/login"
+						element={
+							<AuthGuard requireAuth={false}>
+								<LoginPage />
+							</AuthGuard>
+						}
+					/>
 					<Route path="/signup" element={<SignupPage />} />
 					<Route path="/auth/callback" element={<OAuthCallback />} />
 				</Routes>
