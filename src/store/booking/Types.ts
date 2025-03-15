@@ -14,13 +14,14 @@ export interface iBooking {
 	customerName: string;
 	phoneNumber: string;
 	eventName: string;
-	eventDateTime: string | null;
+	eventDate: string | null;
 	serviceId: string | null;
 	venueAddress: string;
 	decorationTheme: string | null;
 	additionalNotes?: string;
 	budget: string;
 	advancePayment: string;
+	bookingStatus?: string;
 }
 
 export interface iBookingState {

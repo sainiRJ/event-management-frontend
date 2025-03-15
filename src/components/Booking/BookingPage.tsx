@@ -19,7 +19,7 @@ const BookingPage = () => {
 		customerName: "",
 		phoneNumber: "",
 		serviceId: null,
-		eventDateTime: null,
+		eventDate: null,
 		venueAddress: "",
 		decorationTheme: null,
 		budget: "",

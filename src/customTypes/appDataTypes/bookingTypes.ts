@@ -1,7 +1,7 @@
 export interface iCreateBookingDTO {
 	customerName: string;
 	phoneNumber: string;
-	eventDateTime: string | null;
+	eventDate: string | null;
 	serviceId: string | null;
 	venueAddress: string;
 	decorationTheme: string | null;
@@ -11,4 +11,5 @@ export interface iCreateBookingDTO {
 	eventName: string;
 	paymentStatusId: string;
 	bookingStatusId: string;
+	bookingStatus?: string | undefined;
 }

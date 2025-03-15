@@ -83,11 +83,11 @@ const BookingForm: React.FC<BookingFormProps> = ({
 				<Row gutter={16}>
 					<Col xs={12}>
 						<DatePickerField
-							name="eventDateTime"
+							name="eventDate"
 							label="Event Date & Time"
-							value={formValue.eventDateTime}
+							value={formValue.eventDate}
 							onChange={(value) =>
-								setFormValue({...formValue, eventDateTime: value})
+								setFormValue({...formValue, eventDate: value})
 							}
 						/>
 					</Col>
