@@ -130,7 +130,7 @@ const BookingTable = () => {
 							<HeaderCell>Address</HeaderCell>
 							<Cell>
 								{(rowData) =>
-									rowData ? rowData.location : renderNoDataMessage()
+									rowData ? rowData.venueAddress : renderNoDataMessage()
 								}
 							</Cell>
 						</Column>

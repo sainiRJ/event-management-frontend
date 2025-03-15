@@ -8,6 +8,7 @@ import {Routes, Route, BrowserRouter as Router} from "react-router-dom";
 import BookingPage from "./components/Booking/BookingPage";
 import LoginPage from "./components/Auth/LoginPage";
 import SignupPage from "./components/Auth/SignupPage";
+import DashboardPage from "./components/Dashboard/DashboardPage";
 import OAuthCallback from "./components/Auth/OAuthCallback";
 import AuthGuard from "./Authguard";
 
@@ -43,6 +44,14 @@ function App() {
 				</div>
 				{showSideNav && <CustomSideNav />}
 				<Routes>
+					<Route
+						path="/dashboard"
+						element={
+							<AuthGuard requireAuth={true}>
+								<DashboardPage />
+							</AuthGuard>
+						}
+					/>
 					<Route
 						path="/booking"
 						element={
