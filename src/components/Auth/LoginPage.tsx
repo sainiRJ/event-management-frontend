@@ -25,7 +25,7 @@ const LoginPage: React.FC = () => {
 		setError("");
 
 		try {
-			const response = await fetch("/api/auth/login", {
+			const response = await fetch("http://localhost:3080/api/auth/login", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -38,8 +38,8 @@ const LoginPage: React.FC = () => {
 			}
 
 			const data = await response.json();
-			localStorage.setItem("token", data.token);
-			navigate("/dashboard");
+			localStorage.setItem("auth_token", data.data.token);
+			navigate("/booking");
 		} catch (err: any) {
 			setError(err.message);
 		}
