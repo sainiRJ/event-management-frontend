@@ -72,11 +72,25 @@ const WeatherCard: React.FC<WeatherCardProps> = ({location, eventDate}) => {
 	};
 
 	if (loading) {
-		return <DashboardCard title="Weather" value="Loading..." />;
+		return (
+			<DashboardCard
+				title="Weather"
+				value="Loading..."
+				icon={<WiDaySunny />}
+				color="#722ed1"
+			/>
+		);
 	}
 
 	if (error) {
-		return <DashboardCard title="Weather" value="Weather data unavailable" />;
+		return (
+			<DashboardCard
+				title="Weather"
+				value="Weather data unavailable"
+				icon={<WiCloudy />}
+				color="#722ed1"
+			/>
+		);
 	}
 
 	return (
@@ -114,7 +128,7 @@ const WeatherCard: React.FC<WeatherCardProps> = ({location, eventDate}) => {
 				<div className="weather-detail-item">
 					<WiRain size={24} />
 					<div>
-						<p className="label">Rain Probability</p>
+						<p className="label">Rain Chance</p>
 						<p className="value">{weather?.rainProbability}</p>
 					</div>
 				</div>
@@ -122,7 +136,13 @@ const WeatherCard: React.FC<WeatherCardProps> = ({location, eventDate}) => {
 
 			<div className="weather-footer">
 				<p>
-					Forecast for: {new Date(weather?.date || "").toLocaleDateString()}
+					Forecast for{" "}
+					{new Date(weather?.date || "").toLocaleDateString("en-US", {
+						weekday: "long",
+						month: "short",
+						day: "numeric",
+						year: "numeric",
+					})}
 				</p>
 			</div>
 		</Panel>
