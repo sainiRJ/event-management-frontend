@@ -17,7 +17,7 @@ const HeaderTab = () => {
 	return (
 		<>
 			<Navbar className="custom-navbar">
-				<Navbar.Brand href="#">RSUITE</Navbar.Brand>
+				<Navbar.Brand href="#">Nothing</Navbar.Brand>
 				<Nav pullRight>
 					<Whisper
 						placement="bottomEnd"
