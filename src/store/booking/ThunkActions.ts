@@ -110,3 +110,33 @@ export const getAllBookings = createAsyncThunk<
 		});
 	}
 });
+
+export const deleteBooking = createAsyncThunk(
+	"booking/deleteBooking",
+	async (ids: string | string[], { rejectWithValue }) => {
+		try {
+			const response = await bookingService.deleteBooking(ids);
+			if (!response) {
+				return rejectWithValue({
+					message: "Failed to delete booking(s)",
+				});
+			}
+			return response;
+		} catch (error) {
+			return rejectWithValue({
+				message: "Failed to delete booking(s)",
+			});
+		}
+	},
+);
+
+export const updateBooking = createAsyncThunk(
+	"booking/updateBooking",
+	async (booking: iCreateBookingDTO) => {
+		const response = await bookingService.updateBooking(booking);
+		if (!response) {
+			throw new Error("Failed to update booking");
+		}
+		return response.data;
+	},
+);

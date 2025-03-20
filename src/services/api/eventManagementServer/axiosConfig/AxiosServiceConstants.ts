@@ -72,10 +72,19 @@ export const apiEndpoints = Object.freeze({
 	},
 	booking: {
 		createBooking: () => {
-			return "booking/create";
+			return `booking/create`;
 		},
 		getAllBooking: () => {
-			return "booking/all";
+			return `booking/all`;
+		},
+		deleteBooking: (id: string) => {
+			return `booking/delete/${id}`;
+		},
+		updateBooking: (id: string) => {
+			return `booking/update/${id}`;
+		},
+		bulkDelete: () => {
+			return `booking/bulk-delete`;
 		},
 	},
 
