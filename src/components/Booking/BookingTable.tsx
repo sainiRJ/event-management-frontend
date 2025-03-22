@@ -29,8 +29,9 @@ import FilterIcon from "@rsuite/icons/Funnel";
 import EditIcon from "@rsuite/icons/Edit";
 import TrashIcon from "@rsuite/icons/Trash";
 import CustomTable from "../common/CustomTable";
-import BookingForm from "./BookingForm";
+import CustomForm from "../common/CustomForm";
 import {iCreateBookingDTO} from "../../customTypes/appDataTypes/bookingTypes";
+import {bookingValidationSchema} from "../../validations/BookingValidationSchema";
 
 const formatDate = (dateString: string) => {
 	const date = new Date(dateString);
@@ -593,18 +594,18 @@ const BookingTable = () => {
 									Delete Selected ({selectedKeys.length})
 								</Button>
 							)}
-							<ButtonGroup>
-								<IconButton
-									icon={<FilterIcon />}
-									onClick={() => setShowFilters(!showFilters)}
-									appearance={showFilters ? "primary" : "default"}
-								>
-									Filters
-								</IconButton>
-								<IconButton icon={<RefreshIcon />} onClick={handleRefresh}>
-									Refresh
-								</IconButton>
-							</ButtonGroup>
+						<ButtonGroup>
+							<IconButton
+								icon={<FilterIcon />}
+								onClick={() => setShowFilters(!showFilters)}
+								appearance={showFilters ? "primary" : "default"}
+							>
+								Filters
+							</IconButton>
+							<IconButton icon={<RefreshIcon />} onClick={handleRefresh}>
+								Refresh
+							</IconButton>
+						</ButtonGroup>
 						</Stack>
 					</Stack>
 				</div>
@@ -613,7 +614,7 @@ const BookingTable = () => {
 					data={filteredData}
 					loading={loading}
 					columns={columns}
-					height={400}
+						height={400}
 					selectable
 					selectedKeys={selectedKeys}
 					onSelectChange={setSelectedKeys}
@@ -630,13 +631,88 @@ const BookingTable = () => {
 				</Modal.Header>
 				<Modal.Body>
 					{editingBooking && (
-						<BookingForm
+						<CustomForm
 							formValue={editingBooking}
 							setFormValue={setEditingBooking}
-							serviceList={eventTypes}
-							decorationThemes={[]} // Add your decoration themes here
-							bookingStatuses={bookingStatuses}
-							paymentStatuses={[]} // Add your payment statuses here
+							validationModel={bookingValidationSchema}
+							fields={[
+								{
+									name: "customerName",
+									label: "Customer Name",
+									type: "text",
+									colSpan: 12,
+								},
+								{
+									name: "phoneNumber",
+									label: "Phone Number",
+									type: "tel",
+									colSpan: 12,
+								},
+								{
+									name: "eventName",
+									label: "Event Name",
+									type: "text",
+									colSpan: 12,
+								},
+								{
+									name: "serviceId",
+									label: "Service",
+									type: "select",
+									options: eventTypes,
+									colSpan: 12,
+								},
+								{
+									name: "eventDate",
+									label: "Event Date & Time",
+									type: "date",
+									colSpan: 12,
+								},
+								{
+									name: "venueAddress",
+									label: "Venue Address",
+									type: "text",
+									colSpan: 12,
+								},
+								{
+									name: "decorationTheme",
+									label: "Decoration Theme",
+									type: "select",
+									options: [], // Add your decoration themes here
+									colSpan: 12,
+								},
+								{
+									name: "budget",
+									label: "Budget",
+									type: "number",
+									colSpan: 12,
+								},
+								{
+									name: "advancePayment",
+									label: "Advance Payment",
+									type: "number",
+									colSpan: 12,
+								},
+								{
+									name: "bookingStatusId",
+									label: "Booking Status",
+									type: "select",
+									options: bookingStatuses,
+									colSpan: 12,
+								},
+								{
+									name: "paymentStatusId",
+									label: "Payment Status",
+									type: "select",
+									options: [], // Add your payment statuses here
+									colSpan: 12,
+								},
+								{
+									name: "additionalNotes",
+									label: "Additional Notes",
+									type: "textarea",
+									colSpan: 24,
+								},
+							]}
 						/>
 					)}
 				</Modal.Body>
