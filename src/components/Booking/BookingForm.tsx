@@ -1,8 +1,8 @@
 import React from "react";
 import {Form, Grid, Row, Col} from "rsuite";
-import InputField from "../../common/InputField";
-import SelectField from "../../common/Select";
-import DatePickerField from "../../common/DatePicker";
+import InputField from "../common/InputField";
+import SelectField from "../common/Select";
+import DatePickerField from "../common/DatePicker";
 import {bookingValidationSchema} from "../../validations/BookingValidationSchema";
 import {iCreateBookingDTO} from "../../customTypes/appDataTypes/bookingTypes";
 

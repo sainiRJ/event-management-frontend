@@ -1,23 +1,18 @@
 import {AxiosInstance} from "axios";
-
 import {APIResponse} from "@/customTypes/NetworkTypes";
-
-import NetworkUtil from "@/utils/NetworkUtil";
-import {NullableString} from "@/customTypes/CommonTypes";
 import {apiEndpoints} from "./axiosConfig/AxiosServiceConstants";
-
-import {iCreateBookingDTO} from "@/customTypes/appDataTypes/bookingTypes";
+import NetworkUtil from "@/utils/NetworkUtil";
+import {iCreateEmployeeDTO} from "../../../customTypes/appDataTypes/employeeTypes";
 
 function EmployeeService(apiServer: AxiosInstance) {
-	const createBooking = async (
-		createBookingDTO: Partial<iCreateBookingDTO>,
-	): Promise<APIResponse<iCreateBookingDTO> | null> => {
+	const createEmployee = async (
+		createEmployeeDTO: Partial<iCreateEmployeeDTO>,
+	): Promise<APIResponse<iCreateEmployeeDTO> | null> => {
 		let result = null;
 
 		await apiServer
-			.patch(apiEndpoints.booking.createBooking(), createBookingDTO)
+			.post(apiEndpoints.employee.createEmployee(), createEmployeeDTO)
 			.then(
-				//on fullfilled
 				(value) => {
 					result = NetworkUtil.buildResult<null>(
 						null,
@@ -26,11 +21,9 @@ function EmployeeService(apiServer: AxiosInstance) {
 						value.data,
 					);
 				},
-				// onRejected
 				(reason) => {
 					const {response} = reason;
 					const {status, data} = response;
-
 					result = NetworkUtil.buildResult<null>(data, status, data, null);
 				},
 			)
@@ -40,8 +33,101 @@ function EmployeeService(apiServer: AxiosInstance) {
 
 		return result;
 	};
+
+	const getAllEmployees = async (): Promise<APIResponse<iCreateEmployeeDTO[]> | null> => {
+		let result = null;
+
+		await apiServer
+			.get(apiEndpoints.employee.getAllEmployees())
+			.then(
+				(value) => {
+					result = NetworkUtil.buildResult<null>(
+						null,
+						value.status,
+						null,
+						value.data,
+					);
+				},
+				(reason) => {
+					const {response} = reason;
+					const {status, data} = response;
+					result = NetworkUtil.buildResult<null>(data, status, data, null);
+				},
+			)
+			.catch((error) => {
+				throw error;
+			});
+
+		return result;
+	};
+
+	const updateEmployee = async (
+		employeeData: iCreateEmployeeDTO,
+	): Promise<APIResponse<iCreateEmployeeDTO> | null> => {
+		let result = null;
+
+		await apiServer
+			.put(apiEndpoints.employee.updateEmployee(employeeData.id!), employeeData)
+			.then(
+				(value) => {
+					result = NetworkUtil.buildResult<null>(
+						null,
+						value.status,
+						null,
+						value.data,
+					);
+				},
+				(reason) => {
+					const {response} = reason;
+					const {status, data} = response;
+					result = NetworkUtil.buildResult<null>(data, status, data, null);
+				},
+			)
+			.catch((error) => {
+				throw error;
+			});
+
+		return result;
+	};
+
+	const deleteEmployee = async (
+		id: string | string[],
+	): Promise<APIResponse<null> | null> => {
+		let result = null;
+
+		await apiServer
+			.delete(
+				apiEndpoints.employee.deleteEmployee(
+					Array.isArray(id) ? id.join(",") : id,
+				),
+			)
+			.then(
+				(value) => {
+					result = NetworkUtil.buildResult<null>(
+						null,
+						value.status,
+						null,
+						value.data,
+					);
+				},
+				(reason) => {
+					const {response} = reason;
+					const {status, data} = response;
+					result = NetworkUtil.buildResult<null>(data, status, data, null);
+				},
+			)
+			.catch((error) => {
+				throw error;
+			});
+
+		return result;
+	};
+
 	return {
-		createBooking,
+		createEmployee,
+		getAllEmployees,
+		updateEmployee,
+		deleteEmployee,
 	};
 }
 
