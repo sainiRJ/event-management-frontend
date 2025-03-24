@@ -17,6 +17,7 @@
     "react-redux": "^9.2.0",
     "react-router-dom": "^6.30.0",
     "react-scripts": "5.0.1",
+    "recharts": "^2.15.1",
     "redux-logger": "^3.0.6",
     "redux-react-hook": "^4.0.3",
     "rsuite": "^5.76.3",
