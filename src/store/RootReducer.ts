@@ -1,17 +1,16 @@
 import {combineReducers} from "@reduxjs/toolkit";
-
-import exampleReducer from "./example/ExampleSlice";
+import employeeReducer from "./employee/EmployeeSlice";
+import bookingReducer from "./booking/BookingSlice";
 import serviceReducer from "./services/ServicesSlice";
 import statusReducer from "./status/StatusSlice";
-import bookingReducer from "./booking/BookingSlice";
-import employeeReducer from "./employee/EmployeeSlice"
+import financeReducer from "./finance/FinanceSlice";
 
-// Combine multiple reducers into a single root reducer
-const rootReducer = combineReducers({
+export const rootReducer = combineReducers({
+	employeeReducer,
+	bookingReducer,
 	serviceReducer,
 	statusReducer,
-	bookingReducer,
-	employeeReducer,
+	financeReducer,
 });
 export type RootState = ReturnType<typeof rootReducer>;
 

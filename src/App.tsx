@@ -6,12 +6,14 @@ import CustomSideNav from "./components/CustomSideNav";
 import {BsChevronRight, BsChevronLeft} from "react-icons/bs";
 import {Routes, Route, BrowserRouter as Router} from "react-router-dom";
 import BookingPage from "./components/Booking/BookingPage";
+import FinancePage from "./components/Finance/FinancePage";
 import LoginPage from "./components/Auth/LoginPage";
 import SignupPage from "./components/Auth/SignupPage";
 import DashboardPage from "./components/Dashboard/DashboardPage";
 import OAuthCallback from "./components/Auth/OAuthCallback";
 import EmployeeTable from "./components/Employee/EmployeeTable";
 import AuthGuard from "./Authguard";
+import { ImportSite } from "@rsuite/icons";
 
 function App() {
 	const [showSideNav, setShowSideNav] = React.useState(false);
@@ -66,6 +68,14 @@ function App() {
 						element={
 							<AuthGuard requireAuth={true}>
 								<BookingPage />
+							</AuthGuard>
+						}
+					/>
+					<Route
+						path="/finance"
+						element={
+							<AuthGuard requireAuth={true}>
+								<FinancePage />
 							</AuthGuard>
 						}
 					/>
