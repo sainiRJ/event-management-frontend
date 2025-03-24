@@ -10,6 +10,7 @@ import LoginPage from "./components/Auth/LoginPage";
 import SignupPage from "./components/Auth/SignupPage";
 import DashboardPage from "./components/Dashboard/DashboardPage";
 import OAuthCallback from "./components/Auth/OAuthCallback";
+import EmployeeTable from "./components/Employee/EmployeeTable";
 import AuthGuard from "./Authguard";
 
 function App() {
@@ -49,6 +50,14 @@ function App() {
 						element={
 							<AuthGuard requireAuth={true}>
 								<DashboardPage />
+							</AuthGuard>
+						}
+					/>
+					<Route
+						path="/employees"
+						element={
+							<AuthGuard requireAuth={true}>
+								<EmployeeTable/>
 							</AuthGuard>
 						}
 					/>

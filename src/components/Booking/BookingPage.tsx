@@ -55,13 +55,9 @@ const BookingPage = () => {
 		.filter((status) => status.context === "payment")
 		.map((status) => ({label: status.name, value: status.id}));
 
-	console.log("Booking Statuses:", bookingStatuses);
-	console.log("Payment Statuses:", paymentStatuses);
 
 	const handleSubmit = async () => {
-		console.log("Submitting Form:", formValue);
 		const response = await dispatch(createBooking(formValue));
-		console.log("response", response);
 
 		setIsModalOpen(false);
 	};

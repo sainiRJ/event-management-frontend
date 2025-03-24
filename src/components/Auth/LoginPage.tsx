@@ -10,7 +10,6 @@ const LoginPage: React.FC = () => {
 		password: "",
 	});
 	const [error, setError] = useState("");
-	console.log("GOOGLE_AUTH_URL", GOOGLE_AUTH_URL);
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const {name, value} = e.target;

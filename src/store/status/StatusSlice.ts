@@ -35,7 +35,6 @@ export const statusSlice = createSlice({
 			})
 			.addCase(fetchStatus.fulfilled, (state, action) => {
 				const payload = action.payload;
-				console.log("payload.data", payload);
 				if (payload && payload.data) {
 					state.statusList = payload.data; // This should be a single order object
 					state.isLoading = false;

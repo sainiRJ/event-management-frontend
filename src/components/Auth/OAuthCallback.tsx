@@ -21,7 +21,6 @@ const OAuthCallback: React.FC = () => {
 				return;
 			}
 
-			console.log(code);
 
 			try {
 				const tokenResponse = await fetch(
@@ -43,7 +42,6 @@ const OAuthCallback: React.FC = () => {
 					},
 				);
 
-				console.log("tokenResponse", tokenResponse);
 
 				// Fetch user info from Google
 				const tokenData: any = await tokenResponse.json();
@@ -66,8 +64,6 @@ const OAuthCallback: React.FC = () => {
 						body: JSON.stringify(userData),
 					},
 				);
-
-				console.log("response", response);
 
 				if (!response.ok) {
 					throw new Error("Failed to authenticate");

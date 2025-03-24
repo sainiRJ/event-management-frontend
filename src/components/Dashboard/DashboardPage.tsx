@@ -9,7 +9,6 @@ import "./DashboardPage.css";
 const DashboardPage: React.FC = () => {
 	const dispatch = useAppDispatch();
 	const {bookingList} = useAppSelector((state) => state.bookingReducer);
-	console.log("bookingList", bookingList);
 
 	useEffect(() => {
 		dispatch(getAllBookings());
@@ -52,7 +51,6 @@ const DashboardPage: React.FC = () => {
 			)[0];
 	};
 	const nextEvent = getNextEvent();
-	console.log("getNextEvent", nextEvent);
 
 	return (
 		<div className="dashboard-container">

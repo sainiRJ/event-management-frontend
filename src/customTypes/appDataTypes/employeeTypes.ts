@@ -8,8 +8,12 @@ export interface iCreateEmployeeDTO {
 	joinedDate: Date | string;
 }
 
+export interface iEmployeeResponse {
+	employeeDetails: Record<string, iCreateEmployeeDTO>;
+}
+
 export interface iEmployeeState {
 	employeeList: iCreateEmployeeDTO[];
 	loading: boolean;
 	error: string | null;
-} 
+}

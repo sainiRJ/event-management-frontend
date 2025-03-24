@@ -9,6 +9,12 @@ interface iValidationErrorDetails {
 
 type ValidationErrorsType = Record<string, iValidationErrorDetails>;
 
+import {iCreateEmployeeDTO} from "./appDataTypes/employeeTypes";
+
+export interface iEmployeeResponse {
+	employeeDetails: Record<string, iCreateEmployeeDTO>;
+}
+
 interface iPaginationInfo {
 	// Current page number.
 	page: number;
@@ -40,16 +46,16 @@ interface iServiceError {
 }
 interface iErrorResponse {
 	message: {
-	  error:{
-		message: string;
-	  validationErrors:{
-		body: {
-			message:string
-			  }
-	  }
-	  }  
+		error: {
+			message: string;
+			validationErrors: {
+				body: {
+					message: string;
+				};
+			};
+		};
 	};
-  }
+}
 
 interface iServiceSuccess {
 	message: string;
@@ -78,6 +84,7 @@ interface iGenericResponse<SuccessResultType> {
 	error: GenericNullable<iServiceError>;
 	meta: iResponseMeta;
 	data: GenericNullable<SuccessResultType>;
+	employeeDetails?: Record<string, iCreateEmployeeDTO>;
 }
 
 interface iGenericThunkUnwrapException {
