@@ -25,7 +25,7 @@ const employeeSlice = createSlice({
 		});
 		builder.addCase(getAllEmployees.fulfilled, (state, action) => {
 			state.loading = false;
-			state.employeeList = action.payload;
+			state.employeeList = action.payload?.data || [];
 		});
 		builder.addCase(getAllEmployees.rejected, (state, action) => {
 			state.loading = false;
@@ -73,4 +73,4 @@ const employeeSlice = createSlice({
 	},
 });
 
-export default employeeSlice.reducer; 
+export default employeeSlice.reducer;

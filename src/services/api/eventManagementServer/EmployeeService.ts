@@ -34,7 +34,9 @@ function EmployeeService(apiServer: AxiosInstance) {
 		return result;
 	};
 
-	const getAllEmployees = async (): Promise<APIResponse<iCreateEmployeeDTO[]> | null> => {
+	const getAllEmployees = async (): Promise<APIResponse<
+		iCreateEmployeeDTO[]
+	> | null> => {
 		let result = null;
 
 		await apiServer
@@ -42,10 +44,10 @@ function EmployeeService(apiServer: AxiosInstance) {
 			.then(
 				(value) => {
 					result = NetworkUtil.buildResult<null>(
-						null,
+						value.data.data,
 						value.status,
 						null,
-						value.data,
+						null,
 					);
 				},
 				(reason) => {
@@ -67,7 +69,10 @@ function EmployeeService(apiServer: AxiosInstance) {
 		let result = null;
 
 		await apiServer
-			.put(apiEndpoints.employee.updateEmployee(employeeData.id!), employeeData)
+			.patch(
+				apiEndpoints.employee.updateEmployee(employeeData.id!),
+				employeeData,
+			)
 			.then(
 				(value) => {
 					result = NetworkUtil.buildResult<null>(

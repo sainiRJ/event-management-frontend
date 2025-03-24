@@ -8,12 +8,16 @@ import {
 	Modal,
 	toaster,
 	Message,
+	Input,
+	SelectPicker,
 } from "rsuite";
 import {
 	getAllEmployees,
 	deleteEmployee,
 	updateEmployee,
 } from "@/store/employee/ThunkActions";
+import {fetchServices} from "@/store/services/ThunkActions";
+import {fetchStatus} from "@/store/status/ThunkActions";
 import {RootState} from "@/store";
 import RefreshIcon from "@rsuite/icons/Reload";
 import CustomTable from "../common/CustomTable";
@@ -39,7 +43,13 @@ const formatCurrency = (amount: number) => {
 const EmployeeTable = () => {
 	const [loading, setLoading] = useState(true);
 	const [data, setData] = useState<any[]>([]);
+	const [filteredData, setFilteredData] = useState<any[]>([]);
 	const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
+	const [searchQuery, setSearchQuery] = useState("");
+	const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
+	const [selectedDesignation, setSelectedDesignation] = useState<string | null>(
+		null,
+	);
 	const [showEditModal, setShowEditModal] = useState(false);
 	const [editingEmployee, setEditingEmployee] =
 		useState<iCreateEmployeeDTO | null>(null);
@@ -62,6 +72,11 @@ const EmployeeTable = () => {
 		setLoading(true);
 		dispatch(getAllEmployees());
 	};
+
+	useEffect(() => {
+		dispatch(fetchServices());
+		dispatch(fetchStatus());
+	}, [dispatch]);
 
 	const handleEdit = (rowData: any) => {
 		setEditingEmployee(rowData);
@@ -126,6 +141,31 @@ const EmployeeTable = () => {
 		}
 	}, [employeeList]);
 
+	useEffect(() => {
+		let filtered = [...data];
+
+		if (searchQuery) {
+			filtered = filtered.filter((employee) =>
+				employee.name.toLowerCase().includes(searchQuery.toLowerCase()),
+			);
+		}
+
+		if (selectedStatus) {
+			filtered = filtered.filter(
+				(employee) =>
+					employee.status.toLowerCase() === selectedStatus.toLowerCase(),
+			);
+		}
+
+		if (selectedDesignation) {
+			filtered = filtered.filter(
+				(employee) => employee.designation === selectedDesignation,
+			);
+		}
+
+		setFilteredData(filtered);
+	}, [data, searchQuery, selectedStatus, selectedDesignation]);
+
 	const columns = [
 		{
 			key: "name",
@@ -181,6 +221,14 @@ const EmployeeTable = () => {
 		},
 	];
 
+	const {statusList} = useAppSelector(
+		(state: RootState) => state.statusReducer,
+	);
+
+	const employeeStatuses = statusList
+		.filter((status) => status.context === "employee")
+		.map((status) => ({label: status.name, value: status.name}));
+
 	const employeeFormFields = [
 		{
 			name: "name",
@@ -210,10 +258,7 @@ const EmployeeTable = () => {
 			name: "status",
 			label: "Status",
 			type: "select" as const,
-			options: [
-				{label: "Active", value: "active"},
-				{label: "Inactive", value: "inactive"},
-			],
+			options: employeeStatuses,
 			colSpan: 12,
 		},
 		{
@@ -240,10 +285,39 @@ const EmployeeTable = () => {
 						justifyContent="space-between"
 						alignItems="center"
 					>
+						<Stack spacing={10}>
+							<Input
+								placeholder="Search by name..."
+								value={searchQuery}
+								onChange={setSearchQuery}
+								size="sm"
+							/>
+							<SelectPicker
+								data={employeeStatuses}
+								placeholder="Filter by status"
+								value={selectedStatus}
+								onChange={setSelectedStatus}
+								size="sm"
+								cleanable
+							/>
+							<SelectPicker
+								data={Array.from(
+									new Set(data.map((emp) => emp.designation)),
+								).map((designation) => ({
+									label: designation,
+									value: designation,
+								}))}
+								placeholder="Filter by designation"
+								value={selectedDesignation}
+								onChange={setSelectedDesignation}
+								size="sm"
+								cleanable
+							/>
+						</Stack>
 						<div>
 							<h4 style={{margin: 0}}>
-								{data.length} {data.length === 1 ? "Employee" : "Employees"}{" "}
-								Found
+								{filteredData.length}{" "}
+								{filteredData.length === 1 ? "Employee" : "Employees"} Found
 							</h4>
 						</div>
 						<Stack spacing={10}>
@@ -272,7 +346,7 @@ const EmployeeTable = () => {
 				</div>
 
 				<CustomTable
-					data={data}
+					data={filteredData}
 					loading={loading}
 					columns={columns}
 					height={400}
@@ -347,4 +421,4 @@ const EmployeeTable = () => {
 	);
 };
 
-export default EmployeeTable; 
+export default EmployeeTable;
