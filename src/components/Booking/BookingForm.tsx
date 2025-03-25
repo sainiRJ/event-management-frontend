@@ -171,9 +171,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
 							name="additionalNotes"
 							label="Additional Notes"
 							value={formValue.additionalNotes}
-							onChange={(value) =>
-								setFormValue({...formValue, additionalNotes: value})
-							}
+							onChange={(value) => ({...formValue, additionalNotes: value})}
 						/>
 					</Col>
 				</Row>

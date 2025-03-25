@@ -2,9 +2,10 @@ export interface iCreateEmployeeDTO {
 	id?: string;
 	name: string;
 	email: string;
+	phoneNumber: string;
 	designation: string;
 	salary: number;
-	status: string;
+	statusId: string;
 	joinedDate: Date | string;
 }
 

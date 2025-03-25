@@ -15,6 +15,7 @@ import {
 	getAllEmployees,
 	deleteEmployee,
 	updateEmployee,
+	createEmployee,
 } from "@/store/employee/ThunkActions";
 import {fetchServices} from "@/store/services/ThunkActions";
 import {fetchStatus} from "@/store/status/ThunkActions";
@@ -23,6 +24,7 @@ import RefreshIcon from "@rsuite/icons/Reload";
 import CustomTable from "../common/CustomTable";
 import CustomForm from "../common/CustomForm";
 import {iCreateEmployeeDTO} from "../../customTypes/appDataTypes/employeeTypes";
+import {employeeValidationSchema} from "../../validations/EmployeeValidationSchema";
 
 const formatDate = (dateString: string) => {
 	const date = new Date(dateString);
@@ -57,9 +59,10 @@ const EmployeeTable = () => {
 	const [newEmployee, setNewEmployee] = useState<iCreateEmployeeDTO>({
 		name: "",
 		email: "",
+		phoneNumber: "",
 		designation: "",
 		salary: 0,
-		status: "active",
+		statusId: "",
 		joinedDate: new Date(),
 	});
 
@@ -180,6 +183,12 @@ const EmployeeTable = () => {
 			resizable: true,
 		},
 		{
+			key: "phoneNumber",
+			label: "Phone Number",
+			width: 150,
+			resizable: true,
+		},
+		{
 			key: "designation",
 			label: "Designation",
 			width: 200,
@@ -227,7 +236,7 @@ const EmployeeTable = () => {
 
 	const employeeStatuses = statusList
 		.filter((status) => status.context === "employee")
-		.map((status) => ({label: status.name, value: status.name}));
+		.map((status) => ({label: status.name, value: status.id}));
 
 	const employeeFormFields = [
 		{
@@ -243,6 +252,12 @@ const EmployeeTable = () => {
 			colSpan: 12,
 		},
 		{
+			name: "phoneNumber",
+			label: "Phone Number",
+			type: "tel" as const,
+			colSpan: 12,
+		},
+		{
 			name: "designation",
 			label: "Designation",
 			type: "text" as const,
@@ -255,7 +270,7 @@ const EmployeeTable = () => {
 			colSpan: 12,
 		},
 		{
-			name: "status",
+			name: "statusId",
 			label: "Status",
 			type: "select" as const,
 			options: employeeStatuses,
@@ -370,6 +385,7 @@ const EmployeeTable = () => {
 							formValue={editingEmployee}
 							setFormValue={setEditingEmployee}
 							fields={employeeFormFields}
+							validationModel={employeeValidationSchema}
 						/>
 					)}
 				</Modal.Body>
@@ -399,6 +415,7 @@ const EmployeeTable = () => {
 						formValue={newEmployee}
 						setFormValue={setNewEmployee}
 						fields={employeeFormFields}
+						validationModel={employeeValidationSchema}
 					/>
 				</Modal.Body>
 				<Modal.Footer>
@@ -407,7 +424,7 @@ const EmployeeTable = () => {
 					</Button>
 					<Button
 						onClick={() => {
-							// dispatch(createEmployee(newEmployee));
+							dispatch(createEmployee(newEmployee));
 							setShowAddModal(false);
 							handleRefresh();
 						}}

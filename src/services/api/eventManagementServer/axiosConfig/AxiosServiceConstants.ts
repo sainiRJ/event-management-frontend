@@ -69,7 +69,7 @@ export const apiEndpoints = Object.freeze({
 		addCapabilities: () => {
 			return `/employee/add-capabilities`;
 		},
-		createEmployee: () => "employee",
+		createEmployee: () => "employee/create",
 		getAllEmployees: () => "employee/all",
 		updateEmployee: (id: string) => `employee/update/${id}`,
 		deleteEmployee: (id: string) => `employee/delete/${id}`,
