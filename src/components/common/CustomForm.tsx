@@ -76,25 +76,19 @@ const CustomForm: React.FC<CustomFormProps> = ({
 
 	const renderFormFields = () => {
 		const rows: React.ReactElement[] = [];
-		
+
 		for (let i = 0; i < fields.length; i += 2) {
 			const field1 = fields[i];
 			const field2 = fields[i + 1];
-			
+
 			rows.push(
 				<Row key={i} gutter={16}>
-					<Col xs={field1.colSpan || 12}>
-						{renderField(field1)}
-					</Col>
-					{field2 && (
-						<Col xs={field2.colSpan || 12}>
-							{renderField(field2)}
-						</Col>
-					)}
-				</Row>
+					<Col xs={field1.colSpan || 12}>{renderField(field1)}</Col>
+					{field2 && <Col xs={field2.colSpan || 12}>{renderField(field2)}</Col>}
+				</Row>,
 			);
 		}
-		
+
 		return rows;
 	};
 
@@ -106,9 +100,7 @@ const CustomForm: React.FC<CustomFormProps> = ({
 			formValue={formValue}
 			onChange={setFormValue}
 		>
-			<Grid fluid>
-				{renderFormFields()}
-			</Grid>
+			<Grid fluid>{renderFormFields()}</Grid>
 		</Form>
 	);
 };
