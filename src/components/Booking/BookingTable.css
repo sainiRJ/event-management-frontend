@@ -1,7 +1,7 @@
 .booking-page {
 	padding: 24px;
 	background: var(--rs-bg-default);
-	width: 100%;
+	/* width: 100%; */
 }
 
 .page-header {
