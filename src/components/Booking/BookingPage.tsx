@@ -7,10 +7,11 @@ import {RootState} from "@store/index";
 import BookingTable from "./BookingTable";
 import Modal from "../Modal/Modal";
 import BookingForm from "./BookingForm";
+import BookingFilter from "./BookingFilter";
 import Styles from "./Styles";
 import {useThemeAwareObject} from "../../styles/theme/ThemingHelper";
-import {ButtonToolbar, Button} from "rsuite";
 import "./BookingPage.css";
+
 const BookingPage = () => {
 	const styles = useThemeAwareObject(Styles);
 	const dispatch = useAppDispatch();
@@ -64,15 +65,7 @@ const BookingPage = () => {
 
 	return (
 		<div css={styles.container}>
-			<ButtonToolbar>
-				<Button
-					className="add-new-booking"
-					onClick={() => setIsModalOpen(true)}
-				>
-					Add New Booking
-				</Button>
-			</ButtonToolbar>
-			<BookingTable />
+			<BookingTable onAddNewBooking={() => setIsModalOpen(true)} />
 			<Modal
 				open={isModalOpen}
 				onClose={() => setIsModalOpen(false)}
