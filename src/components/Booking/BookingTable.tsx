@@ -32,6 +32,7 @@ import CustomTable from "../common/CustomTable";
 import CustomForm from "../common/CustomForm";
 import {iCreateBookingDTO} from "../../customTypes/appDataTypes/bookingTypes";
 import {bookingValidationSchema} from "../../validations/BookingValidationSchema";
+import styled from '@emotion/styled';
 
 const formatDate = (dateString: string) => {
 	const date = new Date(dateString);
@@ -119,7 +120,46 @@ const EditableCell = ({rowData, dataKey, onChange, ...props}: any) => {
 	return <span>{value}</span>;
 };
 
-const BookingTable = () => {
+interface BookingTableProps {
+	onAddNewBooking: () => void;
+}
+
+const FilterSection = styled.div`
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 16px 24px;
+	background-color: #f7f7fa;
+	border-radius: 8px;
+	margin-bottom: 20px;
+`;
+
+const FilterControls = styled.div`
+	display: flex;
+	gap: 12px;
+	align-items: center;
+`;
+
+const StyledButton = styled(Button)`
+	background-color: #3498ff;
+	color: white;
+	padding: 8px 16px;
+	border-radius: 6px;
+	font-weight: 500;
+	transition: all 0.2s ease;
+	
+	&:hover {
+		background-color: #2589f5;
+		transform: translateY(-1px);
+		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+	}
+
+	&:active {
+		transform: translateY(0);
+	}
+`;
+
+const BookingTable: React.FC<BookingTableProps> = ({onAddNewBooking}) => {
 	const [loading, setLoading] = useState(true);
 	const [data, setData] = useState<any[]>([]);
 	const [filteredData, setFilteredData] = useState<any[]>([]);
@@ -567,6 +607,12 @@ const BookingTable = () => {
 						<Button appearance="primary" onClick={handleRefresh}>
 							<RefreshIcon /> Refresh
 						</Button>
+						<StyledButton
+							className="add-new-booking"
+							onClick={onAddNewBooking}
+						>
+							+ Add New Booking
+						</StyledButton>
 					</Stack>
 				</Stack>
 			</div>
