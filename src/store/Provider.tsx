@@ -16,9 +16,8 @@ export function ReduxProvider({children}: {children: React.ReactNode}) {
 	 *
 	 * Currently we're using this only in development environment.
 	 */
-	if (AppUtil.isDev()) {
-		injectStore(store);
-	}
+	// Always inject the store to ensure axios interceptors work in all environments
+	injectStore(store);
 
 	return <Provider store={store}>{children}</Provider>;
 }

@@ -4,6 +4,7 @@ import bookingReducer from "./booking/BookingSlice";
 import serviceReducer from "./services/ServicesSlice";
 import statusReducer from "./status/StatusSlice";
 import financeReducer from "./finance/FinanceSlice";
+import authReducer from "./auth/authSlice";
 
 export const rootReducer = combineReducers({
 	employeeReducer,
@@ -11,6 +12,7 @@ export const rootReducer = combineReducers({
 	serviceReducer,
 	statusReducer,
 	financeReducer,
+	authReducer,
 });
 export type RootState = ReturnType<typeof rootReducer>;
 
