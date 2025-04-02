@@ -1,5 +1,5 @@
 import React from "react";
-import {Form, SelectPicker} from "rsuite";
+import {Form, SelectPicker, PickerHandle} from "rsuite";
 
 interface SelectFieldProps {
 	name: string;
@@ -7,7 +7,20 @@ interface SelectFieldProps {
 	data: {label: string; value: string}[];
 	value: any;
 	onChange: (value: any) => void;
+	error?: string;
+	placeholder?: string;
 }
+
+interface CustomSelectProps extends React.ComponentProps<typeof SelectPicker> {
+	error?: string;
+}
+
+const CustomSelect = React.forwardRef<PickerHandle, CustomSelectProps>((props, ref) => {
+	const { error, ...rest } = props;
+	return <SelectPicker ref={ref} {...rest} />;
+});
+
+CustomSelect.displayName = "CustomSelect";
 
 const SelectField: React.FC<SelectFieldProps> = ({
 	name,
@@ -15,15 +28,19 @@ const SelectField: React.FC<SelectFieldProps> = ({
 	data,
 	value,
 	onChange,
+	error,
+	placeholder = "Select an option",
 }) => {
 	return (
 		<Form.Group controlId={name}>
 			<Form.ControlLabel>{label}</Form.ControlLabel>
-			<SelectPicker
-				data={data}
+			<Form.Control
 				name={name}
+				errorMessage={error}
+				accepter={CustomSelect}
+				data={data}
 				block
-				placeholder="Select an option"
+				placeholder={placeholder}
 				value={value}
 				onChange={onChange}
 			/>
