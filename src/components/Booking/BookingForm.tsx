@@ -1,5 +1,5 @@
-import React from "react";
-import {Form, Grid, Row, Col} from "rsuite";
+import React, { useState, useEffect } from "react";
+import {Form, Grid, Row, Col, Schema} from "rsuite";
 import InputField from "../common/InputField";
 import SelectField from "../common/Select";
 import DatePickerField from "../common/DatePicker";
@@ -13,7 +13,31 @@ interface BookingFormProps {
 	decorationThemes: {label: string; value: string}[];
 	bookingStatuses: {label: string; value: string}[];
 	paymentStatuses: {label: string; value: string}[];
+	onSubmit: () => void;
+	showValidation: boolean;
 }
+
+interface FormErrors {
+	customerName?: string;
+	phoneNumber?: string;
+	eventName?: string;
+	eventDate?: string;
+	venueAddress?: string;
+	decorationTheme?: string;
+	budget?: string;
+	advancePayment?: string;
+	bookingStatusId?: string;
+	paymentStatusId?: string;
+	additionalNotes?: string;
+	serviceId?: string;
+}
+
+type SchemaCheckResult = {
+	[key in keyof FormErrors]: {
+		hasError: boolean;
+		errorMessage?: string;
+	};
+};
 
 const BookingForm: React.FC<BookingFormProps> = ({
 	formValue,
@@ -22,7 +46,48 @@ const BookingForm: React.FC<BookingFormProps> = ({
 	decorationThemes,
 	bookingStatuses,
 	paymentStatuses,
+	onSubmit,
+	showValidation,
 }) => {
+	const [formErrors, setFormErrors] = useState<FormErrors>({});
+
+	const validateForm = () => {
+		// Convert Date object to string for validation
+		const validationValue = {
+			...formValue,
+			eventDate: formValue.eventDate ? new Date(formValue.eventDate).toISOString() : null,
+			budget: formValue.budget ? Number(formValue.budget) : null,
+			advancePayment: formValue.advancePayment ? Number(formValue.advancePayment) : null,
+		};
+		
+		const checkResult = bookingValidationSchema.check(validationValue) as SchemaCheckResult;
+		const errors: FormErrors = {};
+		
+		(Object.keys(checkResult) as Array<keyof FormErrors>).forEach((key) => {
+			const fieldResult = checkResult[key];
+			if (fieldResult?.hasError && fieldResult?.errorMessage) {
+				errors[key] = fieldResult.errorMessage;
+			}
+		});
+		
+		setFormErrors(errors);
+		return Object.keys(errors).length === 0;
+	};
+
+	const handleSubmit = () => {
+		if (validateForm()) {
+			onSubmit();
+		}
+	};
+
+	useEffect(() => {
+		if (showValidation) {
+			validateForm();
+		}
+	}, [formValue, showValidation]);
+
+	const hasErrors = Object.keys(formErrors).length > 0;
+
 	return (
 		<Form
 			fluid
@@ -30,6 +95,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
 			model={bookingValidationSchema}
 			formValue={formValue}
 			onChange={setFormValue}
+			onSubmit={handleSubmit}
 		>
 			<Grid fluid>
 				<Row gutter={16}>
@@ -38,6 +104,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
 							name="customerName"
 							label="Customer Name"
 							value={formValue.customerName}
+							error={showValidation ? formErrors.customerName : undefined}
 							onChange={(value) =>
 								setFormValue({...formValue, customerName: value})
 							}
@@ -49,6 +116,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
 							label="Phone Number"
 							type="tel"
 							value={formValue.phoneNumber}
+							error={showValidation ? formErrors.phoneNumber : undefined}
 							onChange={(value) =>
 								setFormValue({...formValue, phoneNumber: value})
 							}
@@ -62,6 +130,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
 							name="eventName"
 							label="Event Name"
 							value={formValue.eventName}
+							error={showValidation ? formErrors.eventName : undefined}
 							onChange={(value) =>
 								setFormValue({...formValue, eventName: value})
 							}
@@ -69,10 +138,12 @@ const BookingForm: React.FC<BookingFormProps> = ({
 					</Col>
 					<Col xs={12}>
 						<SelectField
-							name="service"
+							name="serviceId"
 							label="Service"
 							data={serviceList}
 							value={formValue.serviceId}
+							error={showValidation ? formErrors.serviceId : undefined}
+							placeholder="Select a service"
 							onChange={(value) =>
 								setFormValue({...formValue, serviceId: value})
 							}
@@ -85,9 +156,10 @@ const BookingForm: React.FC<BookingFormProps> = ({
 						<DatePickerField
 							name="eventDate"
 							label="Event Date & Time"
-							value={formValue.eventDate}
+							value={formValue.eventDate ? new Date(formValue.eventDate) : null}
+							error={showValidation ? formErrors.eventDate : undefined}
 							onChange={(value) =>
-								setFormValue({...formValue, eventDate: value})
+								setFormValue({...formValue, eventDate: value ? value.toISOString() : null})
 							}
 						/>
 					</Col>
@@ -96,6 +168,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
 							name="venueAddress"
 							label="Venue Address"
 							value={formValue.venueAddress}
+							error={showValidation ? formErrors.venueAddress : undefined}
 							onChange={(value) =>
 								setFormValue({...formValue, venueAddress: value})
 							}
@@ -110,6 +183,8 @@ const BookingForm: React.FC<BookingFormProps> = ({
 							label="Decoration Theme"
 							data={decorationThemes}
 							value={formValue.decorationTheme}
+							error={showValidation ? formErrors.decorationTheme : undefined}
+							placeholder="Select a theme"
 							onChange={(value) =>
 								setFormValue({...formValue, decorationTheme: value})
 							}
@@ -121,6 +196,8 @@ const BookingForm: React.FC<BookingFormProps> = ({
 							label="Budget"
 							type="number"
 							value={formValue.budget}
+							error={showValidation ? formErrors.budget : undefined}
+							placeholder="Enter budget amount"
 							onChange={(value) => setFormValue({...formValue, budget: value})}
 						/>
 					</Col>
@@ -133,6 +210,8 @@ const BookingForm: React.FC<BookingFormProps> = ({
 							label="Advance Payment"
 							type="number"
 							value={formValue.advancePayment}
+							error={showValidation ? formErrors.advancePayment : undefined}
+							placeholder="Enter advance payment amount"
 							onChange={(value) =>
 								setFormValue({...formValue, advancePayment: value})
 							}
@@ -143,10 +222,12 @@ const BookingForm: React.FC<BookingFormProps> = ({
 				<Row gutter={16}>
 					<Col xs={12}>
 						<SelectField
-							name="Booking Status"
+							name="bookingStatusId"
 							label="Booking Status"
 							data={bookingStatuses}
 							value={formValue.bookingStatusId}
+							error={showValidation ? formErrors.bookingStatusId : undefined}
+							placeholder="Select booking status"
 							onChange={(value) =>
 								setFormValue({...formValue, bookingStatusId: value})
 							}
@@ -154,10 +235,12 @@ const BookingForm: React.FC<BookingFormProps> = ({
 					</Col>
 					<Col xs={12}>
 						<SelectField
-							name="Payment Status"
+							name="paymentStatusId"
 							label="Payment Status"
 							data={paymentStatuses}
 							value={formValue.paymentStatusId}
+							error={showValidation ? formErrors.paymentStatusId : undefined}
+							placeholder="Select payment status"
 							onChange={(value) =>
 								setFormValue({...formValue, paymentStatusId: value})
 							}
@@ -171,7 +254,8 @@ const BookingForm: React.FC<BookingFormProps> = ({
 							name="additionalNotes"
 							label="Additional Notes"
 							value={formValue.additionalNotes}
-							onChange={(value) => ({...formValue, additionalNotes: value})}
+							error={showValidation ? formErrors.additionalNotes : undefined}
+							onChange={(value) => setFormValue({...formValue, additionalNotes: value})}
 						/>
 					</Col>
 				</Row>
