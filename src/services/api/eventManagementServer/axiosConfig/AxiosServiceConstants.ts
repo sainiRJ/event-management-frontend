@@ -25,7 +25,7 @@ const API_SERVER_REQUEST_TIMEOUT = config.EVENT_MANAGEMENT_API_SERVER_TIMEOUT;
  */
 export const axiosRequestConfig: AxiosRequestConfig =
 	Object.freeze<AxiosRequestConfig>({
-		// withCredentials: true,
+		withCredentials: true,
 		baseURL: API_SERVER_BASE_URL,
 
 		/**

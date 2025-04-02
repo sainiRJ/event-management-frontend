@@ -74,13 +74,13 @@ function BookingService(apiServer: AxiosInstance) {
 	};
 
 	const deleteBooking = async (ids: string | string[]) => {
-		const endpoint = Array.isArray(ids) 
+		const endpoint = Array.isArray(ids)
 			? apiEndpoints.booking.bulkDelete()
 			: apiEndpoints.booking.deleteBooking(ids as string);
-		
+
 		let result = null;
 		await apiServer
-			.delete(endpoint, Array.isArray(ids) ? { data: { ids } } : undefined)
+			.delete(endpoint, Array.isArray(ids) ? {data: {ids}} : undefined)
 			.then(
 				(value) => {
 					result = NetworkUtil.buildResult<null>(

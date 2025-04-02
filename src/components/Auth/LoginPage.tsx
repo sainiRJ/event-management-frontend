@@ -2,6 +2,7 @@ import React, {useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {GOOGLE_AUTH_URL} from "../../config/oauth";
 import "./Auth.css";
+import Cookies from "js-cookie";
 
 const LoginPage: React.FC = () => {
 	const navigate = useNavigate();
@@ -37,7 +38,8 @@ const LoginPage: React.FC = () => {
 			}
 
 			const data = await response.json();
-			localStorage.setItem("auth_token", data.data.token);
+			localStorage.setItem("access_token", data.data.token.accessToken);
+			Cookies.set("refresh_token", data.data.token.refreshToken, {expires: 7});
 			navigate("/booking");
 		} catch (err: any) {
 			setError(err.message);
