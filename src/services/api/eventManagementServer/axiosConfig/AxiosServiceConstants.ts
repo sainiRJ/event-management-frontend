@@ -60,15 +60,15 @@ export const axiosRequestConfig: AxiosRequestConfig =
 export const apiEndpoints = Object.freeze({
 	auth: {
 		authenticate: "",
+		login: () => {
+			return "auth/login";
+		},
+		signup: () => {
+			return "auth/signup";
+		}
 	},
 
 	employee: {
-		getAllEmployeeDetailsWithRoles: () => {
-			return `/employee/getAllEmployeeDetailsWithRoles`;
-		},
-		addCapabilities: () => {
-			return `/employee/add-capabilities`;
-		},
 		createEmployee: () => "employee/create",
 		getAllEmployees: () => "employee/all",
 		updateEmployee: (id: string) => `employee/update/${id}`,
@@ -76,10 +76,10 @@ export const apiEndpoints = Object.freeze({
 	},
 	booking: {
 		createBooking: () => {
-			return `booking/create`;
+			return "booking/create";
 		},
 		getAllBooking: () => {
-			return `booking/all`;
+			return "booking/all";
 		},
 		deleteBooking: (id: string) => {
 			return `booking/delete/${id}`;
@@ -88,24 +88,24 @@ export const apiEndpoints = Object.freeze({
 			return `booking/update/${id}`;
 		},
 		bulkDelete: () => {
-			return `booking/bulk-delete`;
+			return "booking/bulk-delete";
 		},
 	},
 
 	allStatus: {
 		getAllStatus: () => {
-			return `/status/getAllStatus`;
+			return "/status/getAllStatus";
 		},
 	},
 
 	user: {
 		userProfileDetails: () => {
-			return `/user/me/profile`;
+			return "/user/me/profile";
 		},
 	},
 	service: {
 		getAllServices: () => {
-			return `/service/all`;
+			return "/service/all";
 		},
 	},
 	status: {

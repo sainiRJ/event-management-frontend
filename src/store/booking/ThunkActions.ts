@@ -113,7 +113,7 @@ export const getAllBookings = createAsyncThunk<
 
 export const deleteBooking = createAsyncThunk(
 	"booking/deleteBooking",
-	async (ids: string | string[], { rejectWithValue }) => {
+	async (ids: string | string[], {rejectWithValue}) => {
 		try {
 			const response = await bookingService.deleteBooking(ids);
 			if (!response) {

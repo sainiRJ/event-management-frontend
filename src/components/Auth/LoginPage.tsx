@@ -1,11 +1,15 @@
 import React, {useState} from "react";
+import {useAppDispatch, useAppSelector} from "../../store/Hooks";
 import {useNavigate} from "react-router-dom";
 import {GOOGLE_AUTH_URL} from "../../config/oauth";
+import {login} from "@/store/auth/ThunkActions";
 import "./Auth.css";
 import Cookies from "js-cookie";
+import {Message, toaster} from "rsuite";
 
 const LoginPage: React.FC = () => {
 	const navigate = useNavigate();
+	const dispatch = useAppDispatch();
 	const [formData, setFormData] = useState({
 		emailOrPhone: "",
 		password: "",
@@ -25,24 +29,13 @@ const LoginPage: React.FC = () => {
 		setError("");
 
 		try {
-			const response = await fetch("http://localhost:3080/api/auth/login", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify(formData),
-			});
-
-			if (!response.ok) {
-				throw new Error("Login failed");
-			}
-
-			const data = await response.json();
-			localStorage.setItem("access_token", data.data.token.accessToken);
-			Cookies.set("refresh_token", data.data.token.refreshToken, {expires: 7});
+			const response = await dispatch(login(formData));
+			console.log("response", response);
+			toaster.push(<Message type="success">Login successfully</Message>);
 			navigate("/booking");
 		} catch (err: any) {
 			setError(err.message);
+			toaster.push(<Message type="error">Failed to Login </Message>);
 		}
 	};
 

@@ -13,7 +13,7 @@ const Login: React.FC = () => {
 		(state: RootState) => state.authReducer,
 	);
 	const [formData, setFormData] = useState<iLoginCredentials>({
-		email: "",
+		emailOrPhone: "",
 		password: "",
 	});
 
@@ -51,7 +51,7 @@ const Login: React.FC = () => {
 							type="email"
 							id="email"
 							name="email"
-							value={formData.email}
+							value={formData.emailOrPhone}
 							onChange={handleChange}
 							required
 						/>

@@ -1,6 +1,8 @@
 import React, {useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {GOOGLE_AUTH_URL} from "../../config/oauth";
+import {useAppDispatch, useAppSelector} from "../../store/Hooks";
+import {signup} from "@/store/auth/ThunkActions";
 import "./Auth.css";
 import {Input, InputGroup, Message, Progress} from "rsuite";
 import {
@@ -14,10 +16,11 @@ import {
 
 const SignupPage: React.FC = () => {
 	const navigate = useNavigate();
+	const dispatch = useAppDispatch();
 	const [formData, setFormData] = useState({
 		name: "",
 		email: "",
-		phone: "",
+		phoneNumber: "",
 		password: "",
 		confirmPassword: "",
 	});
@@ -92,7 +95,7 @@ const SignupPage: React.FC = () => {
 		}
 
 		// Phone validation - strictly for Indian numbers
-		const cleanPhone = formData.phone.replace(/\D/g, "");
+		const cleanPhone = formData.phoneNumber.replace(/\D/g, "");
 		// Remove 91 prefix if exists
 		const phoneNumber = cleanPhone.startsWith("91")
 			? cleanPhone.slice(2)
@@ -167,27 +170,10 @@ const SignupPage: React.FC = () => {
 		}
 
 		try {
-			const response = await fetch("http://localhost:3080/api/auth/signup", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					name: formData.name,
-					email: formData.email,
-					phone: formData.phone,
-					password: formData.password,
-				}),
-			});
-
-			const data = await response.json();
-
-			if (!response.ok) {
-				throw new Error(data.message || "Signup failed");
-			}
+			const response = await dispatch(signup(formData))
 
 			setSuccessMessage("Account created successfully! Redirecting...");
-			localStorage.setItem("token", data.token);
+			// localStorage.setItem("token", data.token);
 			setTimeout(() => navigate("/login"), 2000);
 		} catch (err: any) {
 			setErrors({
@@ -263,7 +249,7 @@ const SignupPage: React.FC = () => {
 							</InputGroup.Addon>
 							<Input
 								name="phone"
-								value={formatPhoneDisplay(formData.phone)}
+								value={formatPhoneDisplay(formData.phoneNumber)}
 								onChange={(value) => handleInputChange("phone", value)}
 								placeholder="Mobile Number (10 digits)"
 								disabled={loading}

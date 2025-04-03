@@ -1,6 +1,6 @@
 import {createSlice} from "@reduxjs/toolkit";
 import {apiResponseStatuses} from "@/customTypes/NetworkTypes";
-import {handleGoogleCallback, login} from "./ThunkActions";
+import {handleGoogleCallback, login, signup} from "./ThunkActions";
 import {iAuthState, REDUCER_NAME, iAuthResponse} from "./Types";
 import Cookies from "js-cookie";
 
@@ -45,6 +45,20 @@ export const authSlice = createSlice({
 				state.message = "Failed to login";
 				state.isLoading = false;
 				state.responseStatus = apiResponseStatuses.ERROR;
+			})
+			// Signup cases
+			.addCase(signup.pending, (state) => {
+				state.isLoading = true;
+			})
+			.addCase(signup.fulfilled, (state, action) => {
+				state.isLoading = false;
+				state.responseStatus = apiResponseStatuses.SUCCESS;
+				state.message = action.payload?.data?.message || "Signup successful";
+			})
+			.addCase(signup.rejected, (state, action) => {
+				state.isLoading = false;
+				state.responseStatus = apiResponseStatuses.ERROR;
+				state.message = action.payload?.message || "Signup failed";
 			})
 			// Google callback cases
 			.addCase(handleGoogleCallback.pending, (state) => {
