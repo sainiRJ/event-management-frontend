@@ -1,7 +1,13 @@
 import {AxiosError, AxiosInstance, AxiosResponse} from "axios";
 import {httpStatusCodes} from "../../../../customTypes/NetworkTypes";
-import { isAccessTokenExpired, isRefreshTokenExpired, refreshAccessToken, clearTokens, getAccessToken } from "../../../../utils/tokenUtils";
-import { useNavigate } from "react-router-dom";
+import {
+	isAccessTokenExpired,
+	isRefreshTokenExpired,
+	refreshAccessToken,
+	clearTokens,
+	getAccessToken,
+} from "../../../../utils/tokenUtils";
+import {useNavigate} from "react-router-dom";
 
 /**
  * NOTE: Currently we're not using redux in this project.
@@ -35,9 +41,7 @@ function BIToolServerAxiosResponseInterceptors(
 		originally failed request with the newly issued authorization token.
 	 */
 	const responseAuthTokenExpireInterceptor = {
-		onFulfilled: async (
-			response: AxiosResponse,
-		): Promise<AxiosResponse> => {
+		onFulfilled: async (response: AxiosResponse): Promise<AxiosResponse> => {
 			return response;
 		},
 
@@ -49,15 +53,17 @@ function BIToolServerAxiosResponseInterceptors(
 			}
 
 			// Check if the error is due to unauthorized access
-			if (reason.response?.status === httpStatusCodes.CLIENT_ERROR_UNAUTHORIZED) {
+			if (
+				reason.response?.status === httpStatusCodes.CLIENT_ERROR_UNAUTHORIZED
+			) {
 				const accessToken = getAccessToken();
-				
+
 				if (accessToken && isAccessTokenExpired(accessToken)) {
 					// Check if refresh token is expired
 					if (isRefreshTokenExpired()) {
 						// If refresh token is expired, clear tokens and redirect to login
 						clearTokens();
-						window.location.href = '/login';
+						window.location.href = "/login";
 						return Promise.reject(reason);
 					}
 
@@ -71,10 +77,10 @@ function BIToolServerAxiosResponseInterceptors(
 							return apiServer(originalRequest);
 						}
 					} catch (error) {
-						console.error('Error refreshing token:', error);
+						console.error("Error refreshing token:", error);
 						// If refresh fails, redirect to login
 						clearTokens();
-						window.location.href = '/login';
+						window.location.href = "/login";
 					}
 				}
 			}

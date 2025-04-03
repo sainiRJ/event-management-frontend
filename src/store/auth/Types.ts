@@ -42,6 +42,6 @@ export interface iGoogleUserData {
 }
 
 export interface iLoginCredentials {
-    email: string;
+    emailOrPhone: string;
     password: string;
 } 

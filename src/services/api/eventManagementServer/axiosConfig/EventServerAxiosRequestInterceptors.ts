@@ -3,7 +3,7 @@ import {AxiosInstance} from "axios";
 import AppUtil from "../../../../utils/AppUtil";
 
 import type {AxiosRequestHeaders, InternalAxiosRequestConfig} from "axios";
-import { getAccessToken } from "../../../../utils/tokenUtils";
+import {getAccessToken} from "../../../../utils/tokenUtils";
 /**
  * NOTE: Currently we're not using redux in this project.
  * The type of this will be changed to the proper
@@ -35,9 +35,6 @@ function BIToolServerAxiosRequestInterceptors(
 		config: InternalAxiosRequestConfig,
 	): InternalAxiosRequestConfig {
 		const accessToken = getAccessToken();
-		console.log('Request URL:', config.url);
-		console.log('Access Token:', accessToken);
-		
 		if (accessToken) {
 			const updatedConfig = {
 				...config,
@@ -46,10 +43,8 @@ function BIToolServerAxiosRequestInterceptors(
 					Authorization: `Bearer ${accessToken}`,
 				} as AxiosRequestHeaders,
 			};
-			console.log('Request Headers:', updatedConfig.headers);
 			return updatedConfig;
 		}
-		console.log('No access token found');
 		return config;
 	}
 

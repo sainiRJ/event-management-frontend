@@ -20,10 +20,10 @@ function BookingService(apiServer: AxiosInstance) {
 				//on fullfilled
 				(value) => {
 					result = NetworkUtil.buildResult<null>(
-						null,
+						value.data,
 						value.status,
 						null,
-						value.data,
+						null,
 					);
 				},
 				// onRejected
@@ -84,10 +84,10 @@ function BookingService(apiServer: AxiosInstance) {
 			.then(
 				(value) => {
 					result = NetworkUtil.buildResult<null>(
-						null,
+						value.data,
 						value.status,
 						null,
-						value.data,
+						null,
 					);
 				},
 				(reason) => {
