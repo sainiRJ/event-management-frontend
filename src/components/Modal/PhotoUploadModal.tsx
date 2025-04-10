@@ -64,10 +64,13 @@ const PhotoUploadModal: React.FC<PhotoUploadModalProps> = ({open, onClose}) => {
 
 		try {
 			// TODO: Replace with actual API endpoint
-			const response = await fetch("/api/photo/upload", {
-				method: "POST",
-				body: formData,
-			});
+			const response = await fetch(
+				`${process.env.REACT_APP_EVENT_MANAGEMENT_BACKEND_BASEURL}/photo/upload`,
+				{
+					method: "POST",
+					body: formData,
+				},
+			);
 
 			if (response.ok) {
 				toaster.push(
