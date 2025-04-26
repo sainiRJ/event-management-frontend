@@ -6,7 +6,7 @@ import NetworkUtil from "@/utils/NetworkUtil";
 import {NullableString} from "@/customTypes/CommonTypes";
 import {apiEndpoints} from "./axiosConfig/AxiosServiceConstants";
 
-import {iCreateBookingDTO} from "@/customTypes/appDataTypes/bookingTypes";
+import {iCreateBookingDTO, iBookingRequest} from "@/customTypes/appDataTypes/bookingTypes";
 
 function BookingService(apiServer: AxiosInstance) {
 	const createBooking = async (
@@ -133,11 +133,44 @@ function BookingService(apiServer: AxiosInstance) {
 		return result;
 	};
 
+	const getBookingRequest = async (): Promise<APIResponse<
+	iBookingRequest[]
+> | null> => {
+	let result = null;
+
+	await apiServer
+		.get(apiEndpoints.booking.bookingRequest())
+		.then(
+			//on fullfilled
+			(value) => {
+				result = NetworkUtil.buildResult<iBookingRequest[]>(
+					value.data,
+					value.status,
+					null,
+					null,
+				);
+			},
+			// onRejected
+			(reason) => {
+				const {response} = reason;
+				const {status, data} = response;
+
+				result = NetworkUtil.buildResult<null>(data, status, data, null);
+			},
+		)
+		.catch((error) => {
+			throw error;
+		});
+
+	return result;
+};
+
 	return {
 		createBooking,
 		getAllBookings,
 		deleteBooking,
 		updateBooking,
+		getBookingRequest,
 	};
 }
 
