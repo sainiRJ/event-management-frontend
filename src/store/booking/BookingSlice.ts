@@ -1,5 +1,4 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
-import {WritableDraft} from "immer/dist/internal.js";
 import Decimal from "decimal.js";
 
 import {apiResponseStatuses} from "@/customTypes/NetworkTypes";
@@ -8,7 +7,7 @@ import {
 	NullableString,
 	StringArray,
 } from "@/customTypes/CommonTypes";
-import {createBooking, getAllBookings} from "./ThunkActions";
+import {createBooking, getAllBookings, getBookingRequest} from "./ThunkActions";
 import {iBookingState, REDUCER_NAME} from "./Types";
 
 // Define initial state based on the provided structure
@@ -19,6 +18,7 @@ const initialState: iBookingState = {
 	booking: null,
 	message: null,
 	bookingList: [],
+	bookingRequest: [],
 };
 export const bookingSlice = createSlice({
 	name: REDUCER_NAME,
@@ -61,7 +61,23 @@ export const bookingSlice = createSlice({
 				state.message = "Failed to fetch order data";
 				state.isLoading = false;
 				state.responseStatus = apiResponseStatuses.ERROR;
-			});
+			})
+			.addCase(getBookingRequest.pending, (state) => {
+				state.isLoading = true;
+			})
+			.addCase(getBookingRequest.fulfilled, (state, action) => {
+				const payload = action.payload;
+				if (payload && payload.data) {
+					state.bookingRequest = payload.data;
+					state.isLoading = false;
+					state.responseStatus = apiResponseStatuses.SUCCESS;
+				}
+			})
+			.addCase(getBookingRequest.rejected, (state, action) => {
+				state.message = "Failed to fetch order data";
+				state.isLoading = false;
+				state.responseStatus = apiResponseStatuses.ERROR;
+			})
 	},
 });
 

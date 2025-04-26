@@ -90,6 +90,9 @@ export const apiEndpoints = Object.freeze({
 		bulkDelete: () => {
 			return "booking/bulk-delete";
 		},
+		bookingRequest: () => {
+			return "booking/request"
+		}
 	},
 
 	allStatus: {
