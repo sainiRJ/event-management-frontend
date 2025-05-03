@@ -1,0 +1,155 @@
+.custom-navbar {
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	padding: 0.8rem 2rem;
+	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 1000;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.brand-logo {
+	color: white;
+	font-size: 1.5rem;
+	font-weight: 600;
+	text-decoration: none;
+	margin-right: auto;
+}
+
+.desktop-nav {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	margin-left: auto;
+}
+
+.profile-dropdown {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	color: white;
+}
+
+.mobile-menu-button {
+	display: none !important;
+	color: white !important;
+	background: transparent !important;
+	border: none !important;
+	padding: 8px !important;
+}
+
+.mobile-menu-button:hover {
+	background: rgba(255, 255, 255, 0.1) !important;
+}
+
+@media (max-width: 768px) {
+	.custom-navbar {
+		padding: 0.8rem 1rem;
+	}
+
+	.desktop-nav {
+		display: none;
+	}
+
+	.mobile-menu-button {
+		display: block !important;
+	}
+
+	.brand-logo {
+		font-size: 1.2rem;
+		margin-right: 0;
+	}
+}
+
+/* Customize dropdown menu */
+.rs-dropdown-menu {
+	border-radius: 8px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.rs-dropdown-item {
+	padding: 0.8rem 1.2rem;
+	transition: background-color 0.2s ease;
+}
+
+.rs-dropdown-item:hover {
+	background-color: #f5f5f5;
+}
+
+/* Customize drawer */
+.mobile-drawer {
+	z-index: 1100;
+}
+
+.mobile-drawer .rs-drawer {
+	background-color: #f8f9fa;
+	width: 250px !important;
+}
+
+.mobile-drawer .rs-drawer-header {
+	border-bottom: 1px solid #e9ecef;
+	padding: 1rem;
+	background-color: #764ba2;
+	color: white;
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+}
+
+.mobile-drawer .close-button {
+	color: white !important;
+	background: transparent !important;
+	border: none !important;
+	padding: 8px !important;
+}
+
+.mobile-drawer .close-button:hover {
+	background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.mobile-drawer .rs-drawer-body {
+	padding: 1rem;
+}
+
+.mobile-drawer .rs-nav-item {
+	padding: 0.8rem 1.2rem;
+	border-radius: 6px;
+	margin-bottom: 0.5rem;
+	transition: all 0.2s ease;
+	color: #333;
+	display: flex;
+	align-items: center;
+	cursor: pointer;
+}
+
+.mobile-drawer .rs-nav-item:hover {
+	background-color: #f0f2f5;
+	color: #764ba2;
+}
+
+.mobile-drawer .rs-nav-item .rs-icon {
+	margin-right: 10px;
+	font-size: 1.2rem;
+	width: 20px;
+	height: 20px;
+}
+
+.mobile-drawer .rs-nav-divider {
+	margin: 0.5rem 0;
+	border-color: #e9ecef;
+}
+
+/* Active state for navigation items */
+.mobile-drawer .rs-nav-item.rs-nav-item-active {
+	background-color: #764ba2;
+	color: white;
+}
+
+.mobile-drawer .rs-nav-item.rs-nav-item-active:hover {
+	background-color: #764ba2;
+	color: white;
+}
