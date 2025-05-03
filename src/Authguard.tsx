@@ -7,7 +7,7 @@ interface AuthGuardProps {
 }
 
 const AuthGuard: React.FC<AuthGuardProps> = ({children, requireAuth}) => {
-	const token = localStorage.getItem("auth_token");
+	const token = localStorage.getItem("access_token");
 
 	if (requireAuth && !token) return <Navigate to="/login" replace />;
 	if (!requireAuth && token) return <Navigate to="/dashboard" replace />;

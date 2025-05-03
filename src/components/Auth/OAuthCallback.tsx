@@ -5,10 +5,13 @@ import {
 	GOOGLE_CLIENT_ID,
 	OAUTH_REDIRECT_URI,
 } from "../../config/oauth";
+import {handleGoogleCallback} from "../../store/auth/ThunkActions";
+import {useAppDispatch} from "../../store/Hooks";
 
 const OAuthCallback: React.FC = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
+	const dispatch = useAppDispatch();
 	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
@@ -42,8 +45,6 @@ const OAuthCallback: React.FC = () => {
 					},
 				);
 
-
-				// Fetch user info from Google
 				const tokenData: any = await tokenResponse.json();
 				const userInfoResponse = await fetch(
 					"https://www.googleapis.com/oauth2/v2/userinfo",
@@ -53,24 +54,7 @@ const OAuthCallback: React.FC = () => {
 				);
 
 				const userData = await userInfoResponse.json();
-
-				const response = await fetch(
-					"http://localhost:3080/api/auth/google/callback",
-					{
-						method: "POST",
-						headers: {
-							"Content-Type": "application/json",
-						},
-						body: JSON.stringify(userData),
-					},
-				);
-
-				if (!response.ok) {
-					throw new Error("Failed to authenticate");
-				}
-
-				const data = await response.json();
-				localStorage.setItem("auth_token", data.data.token);
+				await dispatch(handleGoogleCallback(userData));
 				navigate("/booking");
 			} catch (err: any) {
 				setError(err.message);
@@ -78,7 +62,7 @@ const OAuthCallback: React.FC = () => {
 		};
 
 		handleCallback();
-	}, [location, navigate]);
+	}, [location, navigate, dispatch]);
 
 	if (error) {
 		return (
