@@ -1,0 +1,4 @@
+#!/bin/sh
+#!/bin/sh
+. "$(pwd)/.husky/_/husky.sh"
+npm run lint

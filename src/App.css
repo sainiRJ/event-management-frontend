@@ -1,0 +1,78 @@
+.app {
+    min-height: 100vh;
+    background-color: #f8f9fa;
+}
+
+.main-content {
+    position: relative;
+    margin-top: 60px; /* Account for fixed header */
+    min-height: calc(100vh - 60px);
+    display: flex;
+}
+
+.content-wrapper {
+    flex: 1;
+    padding: 2rem;
+    transition: margin-right 0.3s ease;
+    margin-right: 50px;
+}
+
+.side-nav-toggle {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    z-index: 9000;
+    background-color: white;
+    padding: 0.5rem;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: right 0.3s ease;
+}
+
+.side-nav-toggle:hover {
+    background-color: #f0f2f5;
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+    .content-wrapper {
+        padding: 1rem;
+        margin-right: 0;
+        width: 100%;
+    }
+
+    .mobile-content {
+        padding: 1rem;
+        margin: 0;
+    }
+
+    .side-nav-toggle {
+        display: none;
+    }
+}
+
+/* Add smooth transitions for all interactive elements */
+* {
+    transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+/* Improve scrollbar appearance */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+} 

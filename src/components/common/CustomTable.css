@@ -1,0 +1,41 @@
+.loading-placeholder {
+  padding: 20px;
+}
+
+.no-data-message {
+  text-align: center;
+  color: #999;
+  padding: 20px;
+  font-style: italic;
+}
+
+.table-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.action-button {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #1677ff;
+  font-size: 14px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.action-button:hover {
+  background-color: #f5f5f5;
+}
+
+.action-button svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Inherit any additional styles from the parent table if needed */ 
