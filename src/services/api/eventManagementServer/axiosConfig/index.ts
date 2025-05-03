@@ -1,18 +1,8 @@
 import axios from "axios";
-
-/**
- * NOTE: Currently we're not using redux in this project.
- * The type of this will be changed to the proper
- * redux store type once we start using redux.
- */
-// import type {StoreType} from "@store/index";
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type StoreType = any;
-
+import type {StoreType} from "@store/index";
 import AxiosResponseInterceptors from "../../commonInterceptors/AxiosResponseInterceptors";
 import EventServerAxiosResponseInterceptors from "./EventServerAxiosResponseInterceptors";
 import EventServerAxiosRequestInterceptors from "./EventServerAxiosRequestInterceptors";
-
 import {axiosRequestConfig} from "./AxiosServiceConstants";
 
 /**
@@ -34,6 +24,8 @@ const apiServer = axios.create(axiosRequestConfig);
  * @param store
  */
 export const injectStore = (store: StoreType): void => {
+	console.log('Injecting store into axios instance');
+	
 	// registering common axios response interceptors
 	AxiosResponseInterceptors(store, apiServer);
 
@@ -42,6 +34,9 @@ export const injectStore = (store: StoreType): void => {
 
 	// registering axios response interceptors specific to EventServer
 	EventServerAxiosResponseInterceptors(store, apiServer);
+
+	// Log that interceptors have been registered
+	console.log('Axios interceptors have been registered');
 };
 
 export {apiServer};

@@ -3,6 +3,7 @@ import {AxiosInstance} from "axios";
 import AppUtil from "../../../../utils/AppUtil";
 
 import type {AxiosRequestHeaders, InternalAxiosRequestConfig} from "axios";
+import {getAccessToken} from "../../../../utils/tokenUtils";
 /**
  * NOTE: Currently we're not using redux in this project.
  * The type of this will be changed to the proper
@@ -33,18 +34,17 @@ function BIToolServerAxiosRequestInterceptors(
 	function requestAuthorizationInterceptor(
 		config: InternalAxiosRequestConfig,
 	): InternalAxiosRequestConfig {
-		if (store) {
-			// setting authorization header
-			return {
+		const accessToken = getAccessToken();
+		if (accessToken) {
+			const updatedConfig = {
 				...config,
 				headers: {
 					...config.headers,
-					// TODO: add authorization header
-					Authorization: "",
+					Authorization: `Bearer ${accessToken}`,
 				} as AxiosRequestHeaders,
 			};
+			return updatedConfig;
 		}
-
 		return config;
 	}
 

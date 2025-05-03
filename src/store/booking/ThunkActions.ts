@@ -8,7 +8,7 @@ import {httpStatusCodes} from "@/customTypes/NetworkTypes";
 import {iStateMessage} from "@/customTypes/GenericReduxTypes";
 import {iGenericResponse} from "@/customTypes/CommonServiceTypes";
 
-import {iCreateBookingDTO} from "@/customTypes/appDataTypes/bookingTypes";
+import {iCreateBookingDTO, iBookingRequest} from "@/customTypes/appDataTypes/bookingTypes";
 import {bookingService} from "@/services/api/eventManagementServer";
 
 import {REDUCER_NAME} from "./Types";
@@ -111,9 +111,57 @@ export const getAllBookings = createAsyncThunk<
 	}
 });
 
+export const getBookingRequest = createAsyncThunk<
+	iGenericResponse<iBookingRequest[] | null> | null,
+	void,
+	{
+		rejectValue: iStateMessage;
+	}
+>(curriedGetThunkName("getBookingRequest"), async (arg, {rejectWithValue}) => {
+	try {
+		const response = await bookingService.getBookingRequest();
+
+		if (response) {
+			const {httpStatusCode, data, message} = response;
+			switch (httpStatusCode) {
+				case httpStatusCodes.SUCCESS_OK: {
+					if (data && data.data) {
+						const payload = {
+							...data,
+							data: data.data,
+						};
+
+						return payload;
+					} else {
+						return rejectWithValue({
+							httpStatusCode,
+							message,
+						});
+					}
+				}
+
+				default: {
+					return rejectWithValue({
+						httpStatusCode,
+						message,
+					});
+				}
+			}
+		} else {
+			return rejectWithValue({
+				message: "No response received",
+			});
+		}
+	} catch (error) {
+		return rejectWithValue({
+			message: "Something went wrong",
+		});
+	}
+});
+
 export const deleteBooking = createAsyncThunk(
 	"booking/deleteBooking",
-	async (ids: string | string[], { rejectWithValue }) => {
+	async (ids: string | string[], {rejectWithValue}) => {
 		try {
 			const response = await bookingService.deleteBooking(ids);
 			if (!response) {

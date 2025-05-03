@@ -11,6 +11,7 @@ import {
 	Input,
 	SelectPicker,
 } from "rsuite";
+import "./EmployeeTable.css";
 import {
 	getAllEmployees,
 	deleteEmployee,

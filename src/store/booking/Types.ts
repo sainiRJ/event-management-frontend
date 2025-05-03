@@ -24,6 +24,22 @@ export interface iBooking {
 	bookingStatus?: string;
 }
 
+export interface iBookingRequest {
+	id: string;
+	customerName: string;
+	phoneNumber: string;
+	email?: string;
+	eventDate: string;
+	location: string;
+	bookingRquestAt: string;
+	status: string;
+	serviceName: string;
+	serviceId: string;
+	statusId: string;
+	statusName: string;
+	notes: string;
+}
+
 export interface iBookingState {
 	isLoading: boolean;
 
@@ -36,4 +52,6 @@ export interface iBookingState {
 	booking: iBooking | null;
 
 	bookingList: iBooking[];
+
+	bookingRequest: iBookingRequest[]
 }

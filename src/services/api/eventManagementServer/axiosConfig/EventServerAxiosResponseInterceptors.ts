@@ -1,4 +1,13 @@
 import {AxiosError, AxiosInstance, AxiosResponse} from "axios";
+import {httpStatusCodes} from "../../../../customTypes/NetworkTypes";
+import {
+	isAccessTokenExpired,
+	isRefreshTokenExpired,
+	refreshAccessToken,
+	clearTokens,
+	getAccessToken,
+} from "../../../../utils/tokenUtils";
+import {useNavigate} from "react-router-dom";
 
 /**
  * NOTE: Currently we're not using redux in this project.
@@ -8,8 +17,6 @@ import {AxiosError, AxiosInstance, AxiosResponse} from "axios";
 // import type {StoreType} from "@store/index";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type StoreType = any;
-
-import {httpStatusCodes} from "../../../../customTypes/NetworkTypes";
 
 /**
  * Mapping all the responseInterceptors defined as closures inside this function
@@ -34,41 +41,51 @@ function BIToolServerAxiosResponseInterceptors(
 		originally failed request with the newly issued authorization token.
 	 */
 	const responseAuthTokenExpireInterceptor = {
-		onFulfilled: async (
-			response: AxiosResponse,
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		): Promise<AxiosResponse<any, any>> => {
+		onFulfilled: async (response: AxiosResponse): Promise<AxiosResponse> => {
 			return response;
 		},
 
 		onRejected: async (reason: AxiosError): Promise<unknown> => {
-			if (store && reason && reason.response) {
-				const {status: errorHttpStatus} = reason.response;
+			const originalRequest = reason.config;
 
-				/*
-					Returns any error that is not a type of httpStatusCodes.CLIENT_ERROR_UNAUTHORIZED
-				*/
-				if (errorHttpStatus !== httpStatusCodes.CLIENT_ERROR_UNAUTHORIZED) {
-					return new Promise((resolve, reject) => {
-						reject(reason);
-					});
-				}
-
-				/*
-					Renewing the expired authorization token with the refresh token
-					and attempting to retry the originally failed request.
-				*/
-
-				// TODO: add implementation for renewal
-				// const originalRequestConfig = reason.config;
-				// // retrying the originally failed request
-				// return apiServer(originalRequestConfig);
-				// }
+			if (!originalRequest) {
+				return Promise.reject(reason);
 			}
 
-			return new Promise((resolve, reject) => {
-				reject(reason);
-			});
+			// Check if the error is due to unauthorized access
+			if (
+				reason.response?.status === httpStatusCodes.CLIENT_ERROR_UNAUTHORIZED
+			) {
+				const accessToken = getAccessToken();
+
+				if (accessToken && isAccessTokenExpired(accessToken)) {
+					// Check if refresh token is expired
+					if (isRefreshTokenExpired()) {
+						// If refresh token is expired, clear tokens and redirect to login
+						clearTokens();
+						window.location.href = "/login";
+						return Promise.reject(reason);
+					}
+
+					try {
+						// Try to refresh the access token
+						const newAccessToken = await refreshAccessToken();
+						if (newAccessToken) {
+							// Update the original request with the new token
+							originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+							// Retry the original request
+							return apiServer(originalRequest);
+						}
+					} catch (error) {
+						console.error("Error refreshing token:", error);
+						// If refresh fails, redirect to login
+						clearTokens();
+						window.location.href = "/login";
+					}
+				}
+			}
+
+			return Promise.reject(reason);
 		},
 	};
 

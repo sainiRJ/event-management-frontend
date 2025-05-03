@@ -6,7 +6,7 @@ import NetworkUtil from "@/utils/NetworkUtil";
 import {NullableString} from "@/customTypes/CommonTypes";
 import {apiEndpoints} from "./axiosConfig/AxiosServiceConstants";
 
-import {iCreateBookingDTO} from "@/customTypes/appDataTypes/bookingTypes";
+import {iCreateBookingDTO, iBookingRequest} from "@/customTypes/appDataTypes/bookingTypes";
 
 function BookingService(apiServer: AxiosInstance) {
 	const createBooking = async (
@@ -20,10 +20,10 @@ function BookingService(apiServer: AxiosInstance) {
 				//on fullfilled
 				(value) => {
 					result = NetworkUtil.buildResult<null>(
-						null,
+						value.data,
 						value.status,
 						null,
-						value.data,
+						null,
 					);
 				},
 				// onRejected
@@ -74,20 +74,20 @@ function BookingService(apiServer: AxiosInstance) {
 	};
 
 	const deleteBooking = async (ids: string | string[]) => {
-		const endpoint = Array.isArray(ids) 
+		const endpoint = Array.isArray(ids)
 			? apiEndpoints.booking.bulkDelete()
 			: apiEndpoints.booking.deleteBooking(ids as string);
-		
+
 		let result = null;
 		await apiServer
-			.delete(endpoint, Array.isArray(ids) ? { data: { ids } } : undefined)
+			.delete(endpoint, Array.isArray(ids) ? {data: {ids}} : undefined)
 			.then(
 				(value) => {
 					result = NetworkUtil.buildResult<null>(
-						null,
+						value.data,
 						value.status,
 						null,
-						value.data,
+						null,
 					);
 				},
 				(reason) => {
@@ -133,11 +133,44 @@ function BookingService(apiServer: AxiosInstance) {
 		return result;
 	};
 
+	const getBookingRequest = async (): Promise<APIResponse<
+	iBookingRequest[]
+> | null> => {
+	let result = null;
+
+	await apiServer
+		.get(apiEndpoints.booking.bookingRequest())
+		.then(
+			//on fullfilled
+			(value) => {
+				result = NetworkUtil.buildResult<iBookingRequest[]>(
+					value.data,
+					value.status,
+					null,
+					null,
+				);
+			},
+			// onRejected
+			(reason) => {
+				const {response} = reason;
+				const {status, data} = response;
+
+				result = NetworkUtil.buildResult<null>(data, status, data, null);
+			},
+		)
+		.catch((error) => {
+			throw error;
+		});
+
+	return result;
+};
+
 	return {
 		createBooking,
 		getAllBookings,
 		deleteBooking,
 		updateBooking,
+		getBookingRequest,
 	};
 }
 

@@ -1,17 +1,22 @@
-import React, {useEffect} from "react";
-import {Grid, Row, Col} from "rsuite";
+import React, {useEffect, useState} from "react";
+import {Grid, Row, Col, Button, IconButton} from "rsuite";
+import CameraRetroIcon from "@rsuite/icons/legacy/CameraRetro";
 import {useAppDispatch, useAppSelector} from "../../store/Hooks";
 import {getAllBookings} from "@/store/booking/ThunkActions";
+import {fetchServices} from "@/store/services/ThunkActions";
 import WeatherCard from "./WeatherCard";
 import BookingStats from "./BookingStats";
+import PhotoUploadModal from "../Modal/PhotoUploadModal";
 import "./DashboardPage.css";
 
 const DashboardPage: React.FC = () => {
 	const dispatch = useAppDispatch();
 	const {bookingList} = useAppSelector((state) => state.bookingReducer);
+	const [showPhotoUpload, setShowPhotoUpload] = useState(false);
 
 	useEffect(() => {
 		dispatch(getAllBookings());
+		dispatch(fetchServices());
 	}, [dispatch]);
 
 	// Calculate booking statistics
@@ -54,11 +59,33 @@ const DashboardPage: React.FC = () => {
 
 	return (
 		<div className="dashboard-container">
+			<PhotoUploadModal
+				open={showPhotoUpload}
+				onClose={() => setShowPhotoUpload(false)}
+			/>
 			<div className="dashboard-header">
-				<h1>Dashboard</h1>
-				<p className="welcome-text">
-					{"Welcome back! Here's your event overview"}
-				</p>
+				<div
+					style={{
+						display: "flex",
+						justifyContent: "space-between",
+						alignItems: "center",
+						width: "100%",
+					}}
+				>
+					<div>
+						<h1>Dashboard</h1>
+						<p className="welcome-text">
+							{"Welcome back! Here's your event overview"}
+						</p>
+					</div>
+					<IconButton
+						icon={<CameraRetroIcon />}
+						appearance="primary"
+						onClick={() => setShowPhotoUpload(true)}
+					>
+						Upload Photo
+					</IconButton>
+				</div>
 			</div>
 
 			<Grid fluid>

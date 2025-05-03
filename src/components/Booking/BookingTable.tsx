@@ -176,7 +176,7 @@ const BookingTable: React.FC<BookingTableProps> = ({onAddNewBooking}) => {
 		useState<iCreateBookingDTO | null>(null);
 	const [editingKey, setEditingKey] = useState<string | null>(null);
 
-	const {bookingList} = useAppSelector(
+	const {bookingList, bookingRequest} = useAppSelector(
 		(state: RootState) => state.bookingReducer,
 	);
 	const dispatch = useAppDispatch();
@@ -185,6 +185,8 @@ const BookingTable: React.FC<BookingTableProps> = ({onAddNewBooking}) => {
 		setLoading(true);
 		dispatch(getAllBookings());
 	};
+
+	console.log("bookingRequest", bookingRequest);
 
 	const resetFilters = () => {
 		setDateRange(null);
