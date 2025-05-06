@@ -41,6 +41,20 @@ const CustomSideNav = () => {
 							<Whisper
 								placement="left"
 								trigger="hover"
+								speaker={<Tooltip>Services</Tooltip>}
+							>
+								<Nav.Item
+									as={Link}
+									to="/dashboard"
+									eventKey="1"
+									icon={<Icon as={SendToDashboardIcon} />}
+								>
+									Services
+								</Nav.Item>
+							</Whisper>
+							<Whisper
+								placement="left"
+								trigger="hover"
 								speaker={<Tooltip>Employees</Tooltip>}
 							>
 								<Nav.Item

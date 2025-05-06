@@ -90,7 +90,7 @@ const BookingPage = () => {
 
 	return (
 		<div css={styles.container}>
-			<BookingTable onAddNewBooking={() => setIsModalOpen(true)} />
+			<BookingTable onAddNewBooking={() => setIsModalOpen(true)} bookingStatuses={bookingStatuses} paymentStatuses={paymentStatuses} />
 			<Modal
 				open={isModalOpen}
 				onClose={handleModalClose}
