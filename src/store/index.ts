@@ -14,7 +14,7 @@ const store = configureStore({
 	reducer: rootReducer,
 	// Note: It's often useful to enable Redux DevTools for development.
 	// You can conditionally enable it based on the environment if needed.
-	devTools: false,
+	devTools: true,
 	middleware: (getDefaultMiddleware) => {
 		const middleware = getDefaultMiddleware();
 

@@ -70,7 +70,7 @@ const StatusBadge = ({status}: {status: string}) => {
 	return <span className={`status-badge ${getStatusClass()}`}>{status}</span>;
 };
 
-const EditableCell = ({rowData, dataKey, onChange, ...props}: any) => {
+const EditableCell = ({rowData, dataKey, onChange,paymentStatus, bookingStatus,...props}: any) => {
 	const editing = rowData.status === "EDIT";
 	const value = rowData[dataKey];
 
@@ -98,20 +98,29 @@ const EditableCell = ({rowData, dataKey, onChange, ...props}: any) => {
 						style={{width: "100%"}}
 					/>
 				);
-			case "bookingStatus":
-			case "paymentStatus":
-				return (
-					<SelectPicker
-						value={value}
-						onChange={handleChange}
-						data={[
-							{label: "Confirmed", value: "confirmed"},
-							{label: "Pending", value: "pending"},
-							{label: "Cancelled", value: "cancelled"},
-						]}
-						style={{width: "100%"}}
-					/>
-				);
+				case "bookingStatus":
+					return (
+						<SelectPicker
+							value={value}
+							onChange={(val) => handleChange(val)} // val is the ID
+							data={bookingStatus}
+							labelKey="label"
+							valueKey="value"
+							style={{width: "100%"}}
+						/>
+					);
+				case "paymentStatus":
+					return (
+						<SelectPicker
+							value={value}
+							onChange={(val) => handleChange(val)} // val is the ID
+							data={paymentStatus}
+							labelKey="label"
+							valueKey="value"
+							style={{width: "100%"}}
+						/>
+					);
+				
 			default:
 				return <Input value={value} onChange={handleChange} />;
 		}
@@ -122,6 +131,8 @@ const EditableCell = ({rowData, dataKey, onChange, ...props}: any) => {
 
 interface BookingTableProps {
 	onAddNewBooking: () => void;
+	bookingStatuses: { label: string; value: string }[];
+	paymentStatuses: { label: string; value: string }[];
 }
 
 const FilterSection = styled.div`
@@ -159,7 +170,8 @@ const StyledButton = styled(Button)`
 	}
 `;
 
-const BookingTable: React.FC<BookingTableProps> = ({onAddNewBooking}) => {
+const BookingTable: React.FC<BookingTableProps> = ({onAddNewBooking,bookingStatuses,paymentStatuses}) => {
+	console.log(paymentStatuses,"paymentStatuses")
 	const [loading, setLoading] = useState(true);
 	const [data, setData] = useState<any[]>([]);
 	const [filteredData, setFilteredData] = useState<any[]>([]);
@@ -251,25 +263,39 @@ const BookingTable: React.FC<BookingTableProps> = ({onAddNewBooking}) => {
 
 	const handleSave = async (id: string) => {
 		const editedRow = data.find((item) => item.id === id);
-		if (editedRow) {
-			try {
-				await dispatch(updateBooking(editedRow));
-				toaster.push(
-					<Message type="success">Booking updated successfully</Message>,
-				);
-				setEditingKey(null);
-				setData(
-					data.map((item) =>
-						item.id === id ? {...item, status: "VIEW"} : item,
-					),
-				);
-				handleRefresh();
-			} catch (error) {
-				toaster.push(<Message type="error">Failed to update booking</Message>);
-			}
+		if (!editedRow) return;
+	
+		// Check if it's already an ID, else map label to ID
+		const bookingStatusId = bookingStatuses.find((status) =>
+			status.value === editedRow.bookingStatus || status.label === editedRow.bookingStatus
+		)?.value;
+	
+		const paymentStatusId = paymentStatuses.find((status) =>
+			status.value === editedRow.paymentStatus || status.label === editedRow.paymentStatus
+		)?.value;
+	
+		const payload = {
+			...editedRow,
+			bookingStatus: bookingStatusId,
+			paymentStatus: paymentStatusId,
+		};
+	
+		try {
+			await dispatch(updateBooking(payload));
+			toaster.push(<Message type="success">Booking updated successfully</Message>);
+			setEditingKey(null);
+			setData(
+				data.map((item) =>
+					item.id === id ? { ...item, status: "VIEW" } : item
+				)
+			);
+			handleRefresh();
+		} catch (error) {
+			toaster.push(<Message type="error">Failed to update booking</Message>);
 		}
 	};
-
+	
+	
 	const handleCancel = (id: string) => {
 		setEditingKey(null);
 		setData(
@@ -309,13 +335,12 @@ const BookingTable: React.FC<BookingTableProps> = ({onAddNewBooking}) => {
 		value: type,
 	}));
 
-	const bookingStatuses = Array.from(
-		new Set(data.map((item) => item.bookingStatus)),
-	).map((status) => ({
-		label: status,
-		value: status,
-	}));
-
+	// const bookingStatuses = Array.from(
+	// 	new Set(data.map((item) => item.bookingStatus)),
+	// ).map((status) => ({
+	// 	label: status,
+	// 	value: status,
+	// }));
 	const budgets = data.map((item) => Number(item.totalCost));
 	const maxBudget = Math.max(...budgets, 100000);
 	const minBudget = Math.min(...budgets, 0);
@@ -472,6 +497,7 @@ const BookingTable: React.FC<BookingTableProps> = ({onAddNewBooking}) => {
 					rowData={rowData}
 					dataKey="bookingStatus"
 					onChange={handleChange}
+					bookingStatus={bookingStatuses}
 				/>
 			),
 		},
@@ -485,6 +511,7 @@ const BookingTable: React.FC<BookingTableProps> = ({onAddNewBooking}) => {
 					rowData={rowData}
 					dataKey="paymentStatus"
 					onChange={handleChange}
+					paymentStatus={paymentStatuses}
 				/>
 			),
 		},
