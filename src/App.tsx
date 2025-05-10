@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import {CustomProvider, Container} from "rsuite";
 import "rsuite/dist/rsuite.min.css";
 import HeaderTab from "./components/layouts/Header";
 import CustomSideNav from "./components/CustomSideNav/CustomSideNav";
+import * as FaIcons from "react-icons/fa";
 import {BsChevronRight, BsChevronLeft} from "react-icons/bs";
 import {Routes, Route, BrowserRouter as Router} from "react-router-dom";
 import BookingPage from "./components/Booking/BookingPage";
@@ -13,7 +14,7 @@ import DashboardPage from "./components/Dashboard/DashboardPage";
 import OAuthCallback from "./components/Auth/OAuthCallback";
 import EmployeeTable from "./components/Employee/EmployeeTable";
 import AuthGuard from "./Authguard";
-import { ImportSite } from "@rsuite/icons";
+import {ImportSite} from "@rsuite/icons";
 import "./App.css";
 
 function App() {
@@ -25,8 +26,8 @@ function App() {
 			setIsMobile(window.innerWidth <= 768);
 		};
 
-		window.addEventListener('resize', handleResize);
-		return () => window.removeEventListener('resize', handleResize);
+		window.addEventListener("resize", handleResize);
+		return () => window.removeEventListener("resize", handleResize);
 	}, []);
 
 	function toggleSideNav() {
@@ -37,9 +38,9 @@ function App() {
 	return (
 		<CustomProvider theme="light">
 			<Container className="app">
-			{token && <HeaderTab />}
+				{token && <HeaderTab />}
 				<div className="main-content">
-					{!isMobile && token &&(
+					{!isMobile && token && (
 						<div
 							onClick={toggleSideNav}
 							className="side-nav-toggle"
@@ -54,17 +55,19 @@ function App() {
 							)}
 						</div>
 					)}
-					{!isMobile && showSideNav &&token && <CustomSideNav />}
-					<div className={`content-wrapper ${isMobile ? 'mobile-content' : ''}`}>
+					{!isMobile && showSideNav && token && <CustomSideNav />}
+					<div
+						className={`content-wrapper ${isMobile ? "mobile-content" : ""}`}
+					>
 						<Routes>
-						<Route
-							path="/"
-							element={
-								<AuthGuard requireAuth={true}>
-								<DashboardPage />
-							</AuthGuard>
-							}
-						/>
+							<Route
+								path="/"
+								element={
+									<AuthGuard requireAuth={true}>
+										<DashboardPage />
+									</AuthGuard>
+								}
+							/>
 							<Route
 								path="/dashboard"
 								element={
