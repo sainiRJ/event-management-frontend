@@ -32,13 +32,14 @@ function App() {
 	function toggleSideNav() {
 		setShowSideNav((prev) => !prev);
 	}
+	const token = localStorage.getItem("access_token");
 
 	return (
 		<CustomProvider theme="light">
 			<Container className="app">
-				<HeaderTab />
+			{token && <HeaderTab />}
 				<div className="main-content">
-					{!isMobile && (
+					{!isMobile && token &&(
 						<div
 							onClick={toggleSideNav}
 							className="side-nav-toggle"
@@ -53,9 +54,17 @@ function App() {
 							)}
 						</div>
 					)}
-					{!isMobile && showSideNav && <CustomSideNav />}
+					{!isMobile && showSideNav &&token && <CustomSideNav />}
 					<div className={`content-wrapper ${isMobile ? 'mobile-content' : ''}`}>
 						<Routes>
+						<Route
+							path="/"
+							element={
+								<AuthGuard requireAuth={true}>
+								<DashboardPage />
+							</AuthGuard>
+							}
+						/>
 							<Route
 								path="/dashboard"
 								element={
