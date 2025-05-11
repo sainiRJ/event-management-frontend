@@ -1,19 +1,22 @@
 .app {
-	min-height: 100vh;
+	height: 100vh;
+	overflow: hidden;
 	/* background-color: #f8f9fa; */
 }
 
 .main-content {
 	position: relative;
-	/* margin-top: 60px;  */
-	min-height: calc(100vh - 60px);
+	height: calc(100vh - 60px);
 	display: flex;
+	margin-top: 60px; /* Ensure content is not hidden under navbar */
+	overflow-y: auto;
 }
 
 .content-wrapper {
 	flex: 1;
 	/* padding: 2rem; */
 	transition: margin-right 0.3s ease;
+	overflow-y: auto;
 	/* margin-right: 50px; */
 }
 
@@ -49,6 +52,9 @@
 
 	.side-nav-toggle {
 		display: none;
+	}
+	.main-content {
+		margin-top: 56px; /* Slightly smaller for mobile if needed */
 	}
 }
 

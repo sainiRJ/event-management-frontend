@@ -5,21 +5,19 @@ export interface iCreateBookingDTO {
 	eventDate: string | null;
 	serviceId: string | null;
 	venueAddress: string;
-	decorationTheme: string | null;
 	additionalNotes?: string;
 	budget: string;
 	advancePayment: string;
 	eventName: string;
 	paymentStatusId: string;
 	bookingStatusId: string;
-	bookingStatus?: string | undefined;
+	bookingStatus: string | null;
 }
 
 export interface iBookingRequest{
 	id: string;
 	customerName: string;
 	phoneNumber: string;
-	email?: string;
 	eventDate: string;
 	location: string;
 	bookingRquestAt: string;

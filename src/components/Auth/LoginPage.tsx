@@ -1,217 +1,56 @@
-// import React, {useState} from "react";
-// import {useAppDispatch, useAppSelector} from "../../store/Hooks";
-// import {useNavigate} from "react-router-dom";
-// import {GOOGLE_AUTH_URL} from "../../config/oauth";
-// import {login} from "@/store/auth/ThunkActions";
-// import "./Auth.css";
-// import Cookies from "js-cookie";
-// import {Message, toaster} from "rsuite";
-
-// const LoginPage: React.FC = () => {
-// 	const navigate = useNavigate();
-// 	const dispatch = useAppDispatch();
-// 	const [formData, setFormData] = useState({
-// 		emailOrPhone: "",
-// 		password: "",
-// 	});
-// 	const [error, setError] = useState("");
-
-// 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-// 		const {name, value} = e.target;
-// 		setFormData((prev) => ({
-// 			...prev,
-// 			[name]: value,
-// 		}));
-// 	};
-
-// 	const handleSubmit = async (e: React.FormEvent) => {
-// 		e.preventDefault();
-// 		setError("");
-
-// 		try {
-// 			const response = await dispatch(login(formData));
-// 			console.log("response", response);
-// 			toaster.push(<Message type="success">Login successfully</Message>);
-// 			navigate("/booking");
-// 		} catch (err: any) {
-// 			setError(err.message);
-// 			toaster.push(<Message type="error">Failed to Login </Message>);
-// 		}
-// 	};
-
-// 	const handleGoogleSignIn = () => {
-// 		window.location.href = GOOGLE_AUTH_URL;
-// 	};
-
-// 	return (
-// 		<div className="auth-container">
-// 			<div className="auth-box">
-// 				<div className="auth-header">
-// 					<h2>Welcome Back!</h2>
-// 					<p>Please sign in to continue</p>
-// 				</div>
-
-// 				{error && <div className="error-message">{error}</div>}
-
-// 				<form onSubmit={handleSubmit} className="auth-form">
-// 					<div className="form-group">
-// 						<label>Email or Phone Number</label>
-// 						<div className="input-container">
-// 							<i className="fas fa-user input-icon"></i>
-// 							<input
-// 								type="text"
-// 								name="emailOrPhone"
-// 								value={formData.emailOrPhone}
-// 								onChange={handleInputChange}
-// 								placeholder="Enter your email or phone number"
-// 								required
-// 							/>
-// 						</div>
-// 					</div>
-
-// 					<div className="form-group">
-// 						<label>Password</label>
-// 						<div className="input-container">
-// 							<i className="fas fa-lock input-icon"></i>
-// 							<input
-// 								type="password"
-// 								name="password"
-// 								value={formData.password}
-// 								onChange={handleInputChange}
-// 								placeholder="Enter your password"
-// 								required
-// 							/>
-// 						</div>
-// 					</div>
-
-// 					<div className="forgot-password">
-// 						<a href="/forgot-password">Forgot Password?</a>
-// 					</div>
-
-// 					<button type="submit" className="submit-btn">
-// 						Login
-// 					</button>
-// 				</form>
-
-// 				<div className="divider">
-// 					<span>OR</span>
-// 				</div>
-
-// 				<button className="google-btn" onClick={handleGoogleSignIn}>
-// 					<img src="/google-icon.svg" alt="Google" />
-// 					Continue with Google
-// 				</button>
-
-// 				<p className="auth-link">
-// 					{"Don't have an account?"} <a href="/signup">Sign up</a>
-// 				</p>
-// 			</div>
-// 		</div>
-// 	);
-// };
-
-// export default LoginPage;
-
-
-// import React, { useState } from "react";
-// import { useNavigate } from "react-router-dom";
-// import { useSelector } from "react-redux";
-// import { login } from "../../store/auth/ThunkActions";
-// import { RootState } from "../../store/RootReducer";
-// import { iLoginCredentials } from "../../store/auth/Types";
-// import { useAppDispatch } from "../../store/Hooks";
-
-// const Login: React.FC = () => {
-// 	const navigate = useNavigate();
-// 	const dispatch = useAppDispatch();
-// 	const { isLoading, message } = useSelector((state: RootState) => state.authReducer);
-
-// 	const [formData, setFormData] = useState<iLoginCredentials>({
-// 		emailOrPhone: "",
-// 		password: "",
-// 	});
-
-// 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-// 		const { name, value } = e.target;
-// 		setFormData((prev) => ({
-// 			...prev,
-// 			[name]: value,
-// 		}));
-// 	};
-
-// 	const handleSubmit = async (e: React.FormEvent) => {
-// 		e.preventDefault();
-// 		try {
-// 			await dispatch(login(formData));
-// 			navigate("/booking");
-// 		} catch (error) {
-// 			console.error("Login failed:", error);
-// 		}
-// 	};
-
-// 	const handleGoogleLogin = () => {
-// 		window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.REACT_APP_GOOGLE_CLIENT_ID}&redirect_uri=${process.env.REACT_APP_OAUTH_REDIRECT_URI}&response_type=code&scope=email profile`;
-// 	};
-
-// 	return (
-// 		<div className="login-wrapper">
-// 			<div className="background-circles"></div>
-// 			<div className="login-box">
-// 				<h2 className="title">Login Here</h2>
-// 				{message && <p className="error">{message}</p>}
-// 				<form onSubmit={handleSubmit}>
-// 					<label>Username</label>
-// 					<input
-// 						type="text"
-// 						name="emailOrPhone"
-// 						placeholder="Email or Phone"
-// 						value={formData.emailOrPhone}
-// 						onChange={handleChange}
-// 						required
-// 					/>
-// 					<label>Password</label>
-// 					<input
-// 						type="password"
-// 						name="password"
-// 						placeholder="Password"
-// 						value={formData.password}
-// 						onChange={handleChange}
-// 						required
-// 					/>
-// 					<button type="submit" className="login-button" disabled={isLoading}>
-// 						{isLoading ? "Logging in..." : "Log In"}
-// 					</button>
-// 				</form>
-// 				<div className="social-buttons">
-// 					<button onClick={handleGoogleLogin} className="google-btn">
-// 						<span>G</span> Google
-// 					</button>
-// 					<button className="facebook-btn">
-// 						<span>f</span> Facebook
-// 					</button>
-// 				</div>
-// 			</div>
-// 		</div>
-// 	);
-// };
-
-// export default Login;
-
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { login } from "../../store/auth/ThunkActions";
-import { RootState } from "../../store/RootReducer";
-import { iLoginCredentials } from "../../store/auth/Types";
-import { useAppDispatch } from "../../store/Hooks";
+import React, {useState, useEffect} from "react";
+import {useNavigate} from "react-router-dom";
+import {useSelector} from "react-redux";
+import {login} from "../../store/auth/ThunkActions";
+import {RootState} from "../../store/RootReducer";
+import {iLoginCredentials} from "../../store/auth/Types";
+import {useAppDispatch} from "../../store/Hooks";
 import {Message, toaster} from "rsuite";
 
-import "./Auth.css";
+// Custom CSS for animated background circles
+const bgCircleStyles = `
+  .background-circles {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .background-circles::before, .background-circles::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.5;
+    animation: float 8s ease-in-out infinite alternate;
+  }
+  .background-circles::before {
+    width: 400px;
+    height: 400px;
+    left: -120px;
+    top: -120px;
+    background: radial-gradient(circle, #ffb86c 0%, #ff6bcb 100%);
+    animation-delay: 0s;
+  }
+  .background-circles::after {
+    width: 300px;
+    height: 300px;
+    right: -100px;
+    bottom: -100px;
+    background: radial-gradient(circle, #667eea 0%, #764ba2 100%);
+    animation-delay: 2s;
+  }
+  @keyframes float {
+    0% { transform: translateY(0) scale(1); }
+    100% { transform: translateY(40px) scale(1.1); }
+  }
+`;
 
 const Login: React.FC = () => {
 	const navigate = useNavigate();
 	const dispatch = useAppDispatch();
-	const { isLoading, message } = useSelector((state: RootState) => state.authReducer);
+	const {isLoading, message} = useSelector(
+		(state: RootState) => state.authReducer,
+	);
 	const [error, setError] = useState("");
 
 	const [formData, setFormData] = useState<iLoginCredentials>({
@@ -220,15 +59,15 @@ const Login: React.FC = () => {
 	});
 
 	useEffect(() => {
-		document.body.style.background = "#0f0f1b";
+		document.body.style.background = "#181a22";
 		return () => {
 			document.body.style.background = "";
 		};
 	}, []);
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const { name, value } = e.target;
-		setFormData((prev) => ({ ...prev, [name]: value }));
+		const {name, value} = e.target;
+		setFormData((prev) => ({...prev, [name]: value}));
 	};
 
 	const handleSubmit = async (e: React.FormEvent) => {
@@ -236,7 +75,7 @@ const Login: React.FC = () => {
 		setError("");
 
 		try {
-			const response = await dispatch(login(formData));
+			const response: any = await dispatch(login(formData));
 			console.log("response", response);
 			toaster.push(<Message type="success">Login successfully</Message>);
 			navigate("/booking");
@@ -251,55 +90,127 @@ const Login: React.FC = () => {
 	};
 
 	return (
-		<div className="login-wrapper">
-			<div className="background-circles"></div>
-
-			<div className="login-content">
-				<div className="login-left">
-					<h2>Login Here</h2>
-					{message && <p className="error">{message}</p>}
-					<form onSubmit={handleSubmit}>
-						<label>Username</label>
-						<input
-							type="text"
-							name="emailOrPhone"
-							placeholder="Email or Phone"
-							value={formData.emailOrPhone}
-							onChange={handleChange}
-							required
-						/>
-						<label>Password</label>
-						<input
-							type="password"
-							name="password"
-							placeholder="Password"
-							value={formData.password}
-							onChange={handleChange}
-							required
-						/>
-						<button type="submit" className="login-button" disabled={isLoading}>
-							{isLoading ? "Logging in..." : "Log In"}
+		<div className="relative min-h-screen flex items-center justify-center bg-[#181a22] overflow-hidden">
+			{/* Animated background circles */}
+			<style>{bgCircleStyles}</style>
+			<div className="background-circles" />
+			<div className="relative z-10 w-full max-w-5xl flex flex-col md:flex-row rounded-2xl shadow-2xl overflow-hidden bg-white/90 backdrop-blur-md">
+				{/* Left: Login Form */}
+				<div className="flex flex-col justify-center px-8 py-12 md:w-1/2 w-full bg-white/90">
+					<div className="mb-8 text-center">
+						<h2 className="text-3xl font-bold text-gray-900 mb-2">
+							Login Here
+						</h2>
+						<p className="text-gray-500 text-base">
+							Welcome back! Please login to your account.
+						</p>
+					</div>
+					{message && (
+						<p className="text-red-500 text-sm mb-2 text-center">{message}</p>
+					)}
+					<form onSubmit={handleSubmit} className="flex flex-col gap-4">
+						<div>
+							<label className="block text-gray-700 text-sm mb-1">
+								Username
+							</label>
+							<input
+								type="text"
+								name="emailOrPhone"
+								placeholder="Email or Phone"
+								value={formData.emailOrPhone}
+								onChange={handleChange}
+								required
+								className="w-full px-4 py-2 rounded-md bg-gray-100 text-gray-900 border border-gray-300 focus:ring-2 focus:ring-indigo-400 focus:outline-none placeholder-gray-400 transition"
+							/>
+						</div>
+						<div>
+							<label className="block text-gray-700 text-sm mb-1">
+								Password
+							</label>
+							<input
+								type="password"
+								name="password"
+								placeholder="Password"
+								value={formData.password}
+								onChange={handleChange}
+								required
+								className="w-full px-4 py-2 rounded-md bg-gray-100 text-gray-900 border border-gray-300 focus:ring-2 focus:ring-indigo-400 focus:outline-none placeholder-gray-400 transition"
+							/>
+						</div>
+						<button
+							type="submit"
+							className="submit-btn w-full py-2 mt-2 rounded-md bg-gradient-to-r from-indigo-400 to-purple-500 text-white font-bold text-lg shadow hover:-translate-y-0.5 hover:shadow-lg transition disabled:opacity-60 relative"
+							disabled={isLoading}
+						>
+							{isLoading ? (
+								<span className="flex items-center justify-center">
+									<svg
+										className="animate-spin h-5 w-5 mr-2 text-white"
+										xmlns="http://www.w3.org/2000/svg"
+										fill="none"
+										viewBox="0 0 24 24"
+									>
+										<circle
+											className="opacity-25"
+											cx="12"
+											cy="12"
+											r="10"
+											stroke="currentColor"
+											strokeWidth="4"
+										></circle>
+										<path
+											className="opacity-75"
+											fill="currentColor"
+											d="M4 12a8 8 0 018-8v8z"
+										></path>
+									</svg>
+									Logging in...
+								</span>
+							) : (
+								"Log In"
+							)}
 						</button>
 					</form>
-					<div className="social-buttons">
-						<button onClick={handleGoogleLogin} className="google-btn">
-							<span>G</span> Google
-						</button>
+					<div className="divider flex items-center my-6">
+						<div className="flex-grow h-px bg-gray-300" />
+						<span className="mx-3 text-gray-400">OR</span>
+						<div className="flex-grow h-px bg-gray-300" />
+					</div>
+					<button
+						onClick={handleGoogleLogin}
+						className="google-btn w-full flex items-center justify-center gap-2 py-2 rounded-md bg-white text-gray-800 border border-gray-300 font-semibold text-lg hover:bg-gray-100 transition shadow"
+					>
+						<img src="/google-icon.svg" alt="Google logo" className="w-5 h-5" />
+						Continue with Google
+					</button>
+				</div>
+				{/* Right: Welcome Section */}
+				<div className="flex flex-col justify-center items-center bg-[#6d5c57] px-8 py-12 md:w-1/2 w-full">
+					<div className="welcome-content text-center">
+						<h1 className="text-2xl md:text-3xl font-bold text-white mb-2">
+							Welcome to Saini Event Planner!
+						</h1>
+						<p className="text-white text-base mb-4">
+							we design events that speak your heart unforgettable.
+						</p>
+						<img
+							src="https://i.pinimg.com/736x/9e/f9/2f/9ef92f371c50e5757192fd194f20b471.jpg"
+							alt="Login visual"
+							className="rounded-lg shadow-lg w-full max-w-xs border-4 border-[#bbaea7] animate-slideIn"
+						/>
 					</div>
 				</div>
-
-				<div className="login-right">
-  <div className="welcome-content">
-    <h1>Welcome to Saini Event Planner!</h1>
-	we design events that speak your heart unforgettable.
-    <img
-      src="https://i.pinimg.com/736x/9e/f9/2f/9ef92f371c50e5757192fd194f20b471.jpg"
-      alt="Login visual"
-    />
-  </div>
-</div>
-
 			</div>
+			{/* Custom animation for image */}
+			<style>{`
+				@keyframes slideIn {
+					0% { opacity: 0; transform: translateY(40px); }
+					100% { opacity: 1; transform: translateY(0); }
+				}
+				.animate-slideIn {
+					animation: slideIn 1.2s cubic-bezier(0.23, 1, 0.32, 1) both;
+				}
+			`}</style>
 		</div>
 	);
 };
