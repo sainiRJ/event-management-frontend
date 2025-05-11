@@ -11,24 +11,28 @@ import {
 export const REDUCER_NAME = "bookingSlice";
 
 export interface iBooking {
+	id: string;
 	customerName: string;
 	phoneNumber: string;
 	eventName: string;
 	eventDate: string | null;
 	serviceId: string | null;
 	venueAddress: string;
-	decorationTheme: string | null;
 	additionalNotes?: string;
 	budget: string;
 	advancePayment: string;
 	bookingStatus?: string;
+	paymentStatusId: string;
+	bookingStatusId: string;
+	bookedAt: string;
+	serviceName: string;
+	paymentStatus: string;
 }
 
 export interface iBookingRequest {
 	id: string;
 	customerName: string;
 	phoneNumber: string;
-	email?: string;
 	eventDate: string;
 	location: string;
 	bookingRquestAt: string;
@@ -53,5 +57,5 @@ export interface iBookingState {
 
 	bookingList: iBooking[];
 
-	bookingRequest: iBookingRequest[]
+	bookingRequest: iBookingRequest[];
 }

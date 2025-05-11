@@ -130,3 +130,35 @@
 		padding: 16px;
 	}
 }
+
+.booking-modal {
+	margin-top: 2rem;
+}
+
+.booking-modal .rs-modal-content {
+	max-height: calc(100vh - 4rem);
+	overflow-y: auto;
+}
+
+.booking-modal .rs-modal-body {
+	padding: 1.5rem;
+}
+
+/* Custom scrollbar for the modal */
+.booking-modal .rs-modal-content::-webkit-scrollbar {
+	width: 8px;
+}
+
+.booking-modal .rs-modal-content::-webkit-scrollbar-track {
+	background: #f1f1f1;
+	border-radius: 4px;
+}
+
+.booking-modal .rs-modal-content::-webkit-scrollbar-thumb {
+	background: #888;
+	border-radius: 4px;
+}
+
+.booking-modal .rs-modal-content::-webkit-scrollbar-thumb:hover {
+	background: #555;
+}

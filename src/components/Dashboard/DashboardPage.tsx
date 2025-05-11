@@ -7,7 +7,7 @@ import {fetchServices} from "@/store/services/ThunkActions";
 import WeatherCard from "./WeatherCard";
 import BookingStats from "./BookingStats";
 import PhotoUploadModal from "../Modal/PhotoUploadModal";
-import "./DashboardPage.css";
+// import "./DashboardPage.css";
 
 const DashboardPage: React.FC = () => {
 	const dispatch = useAppDispatch();
@@ -58,23 +58,16 @@ const DashboardPage: React.FC = () => {
 	const nextEvent = getNextEvent();
 
 	return (
-		<div className="dashboard-container">
+		<div className="px-4 py-6 max-w-screen-xl mx-auto bg-[#f5f8fa] min-h-screen">
 			<PhotoUploadModal
 				open={showPhotoUpload}
 				onClose={() => setShowPhotoUpload(false)}
 			/>
-			<div className="dashboard-header">
-				<div
-					style={{
-						display: "flex",
-						justifyContent: "space-between",
-						alignItems: "center",
-						width: "100%",
-					}}
-				>
+			<div className="mb-8">
+				<div className="flex flex-col md:flex-row md:items-center md:justify-between w-full gap-4">
 					<div>
-						<h1>Dashboard</h1>
-						<p className="welcome-text">
+						<h1 className="m-0 text-2xl font-bold text-gray-800">Dashboard</h1>
+						<p className="text-gray-600 mt-2 text-base md:text-lg">
 							{"Welcome back! Here's your event overview"}
 						</p>
 					</div>
@@ -88,54 +81,62 @@ const DashboardPage: React.FC = () => {
 				</div>
 			</div>
 
-			<Grid fluid>
-				<Row className="dashboard-row">
-					<Col xs={24}>
-						<BookingStats
-							upcoming={stats.upcoming}
-							completed={stats.completed}
-							cancelled={stats.cancelled}
-						/>
-					</Col>
-				</Row>
+			<div className="mb-6">
+				<BookingStats
+					upcoming={stats.upcoming}
+					completed={stats.completed}
+					cancelled={stats.cancelled}
+				/>
+			</div>
 
-				{nextEvent && (
-					<Row className="dashboard-row">
-						<Col xs={24} md={12}>
-							<WeatherCard
-								location={nextEvent.venueAddress}
-								eventDate={nextEvent.eventDate ?? ""}
-							/>
-						</Col>
-						<Col xs={24} md={12}>
-							<div className="next-event-card">
-								<h3>Next Event</h3>
-								<div className="event-details">
-									<div className="event-name">{nextEvent.eventName}</div>
-									<div className="event-info">
-										<div className="info-item">
-											<span className="label">Customer:</span>
-											<span className="value">{nextEvent.customerName}</span>
-										</div>
-										<div className="info-item">
-											<span className="label">Date:</span>
-											<span className="value">
-												{nextEvent.eventDate
-													? new Date(nextEvent.eventDate).toLocaleDateString()
-													: "N/A"}
-											</span>
-										</div>
-										<div className="info-item">
-											<span className="label">Location:</span>
-											<span className="value">{nextEvent.venueAddress}</span>
-										</div>
+			{nextEvent && (
+				<div className="flex flex-col md:flex-row gap-6 mb-6">
+					<div className="w-full md:w-1/2">
+						<WeatherCard
+							location={nextEvent.venueAddress}
+							eventDate={nextEvent.eventDate ?? ""}
+						/>
+					</div>
+					<div className="w-full md:w-1/2">
+						<div className="bg-white rounded-lg p-6 h-full shadow">
+							<h3 className="text-[#722ed1] text-xl font-semibold mb-5">
+								Next Event
+							</h3>
+							<div className="bg-[#f9f0ff] rounded-lg p-5">
+								<div className="text-lg font-bold text-gray-800 mb-4">
+									{nextEvent.eventName}
+								</div>
+								<div className="grid gap-3">
+									<div className="flex items-center">
+										<span className="text-gray-500 w-24 text-sm">
+											Customer:
+										</span>
+										<span className="text-gray-800 font-medium">
+											{nextEvent.customerName}
+										</span>
+									</div>
+									<div className="flex items-center">
+										<span className="text-gray-500 w-24 text-sm">Date:</span>
+										<span className="text-gray-800 font-medium">
+											{nextEvent.eventDate
+												? new Date(nextEvent.eventDate).toLocaleDateString()
+												: "N/A"}
+										</span>
+									</div>
+									<div className="flex items-center">
+										<span className="text-gray-500 w-24 text-sm">
+											Location:
+										</span>
+										<span className="text-gray-800 font-medium">
+											{nextEvent.venueAddress}
+										</span>
 									</div>
 								</div>
 							</div>
-						</Col>
-					</Row>
-				)}
-			</Grid>
+						</div>
+					</div>
+				</div>
+			)}
 		</div>
 	);
 };
