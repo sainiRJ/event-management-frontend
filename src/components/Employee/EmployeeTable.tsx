@@ -11,7 +11,6 @@ import {
 	Input,
 	SelectPicker,
 } from "rsuite";
-import "./EmployeeTable.css";
 import {
 	getAllEmployees,
 	deleteEmployee,
@@ -26,6 +25,8 @@ import CustomTable from "../common/CustomTable";
 import CustomForm from "../common/CustomForm";
 import {iCreateEmployeeDTO} from "../../customTypes/appDataTypes/employeeTypes";
 import {employeeValidationSchema} from "../../validations/EmployeeValidationSchema";
+import Joi from "joi";
+import DetailsModal from "../common/DetailsModal";
 
 const formatDate = (dateString: string) => {
 	const date = new Date(dateString);
@@ -43,6 +44,19 @@ const formatCurrency = (amount: number) => {
 	}).format(amount);
 };
 
+const StatusBadge = ({status}: {status: string}) => {
+	let color = "bg-gray-200 text-gray-700";
+	if (status?.toLowerCase() === "active") color = "bg-green-100 text-green-700";
+	if (status?.toLowerCase() === "inactive")
+		color = "bg-yellow-100 text-yellow-700";
+	if (status?.toLowerCase() === "terminated") color = "bg-red-100 text-red-700";
+	return (
+		<span className={`px-2 py-1 rounded text-xs font-semibold ${color}`}>
+			{status}
+		</span>
+	);
+};
+
 const EmployeeTable = () => {
 	const [loading, setLoading] = useState(true);
 	const [data, setData] = useState<any[]>([]);
@@ -57,15 +71,15 @@ const EmployeeTable = () => {
 	const [editingEmployee, setEditingEmployee] =
 		useState<iCreateEmployeeDTO | null>(null);
 	const [showAddModal, setShowAddModal] = useState(false);
-	const [newEmployee, setNewEmployee] = useState<iCreateEmployeeDTO>({
-		name: "",
-		email: "",
-		phoneNumber: "",
-		designation: "",
-		salary: 0,
-		statusId: "",
-		joinedDate: new Date(),
-	});
+	const [selectedEmployee, setSelectedEmployee] = useState<any | null>(null);
+	const [modalOpen, setModalOpen] = useState(false);
+	const [filter, setFilter] = useState({name: "", designation: "", status: ""});
+	const [addFormErrors, setAddFormErrors] = useState<Record<string, string>>(
+		{},
+	);
+	const [editFormErrors, setEditFormErrors] = useState<Record<string, string>>(
+		{},
+	);
 
 	const {employeeList} = useAppSelector(
 		(state: RootState) => state.employeeReducer,
@@ -83,7 +97,16 @@ const EmployeeTable = () => {
 	}, [dispatch]);
 
 	const handleEdit = (rowData: any) => {
-		setEditingEmployee(rowData);
+		setEditingEmployee({
+			id: rowData.id ?? "",
+			name: rowData.name ?? "",
+			email: rowData.email ?? "",
+			phoneNumber: rowData.phoneNumber ?? "",
+			designation: rowData.designation ?? "",
+			salary: rowData.salary ?? 0,
+			statusId: rowData.statusId ?? "",
+			joinedDate: rowData.joinedDate ?? "",
+		});
 		setShowEditModal(true);
 	};
 
@@ -239,202 +262,547 @@ const EmployeeTable = () => {
 		.filter((status) => status.context === "employee")
 		.map((status) => ({label: status.name, value: status.id}));
 
-	const employeeFormFields = [
+	const employeeFields = [
 		{
 			name: "name",
 			label: "Name",
 			type: "text" as const,
-			colSpan: 12,
 		},
 		{
 			name: "email",
 			label: "Email",
 			type: "text" as const,
-			colSpan: 12,
 		},
 		{
 			name: "phoneNumber",
 			label: "Phone Number",
-			type: "tel" as const,
-			colSpan: 12,
+			type: "text" as const,
 		},
 		{
 			name: "designation",
 			label: "Designation",
 			type: "text" as const,
-			colSpan: 12,
+		},
+		{
+			name: "status",
+			label: "Status",
+			type: "select" as const,
+			options: employeeStatuses.map((s) => ({label: s.label, value: s.value})),
 		},
 		{
 			name: "salary",
 			label: "Salary",
 			type: "number" as const,
-			colSpan: 12,
-		},
-		{
-			name: "statusId",
-			label: "Status",
-			type: "select" as const,
-			options: employeeStatuses,
-			colSpan: 12,
 		},
 		{
 			name: "joinedDate",
 			label: "Joined Date",
 			type: "date" as const,
-			colSpan: 12,
 		},
 	];
 
-	return (
-		<div className="employee-page">
-			<div className="page-header">
-				<h1>Employees</h1>
-				<p className="page-description">
-					Manage and track all your employees in one place
-				</p>
-			</div>
+	// Filter logic
+	const filtered = data.filter(
+		(row) =>
+			(filter.name === "" ||
+				row.name?.toLowerCase().includes(filter.name.toLowerCase())) &&
+			(filter.designation === "" ||
+				row.designation
+					?.toLowerCase()
+					.includes(filter.designation.toLowerCase())) &&
+			(filter.status === "" || row.status === filter.status),
+	);
 
-			<div className="employee-table-wrapper">
-				<div className="table-actions">
-					<Stack
-						spacing={10}
-						justifyContent="space-between"
-						alignItems="center"
+	// Modal handlers
+	const handleRowClick = (row: any) => {
+		setSelectedEmployee(row);
+		setModalOpen(true);
+	};
+	const handleModalClose = () => {
+		setModalOpen(false);
+		setSelectedEmployee(null);
+	};
+	const handleModalSave = async (updated: any) => {
+		await dispatch(updateEmployee(updated));
+		setModalOpen(false);
+		setSelectedEmployee(null);
+		dispatch(getAllEmployees());
+	};
+
+	// Get unique designations and statuses for filter dropdowns
+	const designations = Array.from(
+		new Set(data.map((emp) => emp.designation)),
+	).filter(Boolean);
+	const statuses = Array.from(new Set(data.map((emp) => emp.status))).filter(
+		Boolean,
+	);
+
+	// Helper to format date as YYYY-MM-DD
+	const toDateInputString = (date: Date | string) => {
+		if (!date) return "";
+		if (typeof date === "string") return date.slice(0, 10);
+		return date.toISOString().slice(0, 10);
+	};
+
+	const [newEmployee, setNewEmployee] = useState<iCreateEmployeeDTO>({
+		name: "",
+		email: "",
+		phoneNumber: "",
+		designation: "",
+		salary: 0,
+		statusId: "",
+		joinedDate: toDateInputString(new Date()),
+	});
+
+	// For DetailsModal, always pass joinedDate as string
+	const selectedEmployeeForModal = selectedEmployee
+		? {
+				...selectedEmployee,
+				joinedDate: toDateInputString(selectedEmployee.joinedDate),
+		  }
+		: null;
+
+	const employeeTableColumns = [
+		{
+			key: "name",
+			label: "Name",
+		},
+		{
+			key: "designation",
+			label: "Designation",
+		},
+		{
+			key: "phoneNumber",
+			label: "Phone Number",
+		},
+		{
+			key: "status",
+			label: "Status",
+			render: (row: any) => <StatusBadge status={row.status || "-"} />,
+		},
+	];
+
+	// Add/Edit Employee Form fields
+	const employeeFormFields = [
+		{name: "name", label: "Name", type: "text"},
+		{name: "email", label: "Email", type: "email"},
+		{name: "phoneNumber", label: "Phone Number", type: "tel"},
+		{name: "designation", label: "Designation", type: "text"},
+		{name: "salary", label: "Salary", type: "number"},
+		{name: "statusId", label: "Status", type: "select"},
+		{name: "joinedDate", label: "Joined Date", type: "date"},
+	];
+
+	// Use real status options from Redux
+	const statusOptions = statusList
+		.filter((status) => status.context === "employee")
+		.map((status) => ({label: status.name, value: status.id}));
+
+	// Add Employee Modal Handlers
+	const handleAddEmployeeSubmit = async (e: React.FormEvent) => {
+		e.preventDefault();
+		const {error} = employeeValidationSchema.validate(newEmployee, {
+			abortEarly: false,
+		});
+		if (error) {
+			const errors: Record<string, string> = {};
+			error.details.forEach((detail: Joi.ValidationErrorItem) => {
+				errors[detail.path[0] as string] = detail.message;
+			});
+			setAddFormErrors(errors);
+			return;
+		}
+		setAddFormErrors({});
+		await dispatch(createEmployee(newEmployee));
+		setShowAddModal(false);
+		setNewEmployee({
+			name: "",
+			email: "",
+			phoneNumber: "",
+			designation: "",
+			salary: 0,
+			statusId: "",
+			joinedDate: toDateInputString(new Date()),
+		});
+		handleRefresh();
+	};
+
+	// Edit Employee Modal Handlers
+	const handleEditEmployeeSubmit = async (e: React.FormEvent) => {
+		e.preventDefault();
+		if (!editingEmployee) return;
+		const {error} = employeeValidationSchema.validate(editingEmployee, {
+			abortEarly: false,
+		});
+		if (error) {
+			const errors: Record<string, string> = {};
+			error.details.forEach((detail: Joi.ValidationErrorItem) => {
+				errors[detail.path[0] as string] = detail.message;
+			});
+			setEditFormErrors(errors);
+			return;
+		}
+		setEditFormErrors({});
+		await dispatch(updateEmployee(editingEmployee));
+		setShowEditModal(false);
+		setEditingEmployee(null);
+		handleRefresh();
+	};
+
+	return (
+		<div className="bg-white rounded-lg shadow p-4 overflow-x-auto w-full max-w-6xl mx-auto mt-16">
+			{/* Filters */}
+			<div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-4 sticky top-0 bg-white z-10 py-2">
+				<div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+					<input
+						type="text"
+						placeholder="Filter by name"
+						className="border rounded px-3 py-2 text-sm w-full md:w-48"
+						value={filter.name}
+						onChange={(e) => setFilter((f) => ({...f, name: e.target.value}))}
+					/>
+					<select
+						className="border rounded px-3 py-2 text-sm w-full md:w-40"
+						value={filter.designation}
+						onChange={(e) =>
+							setFilter((f) => ({...f, designation: e.target.value}))
+						}
 					>
-						<Stack spacing={10}>
-							<Input
-								placeholder="Search by name..."
-								value={searchQuery}
-								onChange={setSearchQuery}
-								size="sm"
-							/>
-							<SelectPicker
-								data={employeeStatuses}
-								placeholder="Filter by status"
-								value={selectedStatus}
-								onChange={setSelectedStatus}
-								size="sm"
-								cleanable
-							/>
-							<SelectPicker
-								data={Array.from(
-									new Set(data.map((emp) => emp.designation)),
-								).map((designation) => ({
-									label: designation,
-									value: designation,
-								}))}
-								placeholder="Filter by designation"
-								value={selectedDesignation}
-								onChange={setSelectedDesignation}
-								size="sm"
-								cleanable
-							/>
-						</Stack>
-						<div>
-							<h4 style={{margin: 0}}>
-								{filteredData.length}{" "}
-								{filteredData.length === 1 ? "Employee" : "Employees"} Found
-							</h4>
-						</div>
-						<Stack spacing={10}>
-							{selectedKeys.length > 0 && (
-								<Button
-									appearance="subtle"
-									color="red"
-									onClick={handleBulkDelete}
+						<option value="">All Designations</option>
+						{designations.map((d) => (
+							<option key={d} value={d}>
+								{d}
+							</option>
+						))}
+					</select>
+					<select
+						className="border rounded px-3 py-2 text-sm w-full md:w-40"
+						value={filter.status}
+						onChange={(e) => setFilter((f) => ({...f, status: e.target.value}))}
+					>
+						<option value="">All Statuses</option>
+						{statuses.map((s) => (
+							<option key={s} value={s}>
+								{s}
+							</option>
+						))}
+					</select>
+				</div>
+				<button
+					onClick={() => setShowAddModal(true)}
+					className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded font-semibold transition w-full md:w-auto"
+				>
+					+ Add New Employee
+				</button>
+			</div>
+			{/* Table */}
+			<CustomTable
+				data={filtered}
+				loading={loading}
+				columns={employeeTableColumns}
+				onRowClick={handleRowClick}
+				rowKey="id"
+			/>
+			{/* Details Modal */}
+			<DetailsModal
+				open={modalOpen}
+				onClose={handleModalClose}
+				data={selectedEmployeeForModal}
+				onSave={handleModalSave}
+				title="Employee Details"
+				fields={employeeFields}
+			/>
+
+			{/* Add New Employee Modal */}
+			{showAddModal && (
+				<div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+					<div className="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 relative">
+						<h2 className="text-xl font-semibold mb-4">Add New Employee</h2>
+						<form onSubmit={handleAddEmployeeSubmit} id="add-employee-form">
+							<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+								{employeeFormFields.map((field) => (
+									<div key={field.name} className="col-span-1 flex flex-col">
+										<label className="block text-sm font-medium text-gray-700 mb-1">
+											{field.label}
+										</label>
+										{field.type === "select" ? (
+											<select
+												name={field.name}
+												value={
+													(newEmployee[
+														field.name as keyof iCreateEmployeeDTO
+													] as string) || ""
+												}
+												onChange={(e) =>
+													setNewEmployee({
+														...newEmployee,
+														[field.name]: e.target.value,
+													})
+												}
+												className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
+													addFormErrors[field.name] ? "border-red-500" : ""
+												}`}
+											>
+												<option value="">Select {field.label}</option>
+												{statusOptions.map((option) => (
+													<option key={option.value} value={option.value}>
+														{option.label}
+													</option>
+												))}
+											</select>
+										) : (
+											<input
+												type={field.type}
+												name={field.name}
+												value={
+													field.type === "date"
+														? newEmployee[
+																field.name as keyof iCreateEmployeeDTO
+														  ]
+															? toDateInputString(
+																	newEmployee[
+																		field.name as keyof iCreateEmployeeDTO
+																	] as string | Date,
+															  )
+															: ""
+														: field.type === "number"
+														? newEmployee[
+																field.name as keyof iCreateEmployeeDTO
+														  ] !== undefined &&
+														  newEmployee[
+																field.name as keyof iCreateEmployeeDTO
+														  ] !== null
+															? Number(
+																	newEmployee[
+																		field.name as keyof iCreateEmployeeDTO
+																	],
+															  )
+															: ""
+														: newEmployee[
+																field.name as keyof iCreateEmployeeDTO
+														  ] !== undefined &&
+														  newEmployee[
+																field.name as keyof iCreateEmployeeDTO
+														  ] !== null
+														? String(
+																newEmployee[
+																	field.name as keyof iCreateEmployeeDTO
+																],
+														  )
+														: ""
+												}
+												onChange={(e) =>
+													setNewEmployee({
+														...newEmployee,
+														[field.name]:
+															field.type === "number"
+																? Number(e.target.value)
+																: e.target.value,
+													})
+												}
+												className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
+													addFormErrors[field.name] ? "border-red-500" : ""
+												}`}
+											/>
+										)}
+										{addFormErrors[field.name] && (
+											<span className="text-xs text-red-600 mt-1">
+												{addFormErrors[field.name]}
+											</span>
+										)}
+									</div>
+								))}
+							</div>
+							<div className="flex justify-end gap-2 mt-6">
+								<button
+									type="button"
+									onClick={() => setShowAddModal(false)}
+									className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded mr-2"
 								>
-									Delete Selected ({selectedKeys.length})
-								</Button>
-							)}
-							<ButtonGroup>
-								<Button
-									appearance="primary"
-									onClick={() => setShowAddModal(true)}
+									Cancel
+								</button>
+								<button
+									type="submit"
+									className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded"
 								>
 									Add Employee
-								</Button>
-								<IconButton icon={<RefreshIcon />} onClick={handleRefresh}>
-									Refresh
-								</IconButton>
-							</ButtonGroup>
-						</Stack>
-					</Stack>
+								</button>
+							</div>
+						</form>
+					</div>
 				</div>
+			)}
 
-				<CustomTable
-					data={filteredData}
-					loading={loading}
-					columns={columns}
-					height={400}
-					selectable
-					selectedKeys={selectedKeys}
-					onSelectChange={setSelectedKeys}
-				/>
-			</div>
-
-			<Modal
-				size="md"
-				open={showEditModal}
-				onClose={() => setShowEditModal(false)}
-			>
-				<Modal.Header>
-					<Modal.Title>Edit Employee</Modal.Title>
-				</Modal.Header>
-				<Modal.Body>
-					{editingEmployee && (
-						<CustomForm
-							formValue={editingEmployee}
-							setFormValue={setEditingEmployee}
-							fields={employeeFormFields}
-							validationModel={employeeValidationSchema}
-						/>
-					)}
-				</Modal.Body>
-				<Modal.Footer>
-					<Button onClick={() => setShowEditModal(false)} appearance="subtle">
-						Cancel
-					</Button>
-					<Button
-						onClick={() => handleEditSubmit(editingEmployee!)}
-						appearance="primary"
-					>
-						Save Changes
-					</Button>
-				</Modal.Footer>
-			</Modal>
-
-			<Modal
-				size="md"
-				open={showAddModal}
-				onClose={() => setShowAddModal(false)}
-			>
-				<Modal.Header>
-					<Modal.Title>Add New Employee</Modal.Title>
-				</Modal.Header>
-				<Modal.Body>
-					<CustomForm
-						formValue={newEmployee}
-						setFormValue={setNewEmployee}
-						fields={employeeFormFields}
-						validationModel={employeeValidationSchema}
-					/>
-				</Modal.Body>
-				<Modal.Footer>
-					<Button onClick={() => setShowAddModal(false)} appearance="subtle">
-						Cancel
-					</Button>
-					<Button
-						onClick={() => {
-							dispatch(createEmployee(newEmployee));
-							setShowAddModal(false);
-							handleRefresh();
-						}}
-						appearance="primary"
-					>
-						Add Employee
-					</Button>
-				</Modal.Footer>
-			</Modal>
+			{/* Edit Employee Modal */}
+			{showEditModal && editingEmployee && (
+				<div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+					<div className="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 relative">
+						<h2 className="text-xl font-semibold mb-4">Edit Employee</h2>
+						<form onSubmit={handleEditEmployeeSubmit} id="edit-employee-form">
+							<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+								{employeeFormFields.map((field) => (
+									<div key={field.name} className="col-span-1 flex flex-col">
+										<label className="block text-sm font-medium text-gray-700 mb-1">
+											{field.label}
+										</label>
+										{field.type === "select" ? (
+											<select
+												name={field.name}
+												value={
+													(editingEmployee[
+														field.name as keyof iCreateEmployeeDTO
+													] as string) || ""
+												}
+												onChange={(e) =>
+													setEditingEmployee((prev) => ({
+														id: prev?.id,
+														name:
+															field.name === "name"
+																? e.target.value
+																: prev?.name ?? "",
+														email:
+															field.name === "email"
+																? e.target.value
+																: prev?.email ?? "",
+														phoneNumber:
+															field.name === "phoneNumber"
+																? e.target.value
+																: prev?.phoneNumber ?? "",
+														designation:
+															field.name === "designation"
+																? e.target.value
+																: prev?.designation ?? "",
+														salary:
+															field.name === "salary"
+																? Number(e.target.value)
+																: prev?.salary ?? 0,
+														statusId:
+															field.name === "statusId"
+																? e.target.value
+																: prev?.statusId ?? "",
+														joinedDate:
+															field.name === "joinedDate"
+																? e.target.value
+																: prev?.joinedDate ?? "",
+													}))
+												}
+												className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
+													editFormErrors[field.name] ? "border-red-500" : ""
+												}`}
+											>
+												<option value="">Select {field.label}</option>
+												{statusOptions.map((option) => (
+													<option key={option.value} value={option.value}>
+														{option.label}
+													</option>
+												))}
+											</select>
+										) : (
+											<input
+												type={field.type}
+												name={field.name}
+												value={
+													field.type === "date"
+														? editingEmployee[
+																field.name as keyof iCreateEmployeeDTO
+														  ]
+															? toDateInputString(
+																	editingEmployee[
+																		field.name as keyof iCreateEmployeeDTO
+																	] as string | Date,
+															  )
+															: ""
+														: field.type === "number"
+														? editingEmployee[
+																field.name as keyof iCreateEmployeeDTO
+														  ] !== undefined &&
+														  editingEmployee[
+																field.name as keyof iCreateEmployeeDTO
+														  ] !== null
+															? Number(
+																	editingEmployee[
+																		field.name as keyof iCreateEmployeeDTO
+																	],
+															  )
+															: ""
+														: editingEmployee[
+																field.name as keyof iCreateEmployeeDTO
+														  ] !== undefined &&
+														  editingEmployee[
+																field.name as keyof iCreateEmployeeDTO
+														  ] !== null
+														? String(
+																editingEmployee[
+																	field.name as keyof iCreateEmployeeDTO
+																],
+														  )
+														: ""
+												}
+												onChange={(e) =>
+													setEditingEmployee((prev) => ({
+														id: prev?.id,
+														name:
+															field.name === "name"
+																? e.target.value
+																: prev?.name ?? "",
+														email:
+															field.name === "email"
+																? e.target.value
+																: prev?.email ?? "",
+														phoneNumber:
+															field.name === "phoneNumber"
+																? e.target.value
+																: prev?.phoneNumber ?? "",
+														designation:
+															field.name === "designation"
+																? e.target.value
+																: prev?.designation ?? "",
+														salary:
+															field.name === "salary"
+																? Number(e.target.value)
+																: prev?.salary ?? 0,
+														statusId:
+															field.name === "statusId"
+																? e.target.value
+																: prev?.statusId ?? "",
+														joinedDate:
+															field.name === "joinedDate"
+																? e.target.value
+																: prev?.joinedDate ?? "",
+													}))
+												}
+												className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
+													editFormErrors[field.name] ? "border-red-500" : ""
+												}`}
+											/>
+										)}
+										{editFormErrors[field.name] && (
+											<span className="text-xs text-red-600 mt-1">
+												{editFormErrors[field.name]}
+											</span>
+										)}
+									</div>
+								))}
+							</div>
+							<div className="flex justify-end gap-2 mt-6">
+								<button
+									type="button"
+									onClick={() => setShowEditModal(false)}
+									className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded mr-2"
+								>
+									Cancel
+								</button>
+								<button
+									type="submit"
+									className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded"
+								>
+									Save Changes
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			)}
 		</div>
 	);
 };

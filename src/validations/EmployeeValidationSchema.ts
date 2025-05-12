@@ -1,19 +1,38 @@
-import {Schema} from "rsuite";
+import Joi from "joi";
 
-const {StringType, NumberType} = Schema.Types;
-
-export const employeeValidationSchema = Schema.Model({
-	name: StringType().isRequired("Name is required."),
-	email: StringType()
-		.isRequired("Email is required.")
-		.isEmail("Please enter a valid email."),
-	phoneNumber: StringType()
-		.isRequired("Phone number is required.")
-		.pattern(/^\d{10}$/, "Please enter a valid 10-digit phone number."),
-	designation: StringType().isRequired("Designation is required."),
-	salary: NumberType()
-		.isRequired("Salary is required.")
-		.min(0, "Salary must be a positive number."),
-	status: StringType().isRequired("Status is required."),
-	joinedDate: StringType().isRequired("Joined date is required."),
+export const employeeValidationSchema = Joi.object({
+	name: Joi.string().required().min(2).messages({
+		"string.empty": "Name is required",
+		"string.min": "Name must be at least 2 characters",
+	}),
+	email: Joi.string()
+		.email({tlds: {allow: false}})
+		.required()
+		.messages({
+			"string.empty": "Email is required",
+			"string.email": "Please enter a valid email",
+		}),
+	phoneNumber: Joi.string()
+		.pattern(/^\d{10}$/)
+		.required()
+		.messages({
+			"string.empty": "Phone number is required",
+			"string.pattern.base": "Please enter a valid 10-digit phone number",
+		}),
+	designation: Joi.string().required().min(2).messages({
+		"string.empty": "Designation is required",
+		"string.min": "Designation must be at least 2 characters",
+	}),
+	salary: Joi.number().min(0).required().messages({
+		"number.base": "Salary must be a number",
+		"number.min": "Salary must be a positive number",
+		"any.required": "Salary is required",
+	}),
+	statusId: Joi.string().required().messages({
+		"string.empty": "Status is required",
+	}),
+	joinedDate: Joi.date().required().messages({
+		"date.base": "Invalid date format",
+		"any.required": "Joined date is required",
+	}),
 });
