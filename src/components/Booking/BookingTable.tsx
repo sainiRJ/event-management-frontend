@@ -52,7 +52,7 @@ const BookingTable: React.FC<BookingTableProps> = ({
 
 		if (selectedStatus) {
 			filtered = filtered.filter(
-				(booking) => booking.bookingStatus === selectedStatus,
+				(booking) => booking.bookingStatusId === selectedStatus,
 			);
 		}
 
@@ -91,8 +91,8 @@ const BookingTable: React.FC<BookingTableProps> = ({
 			width: 150,
 			resizable: true,
 			render: (rowData: iBooking) => {
-				const budgetNum = Number(rowData.budget);
-				return isNaN(budgetNum) || rowData.budget === ""
+				const budgetNum = Number(rowData.totalCost);
+				return isNaN(budgetNum) || rowData.totalCost === ""
 					? "-"
 					: formatCurrency(budgetNum);
 			},

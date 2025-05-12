@@ -28,7 +28,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
 	const {serviceList} = useAppSelector(
 		(state: RootState) => state.serviceReducer,
 	);
-
+console.log(formValue,"formvalue")
 	const bookingStatuses = statusList
 		.filter((status) => status.context === "booking")
 		.map((status) => ({label: status.name, value: status.id}));

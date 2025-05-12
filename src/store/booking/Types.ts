@@ -18,8 +18,9 @@ export interface iBooking {
 	eventDate: string | null;
 	serviceId: string | null;
 	venueAddress: string;
-	additionalNotes?: string;
+	notes?: string;
 	budget: string;
+	totalCost: string;
 	advancePayment: string;
 	bookingStatus?: string;
 	paymentStatusId: string;

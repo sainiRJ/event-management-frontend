@@ -1,5 +1,6 @@
 // utils/showToast.ts
-import { useToaster } from 'rsuite';
+import React from "react";
+import {Message, toaster} from "rsuite";
 
 interface ToastOptions {
   successMessage?: string;
@@ -8,10 +9,10 @@ interface ToastOptions {
 }
 
 export const showToast = ({ response, successMessage, errorMessage }: ToastOptions) => {
-    const toaster=useToaster()
   if (response?.meta?.requestStatus === 'fulfilled') {
-    // toaster.push(<Message type="success">Login successfully</Message>);
-} else if (response?.meta?.requestStatus === 'rejected') {
+	toaster.push(<Message type="success">{successMessage}</Message>);
+
+  } else if (response?.meta?.requestStatus === 'rejected') {
     const payload = response?.payload;
 
     const errMsg =
@@ -19,7 +20,7 @@ export const showToast = ({ response, successMessage, errorMessage }: ToastOptio
       payload?.message?.error?.message ||
       errorMessage ||
       'An unknown error occurred';
+		toaster.push(<Message type="success">{errMsg}</Message>);
 
-    // toast.error(errMsg);
   }
 };

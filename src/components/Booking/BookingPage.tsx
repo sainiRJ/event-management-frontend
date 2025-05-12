@@ -81,7 +81,6 @@ const BookingPage = () => {
 	const {serviceList} = useAppSelector(
 		(state: RootState) => state.serviceReducer,
 	);
-	console.log(editingBooking, "editingBooking");
 	const bookingStatuses = statusList
 		.filter((status) => status.context === "booking")
 		.map((status) => ({label: status.name, value: status.id}));
@@ -119,12 +118,12 @@ const BookingPage = () => {
 	};
 
 	const handleViewDetails = (booking: iBooking) => {
-		setSelectedBooking(booking);
+		setSelectedBooking({...booking,eventDate: booking.eventDate ? new Date(booking.eventDate).toISOString().split("T")[0] : "",
+});
 		setShowDetailsModal(true);
 	};
 
 	const handleEditBooking = (selected: iBooking) => {
-		console.log(selected, "selected");
 		setShowDetailsModal(false);
 		setEditingBooking({
 			id: selected.id || "",
@@ -135,9 +134,9 @@ const BookingPage = () => {
 			venueAddress: selected.venueAddress || "",
 			serviceId: selected.serviceId || "",
 			bookingStatus: selected.bookingStatusId || "",
-			budget: selected.budget || "",
+			budget: selected.totalCost || "",
 			advancePayment: selected.advancePayment || "",
-			notes: selected.additionalNotes || "",
+			notes: selected.notes || "",
 			paymentStatusId: selected.paymentStatusId || "",
 			bookingStatusId: selected.bookingStatusId || "",
 			bookedAt: selected.bookedAt || "",
@@ -207,7 +206,7 @@ const BookingPage = () => {
 	}, [dispatch]);
 
 	return (
-		<div className="min-h-screen bg-gray-50 py-8 px-4">
+		<div className="min-h-screen bg-gray-50 py-8 px-4 mt-10">
 			<div className="max-w-7xl mx-auto">
 				<div className="bg-white rounded-lg shadow p-8 mb-8">
 					<h1 className="text-3xl font-bold mb-2">Bookings</h1>

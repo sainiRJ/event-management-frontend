@@ -6,9 +6,9 @@
 
 .main-content {
 	position: relative;
-	height: calc(100vh - 60px);
+	/* height: calc(100vh - 60px); */
 	display: flex;
-	margin-top: 60px; /* Ensure content is not hidden under navbar */
+	/* margin-top: 60px; */
 	overflow-y: auto;
 }
 
