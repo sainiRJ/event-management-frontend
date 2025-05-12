@@ -58,7 +58,7 @@ const DashboardPage: React.FC = () => {
 	const nextEvent = getNextEvent();
 
 	return (
-		<div className="px-4 py-6 max-w-screen-xl mx-auto bg-[#f5f8fa] min-h-screen">
+		<div className="px-4 py-6 max-w-screen-xl mx-auto bg-[#f5f8fa] min-h-screen mt-16">
 			<PhotoUploadModal
 				open={showPhotoUpload}
 				onClose={() => setShowPhotoUpload(false)}
