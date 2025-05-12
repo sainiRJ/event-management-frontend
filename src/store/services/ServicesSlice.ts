@@ -1,5 +1,4 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
-import {WritableDraft} from "immer/dist/internal.js";
 import Decimal from "decimal.js";
 
 import {apiResponseStatuses} from "@/customTypes/NetworkTypes";

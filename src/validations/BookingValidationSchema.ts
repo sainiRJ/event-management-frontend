@@ -1,22 +1,48 @@
-import {Schema} from "rsuite";
+import Joi from "joi";
 
-const {StringType, NumberType} = Schema.Types;
+export const bookingValidationSchema = Joi.object({
+	id: Joi.string().allow(""),
+	customerName: Joi.string().required().min(2).messages({
+		"string.empty": "Customer name is required",
+		"string.min": "Customer name must be at least 2 characters",
+	}),
+	phoneNumber: Joi.string()
+		.pattern(/^[0-9]{10}$/)
+		.required()
+		.messages({
+			"string.empty": "Phone number is required",
+			"string.pattern.base": "Phone number must be 10 digits",
+		}),
+	eventDate: Joi.string().required().messages({
+		"string.empty": "Event date is required",
+	}),
+	eventName: Joi.string().required().min(2).messages({
+		"string.empty": "Event name is required",
+		"string.min": "Event name must be at least 2 characters",
+	}),
+	venueAddress: Joi.string().required().min(5).messages({
+		"string.empty": "Venue address is required",
+		"string.min": "Venue address must be at least 5 characters",
+	}),
+	budget: Joi.string().required().messages({
+		"string.empty": "Budget is required",
+	}),
+	advancePayment: Joi.string().required().messages({
+		"string.empty": "Advance payment is required",
+	}),
+	notes: Joi.string().max(500).allow("").messages({
+		"string.max": "Notes cannot exceed 500 characters",
+	}),
+	serviceId: Joi.string().required().messages({
+		"string.empty": "Service is required",
+	}),
+	bookingStatusId: Joi.string().required().messages({
+		"string.empty": "Booking status is required",
+	}),
+	paymentStatusId: Joi.string().allow(""),
+	bookedAt: Joi.string().allow(""),
+	serviceName: Joi.string().allow(""),
+	paymentStatus: Joi.string().allow(""),
+	bookingStatus: Joi.string().allow(""),
 
-export const bookingValidationSchema = Schema.Model({
-	customerName: StringType().isRequired("Customer name is required."),
-	phoneNumber: StringType()
-		.isRequired("Phone number is required.")
-		.pattern(/^\d{10}$/, "Please enter a valid 10-digit phone number."),
-	eventName: StringType().isRequired("Event name is required."),
-	eventDate: StringType().isRequired("Event date and time is required."),
-	venueAddress: StringType().isRequired("Venue address is required."),
-	budget: NumberType()
-		.isRequired("Budget is required.")
-		.min(0, "Budget must be a positive number."),
-	serviceId: StringType().isRequired("Service is required."),
-	bookingStatusId: StringType().isRequired("Booking status is required."),
-	paymentStatusId: StringType().isRequired("Payment status is required."),
-	advancePayment: NumberType()
-		.isRequired("Advance payment is required.")
-		.min(0, "Advance payment must be a positive number."),
 });

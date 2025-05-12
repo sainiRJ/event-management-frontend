@@ -24,8 +24,10 @@ import {RootState} from "@/store";
 import RefreshIcon from "@rsuite/icons/Reload";
 import CustomTable from "../common/CustomTable";
 import CustomForm from "../common/CustomForm";
+import EmployeeForm from "./EmployeeForm";
 import {iCreateEmployeeDTO} from "../../customTypes/appDataTypes/employeeTypes";
 import {employeeValidationSchema} from "../../validations/EmployeeValidationSchema";
+import {ValidationError} from "joi";
 
 const formatDate = (dateString: string) => {
 	const date = new Date(dateString);
@@ -66,6 +68,8 @@ const EmployeeTable = () => {
 		statusId: "",
 		joinedDate: new Date(),
 	});
+	const [addFormErrors, setAddFormErrors] = useState<any>({});
+	const [editFormErrors, setEditFormErrors] = useState<any>({});
 
 	const {employeeList} = useAppSelector(
 		(state: RootState) => state.employeeReducer,
@@ -122,6 +126,18 @@ const EmployeeTable = () => {
 	};
 
 	const handleEditSubmit = async (formValue: iCreateEmployeeDTO) => {
+		const {error} = employeeValidationSchema.validate(formValue, {
+			abortEarly: false,
+		});
+		if (error) {
+			const errors: Record<string, string> = {};
+			error.details.forEach((detail) => {
+				errors[detail.path[0]] = detail.message;
+			});
+			setEditFormErrors(errors);
+			return;
+		}
+		setEditFormErrors({});
 		try {
 			await dispatch(updateEmployee(formValue));
 			toaster.push(
@@ -131,6 +147,31 @@ const EmployeeTable = () => {
 			handleRefresh();
 		} catch (error) {
 			toaster.push(<Message type="error">Failed to update employee</Message>);
+		}
+	};
+
+	const handleAddEmployee = async (formValue: iCreateEmployeeDTO) => {
+		const {error} = employeeValidationSchema.validate(formValue, {
+			abortEarly: false,
+		});
+		if (error) {
+			const errors: Record<string, string> = {};
+			error.details.forEach((detail) => {
+				errors[detail.path[0]] = detail.message;
+			});
+			setAddFormErrors(errors);
+			return;
+		}
+		setAddFormErrors({});
+		try {
+			await dispatch(createEmployee(formValue));
+			toaster.push(
+				<Message type="success">Employee added successfully</Message>,
+			);
+			setShowAddModal(false);
+			handleRefresh();
+		} catch (error) {
+			toaster.push(<Message type="error">Failed to add employee</Message>);
 		}
 	};
 
@@ -365,7 +406,6 @@ const EmployeeTable = () => {
 					data={filteredData}
 					loading={loading}
 					columns={columns}
-					height={400}
 					selectable
 					selectedKeys={selectedKeys}
 					onSelectChange={setSelectedKeys}
@@ -382,11 +422,11 @@ const EmployeeTable = () => {
 				</Modal.Header>
 				<Modal.Body>
 					{editingEmployee && (
-						<CustomForm
+						<EmployeeForm
 							formValue={editingEmployee}
 							setFormValue={setEditingEmployee}
-							fields={employeeFormFields}
-							validationModel={employeeValidationSchema}
+							onSubmit={handleEditSubmit}
+							errors={editFormErrors}
 						/>
 					)}
 				</Modal.Body>
@@ -394,10 +434,7 @@ const EmployeeTable = () => {
 					<Button onClick={() => setShowEditModal(false)} appearance="subtle">
 						Cancel
 					</Button>
-					<Button
-						onClick={() => handleEditSubmit(editingEmployee!)}
-						appearance="primary"
-					>
+					<Button type="submit" form="employee-form" appearance="primary">
 						Save Changes
 					</Button>
 				</Modal.Footer>
@@ -412,25 +449,18 @@ const EmployeeTable = () => {
 					<Modal.Title>Add New Employee</Modal.Title>
 				</Modal.Header>
 				<Modal.Body>
-					<CustomForm
+					<EmployeeForm
 						formValue={newEmployee}
 						setFormValue={setNewEmployee}
-						fields={employeeFormFields}
-						validationModel={employeeValidationSchema}
+						onSubmit={handleAddEmployee}
+						errors={addFormErrors}
 					/>
 				</Modal.Body>
 				<Modal.Footer>
 					<Button onClick={() => setShowAddModal(false)} appearance="subtle">
 						Cancel
 					</Button>
-					<Button
-						onClick={() => {
-							dispatch(createEmployee(newEmployee));
-							setShowAddModal(false);
-							handleRefresh();
-						}}
-						appearance="primary"
-					>
+					<Button type="submit" form="employee-form" appearance="primary">
 						Add Employee
 					</Button>
 				</Modal.Footer>
