@@ -8,7 +8,7 @@ import {
 	StringArray,
 } from "@/customTypes/CommonTypes";
 import {createBooking, getAllBookings, getBookingRequest} from "./ThunkActions";
-import {iBookingState, REDUCER_NAME} from "./Types";
+import {iBookingState, REDUCER_NAME, iBooking} from "./Types";
 
 // Define initial state based on the provided structure
 const initialState: iBookingState = {
@@ -36,7 +36,7 @@ export const bookingSlice = createSlice({
 			.addCase(createBooking.fulfilled, (state, action) => {
 				const payload = action.payload;
 				if (payload && payload.data) {
-					state.booking = payload.data; // This should be a single order object
+					state.booking = payload.data as iBooking; // Cast to iBooking
 					state.isLoading = false;
 					state.responseStatus = apiResponseStatuses.SUCCESS;
 				}
@@ -52,7 +52,7 @@ export const bookingSlice = createSlice({
 			.addCase(getAllBookings.fulfilled, (state, action) => {
 				const payload = action.payload;
 				if (payload && payload.data) {
-					state.bookingList = payload.data; // This should be a single order object
+					state.bookingList = payload.data as iBooking[]; // Cast to iBooking[]
 					state.isLoading = false;
 					state.responseStatus = apiResponseStatuses.SUCCESS;
 				}
@@ -77,7 +77,7 @@ export const bookingSlice = createSlice({
 				state.message = "Failed to fetch order data";
 				state.isLoading = false;
 				state.responseStatus = apiResponseStatuses.ERROR;
-			})
+			});
 	},
 });
 

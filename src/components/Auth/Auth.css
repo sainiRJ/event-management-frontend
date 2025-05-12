@@ -2,9 +2,9 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	min-height: 100vh;
-	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	min-height: 80vh;
 	padding: 20px;
+	background-size: cover;
 }
 
 .auth-box {
@@ -291,3 +291,241 @@
 		font-size: 1.5rem;
 	}
 }
+
+
+.login-wrapper {
+	position: relative;
+	height: 100vh;
+	width: 100%;
+	overflow: hidden;
+	background: #0f0f1b;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-wrap: wrap;
+  flex-direction: row;
+}
+
+.background-circles::before,
+.background-circles::after {
+	content: '';
+	position: absolute;
+	width: 400px;
+	height: 400px;
+	border-radius: 50%;
+	filter: blur(120px);
+	z-index: 0;
+}
+
+.background-circles::before {
+	background:  rgba(255, 100, 0, 0.4);
+	top: -100px;
+	left: -100px;
+}
+
+.background-circles::after {
+	background:rgba(0, 123, 255, 0.4);
+	bottom: -100px;
+	right: -100px;
+}
+
+.login-content {
+	position: relative;
+	z-index: 1;
+	display: flex;
+	width: 80%;
+	max-width: 1800px;
+	background-color: rgba(255, 255, 255, 0.04);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	border-radius: 15px;
+	backdrop-filter: blur(10px);
+	overflow: hidden;
+	flex-wrap: wrap;
+  flex-direction: row;
+}
+
+.login-left {
+	flex: 1;
+	padding: 50px;
+	color: white;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+.login-left h2 {
+	margin-bottom: 20px;
+}
+
+.login-left label {
+	margin-top: 15px;
+	/* font-weight: 600; */
+	color: white;
+}
+
+.login-left input {
+	width: 95%;
+	margin-top: 5px;
+	padding: 10px;
+	background-color: #2f2f3f;
+	border: none;
+	border-radius: 5px;
+	color: white;
+}
+
+.login-left input::placeholder {
+	color: #ccc;
+}
+
+.login-button {
+	width: 100%;
+	margin-top: 20px;
+	padding: 10px;
+	background: white;
+	color: black;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	font-weight: bold;
+}
+
+.social-buttons {
+	display: flex;
+	justify-content: space-between;
+	gap: 10px;
+	margin-top: 25px;
+}
+
+.google-btn,
+.facebook-btn {
+	flex: 1;
+	padding: 10px;
+	border: none;
+	border-radius: 5px;
+	background-color: #444;
+	color: white;
+	cursor: pointer;
+	font-weight: bold;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.google-btn span {
+	color: #fbbc05;
+	margin-right: 5px;
+}
+
+.facebook-btn span {
+	color: #1877f2;
+	margin-right: 5px;
+}
+
+.login-right {
+  flex: 1;
+  background: #675353;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  flex-wrap: wrap;
+  flex-direction: row;
+}
+
+.welcome-content {
+  color: white;
+  text-align: center;
+  animation: slideIn 1.2s ease-out;
+}
+
+.welcome-content h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.welcome-content p {
+  font-size: 1.1rem;
+  margin-bottom: 5px;
+  color: #ccc;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.welcome-content img {
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+  border-radius: 10px;
+  padding: 5px;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+}
+
+/* Animation */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0px);
+  }
+}
+
+section.app.rs-container{
+	margin: 0px !important;
+}
+
+
+
+@media (max-width: 768px) {
+	.login-content {
+	  flex-direction: column;
+	  width: 95%;
+	  height: auto;
+	}
+  
+	.login-left,
+	.login-right {
+	  flex: none;
+	  width: 100%;
+	  padding: 30px 20px;
+	  text-align: center;
+	}
+  
+	.login-left input {
+	  width: 100%;
+	}
+  
+	.login-button,
+	.google-btn,
+	.facebook-btn {
+	  width: 100%;
+	}
+  
+	.welcome-content {
+	  padding-top: 10px;
+	  padding-bottom: 10px;
+	}
+  
+	.welcome-content h1 {
+	  font-size: 1.4rem;
+	  margin-bottom: 10px;
+	}
+  
+	.welcome-content p {
+	  font-size: 1rem;
+	  margin-bottom: 20px;
+	}
+  
+	.welcome-content img {
+	  max-width: 90%;
+	}
+  
+	.login-right {
+	  background: transparent; /* Remove brown block effect */
+	  box-shadow: none;
+	}
+  }
+  
