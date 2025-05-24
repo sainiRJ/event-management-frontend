@@ -16,6 +16,7 @@ import EmployeeTable from "./components/Employee/EmployeeTable";
 import AuthGuard from "./Authguard";
 import {ImportSite} from "@rsuite/icons";
 import "./App.css";
+import ServiceTable from "./components/Services/ServiceTable";
 
 function App() {
 	const [showSideNav, setShowSideNav] = React.useState(false);
@@ -81,6 +82,14 @@ function App() {
 								element={
 									<AuthGuard requireAuth={true}>
 										<EmployeeTable />
+									</AuthGuard>
+								}
+							/>
+							<Route
+								path="/services"
+								element={
+									<AuthGuard requireAuth={true}>
+										<ServiceTable />
 									</AuthGuard>
 								}
 							/>
