@@ -45,7 +45,7 @@ const CustomSideNav = () => {
 							>
 								<Nav.Item
 									as={Link}
-									to="/dashboard"
+									to="/services"
 									eventKey="1"
 									icon={<Icon as={SendToDashboardIcon} />}
 								>
