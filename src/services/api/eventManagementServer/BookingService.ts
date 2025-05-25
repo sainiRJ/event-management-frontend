@@ -6,7 +6,11 @@ import NetworkUtil from "@/utils/NetworkUtil";
 import {NullableString} from "@/customTypes/CommonTypes";
 import {apiEndpoints} from "./axiosConfig/AxiosServiceConstants";
 
-import {iCreateBookingDTO, iBookingRequest} from "@/customTypes/appDataTypes/bookingTypes";
+import {
+	iCreateBookingDTO,
+	iBookingRequest,
+} from "@/customTypes/appDataTypes/bookingTypes";
+import {FinanceData} from "@/store/finance/Types";
 
 function BookingService(apiServer: AxiosInstance) {
 	const createBooking = async (
@@ -134,36 +138,68 @@ function BookingService(apiServer: AxiosInstance) {
 	};
 
 	const getBookingRequest = async (): Promise<APIResponse<
-	iBookingRequest[]
-> | null> => {
-	let result = null;
+		iBookingRequest[]
+	> | null> => {
+		let result = null;
 
-	await apiServer
-		.get(apiEndpoints.booking.bookingRequest())
-		.then(
-			//on fullfilled
-			(value) => {
-				result = NetworkUtil.buildResult<iBookingRequest[]>(
-					value.data,
-					value.status,
-					null,
-					null,
-				);
-			},
-			// onRejected
-			(reason) => {
-				const {response} = reason;
-				const {status, data} = response;
+		await apiServer
+			.get(apiEndpoints.booking.bookingRequest())
+			.then(
+				//on fullfilled
+				(value) => {
+					result = NetworkUtil.buildResult<iBookingRequest[]>(
+						value.data,
+						value.status,
+						null,
+						null,
+					);
+				},
+				// onRejected
+				(reason) => {
+					const {response} = reason;
+					const {status, data} = response;
 
-				result = NetworkUtil.buildResult<null>(data, status, data, null);
-			},
-		)
-		.catch((error) => {
-			throw error;
-		});
+					result = NetworkUtil.buildResult<null>(data, status, data, null);
+				},
+			)
+			.catch((error) => {
+				throw error;
+			});
 
-	return result;
-};
+		return result;
+	};
+
+	const getFinanceData = async (
+		queryParams: string,
+	): Promise<APIResponse<FinanceData> | null> => {
+		let result = null;
+
+		await apiServer
+			.get(apiEndpoints.booking.getFinanceData(queryParams))
+			.then(
+				//on fullfilled
+				(value) => {
+					result = NetworkUtil.buildResult<FinanceData>(
+						value.data,
+						value.status,
+						null,
+						null,
+					);
+				},
+				// onRejected
+				(reason) => {
+					const {response} = reason;
+					const {status, data} = response;
+
+					result = NetworkUtil.buildResult<null>(data, status, data, null);
+				},
+			)
+			.catch((error) => {
+				throw error;
+			});
+
+		return result;
+	};
 
 	return {
 		createBooking,
@@ -171,6 +207,7 @@ function BookingService(apiServer: AxiosInstance) {
 		deleteBooking,
 		updateBooking,
 		getBookingRequest,
+		getFinanceData,
 	};
 }
 

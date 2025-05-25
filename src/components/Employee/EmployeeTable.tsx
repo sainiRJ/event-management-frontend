@@ -10,6 +10,7 @@ import {
 	Message,
 	Input,
 	SelectPicker,
+	DatePicker,
 } from "rsuite";
 import {
 	getAllEmployees,
@@ -103,7 +104,6 @@ const EmployeeTable = () => {
 			email: rowData.email ?? "",
 			phoneNumber: rowData.phoneNumber ?? "",
 			designation: rowData.designation ?? "",
-			salary: rowData.salary ?? 0,
 			statusId: rowData.statusId ?? "",
 			joinedDate: rowData.joinedDate ?? "",
 		});
@@ -219,13 +219,6 @@ const EmployeeTable = () => {
 			resizable: true,
 		},
 		{
-			key: "salary",
-			label: "Salary",
-			width: 150,
-			resizable: true,
-			render: (rowData: any) => formatCurrency(rowData.salary),
-		},
-		{
 			key: "status",
 			label: "Status",
 			width: 120,
@@ -259,7 +252,7 @@ const EmployeeTable = () => {
 	);
 
 	const employeeStatuses = statusList
-		.filter((status:any) => status.context === "employee")
+		.filter((status: any) => status.context === "employee")
 		.map((status) => ({label: status.name, value: status.id}));
 
 	const employeeFields = [
@@ -288,11 +281,6 @@ const EmployeeTable = () => {
 			label: "Status",
 			type: "select" as const,
 			options: employeeStatuses.map((s) => ({label: s.label, value: s.value})),
-		},
-		{
-			name: "salary",
-			label: "Salary",
-			type: "number" as const,
 		},
 		{
 			name: "joinedDate",
@@ -349,9 +337,8 @@ const EmployeeTable = () => {
 		email: "",
 		phoneNumber: "",
 		designation: "",
-		salary: 0,
 		statusId: "",
-		joinedDate: toDateInputString(new Date()),
+		joinedDate: new Date().toISOString(),
 	});
 
 	// For DetailsModal, always pass joinedDate as string
@@ -383,14 +370,43 @@ const EmployeeTable = () => {
 	];
 
 	// Add/Edit Employee Form fields
-	const employeeFormFields = [
-		{name: "name", label: "Name", type: "text"},
-		{name: "email", label: "Email", type: "email"},
-		{name: "phoneNumber", label: "Phone Number", type: "tel"},
-		{name: "designation", label: "Designation", type: "text"},
-		{name: "salary", label: "Salary", type: "number"},
-		{name: "statusId", label: "Status", type: "select"},
-		{name: "joinedDate", label: "Joined Date", type: "date"},
+	const employeeFormFields: {
+		name: keyof iCreateEmployeeDTO;
+		label: string;
+		type: "text" | "date" | "select";
+		options?: {label: string; value: string}[];
+	}[] = [
+		{
+			name: "name",
+			label: "Name",
+			type: "text",
+		},
+		{
+			name: "email",
+			label: "Email",
+			type: "text",
+		},
+		{
+			name: "phoneNumber",
+			label: "Phone Number",
+			type: "text",
+		},
+		{
+			name: "designation",
+			label: "Designation",
+			type: "text",
+		},
+		{
+			name: "statusId",
+			label: "Status",
+			type: "select",
+			options: employeeStatuses.map((s) => ({label: s.label, value: s.value})),
+		},
+		{
+			name: "joinedDate",
+			label: "Joined Date",
+			type: "date",
+		},
 	];
 
 	// Use real status options from Redux
@@ -420,9 +436,8 @@ const EmployeeTable = () => {
 			email: "",
 			phoneNumber: "",
 			designation: "",
-			salary: 0,
 			statusId: "",
-			joinedDate: toDateInputString(new Date()),
+			joinedDate: new Date().toISOString(),
 		});
 		handleRefresh();
 	};
@@ -449,77 +464,144 @@ const EmployeeTable = () => {
 		handleRefresh();
 	};
 
+	const initialFormValue: iCreateEmployeeDTO = {
+		name: "",
+		email: "",
+		phoneNumber: "",
+		designation: "",
+		statusId: "",
+		joinedDate: new Date().toISOString(),
+	};
+
+	const [formData, setFormData] =
+		useState<iCreateEmployeeDTO>(initialFormValue);
+
+	const handleFormChange = (field: keyof iCreateEmployeeDTO, value: any) => {
+		setFormData((prev) => ({
+			...prev,
+			[field]: value,
+		}));
+	};
+
+	const renderFormField = (field: {
+		name: keyof iCreateEmployeeDTO;
+		label: string;
+		type: "text" | "date" | "select";
+		options?: {label: string; value: string}[];
+	}) => {
+		switch (field.type) {
+			case "text":
+				return (
+					<Input
+						key={field.name}
+						value={formData[field.name] as string}
+						onChange={(value) => handleFormChange(field.name, value)}
+						placeholder={`Enter ${field.label.toLowerCase()}`}
+					/>
+				);
+			case "date":
+				return (
+					<DatePicker
+						key={field.name}
+						value={
+							formData[field.name]
+								? new Date(formData[field.name] as string)
+								: null
+						}
+						onChange={(value) =>
+							handleFormChange(field.name, value?.toISOString())
+						}
+						placeholder={`Select ${field.label.toLowerCase()}`}
+					/>
+				);
+			case "select":
+				return (
+					<SelectPicker
+						key={field.name}
+						value={formData[field.name] as string}
+						onChange={(value) => handleFormChange(field.name, value)}
+						data={field.options || []}
+						placeholder={`Select ${field.label.toLowerCase()}`}
+					/>
+				);
+			default:
+				return null;
+		}
+	};
+
 	return (
 		<div className="min-h-screen bg-gray-50 py-8 px-4 mt-10">
-						<div className="max-w-7xl mx-auto">
-											<div className="bg-white rounded-lg shadow p-8 mb-8">
+			<div className="max-w-7xl mx-auto">
+				<div className="bg-white rounded-lg shadow p-8 mb-8">
+					{/* Filters */}
+					<h1 className="text-3xl font-bold mb-2">Employees</h1>
 
-
-			{/* Filters */}
-			<h1 className="text-3xl font-bold mb-2">Employees</h1>
-
-			<div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-4 sticky top-0 z-10 py-2">
-				<div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
-					<input
-						type="text"
-						placeholder="Filter by name"
-						className="border rounded px-3 py-2 text-sm w-full md:w-48"
-						value={filter.name}
-						onChange={(e) => setFilter((f) => ({...f, name: e.target.value}))}
+					<div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-4 sticky top-0 z-10 py-2">
+						<div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+							<input
+								type="text"
+								placeholder="Filter by name"
+								className="border rounded px-3 py-2 text-sm w-full md:w-48"
+								value={filter.name}
+								onChange={(e) =>
+									setFilter((f) => ({...f, name: e.target.value}))
+								}
+							/>
+							<select
+								className="border rounded px-3 py-2 text-sm w-full md:w-40"
+								value={filter.designation}
+								onChange={(e) =>
+									setFilter((f) => ({...f, designation: e.target.value}))
+								}
+							>
+								<option value="">All Designations</option>
+								{designations.map((d) => (
+									<option key={d} value={d}>
+										{d}
+									</option>
+								))}
+							</select>
+							<select
+								className="border rounded px-3 py-2 text-sm w-full md:w-40"
+								value={filter.status}
+								onChange={(e) =>
+									setFilter((f) => ({...f, status: e.target.value}))
+								}
+							>
+								<option value="">All Statuses</option>
+								{statuses.map((s) => (
+									<option key={s} value={s}>
+										{s}
+									</option>
+								))}
+							</select>
+						</div>
+						<button
+							onClick={() => setShowAddModal(true)}
+							className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded font-semibold transition w-full md:w-auto"
+						>
+							+ Add New Employee
+						</button>
+					</div>
+					{/* Table */}
+					<CustomTable
+						data={filtered}
+						loading={loading}
+						columns={employeeTableColumns}
+						onRowClick={handleRowClick}
+						rowKey="id"
 					/>
-					<select
-						className="border rounded px-3 py-2 text-sm w-full md:w-40"
-						value={filter.designation}
-						onChange={(e) =>
-							setFilter((f) => ({...f, designation: e.target.value}))
-						}
-					>
-						<option value="">All Designations</option>
-						{designations.map((d) => (
-							<option key={d} value={d}>
-								{d}
-							</option>
-						))}
-					</select>
-					<select
-						className="border rounded px-3 py-2 text-sm w-full md:w-40"
-						value={filter.status}
-						onChange={(e) => setFilter((f) => ({...f, status: e.target.value}))}
-					>
-						<option value="">All Statuses</option>
-						{statuses.map((s) => (
-							<option key={s} value={s}>
-								{s}
-							</option>
-						))}
-					</select>
+					{/* Details Modal */}
+					<DetailsModal
+						open={modalOpen}
+						onClose={handleModalClose}
+						data={selectedEmployeeForModal}
+						onSave={handleModalSave}
+						title="Employee Details"
+						fields={employeeFields}
+					/>
 				</div>
-				<button
-					onClick={() => setShowAddModal(true)}
-					className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded font-semibold transition w-full md:w-auto"
-				>
-					+ Add New Employee
-				</button>
 			</div>
-			{/* Table */}
-			<CustomTable
-				data={filtered}
-				loading={loading}
-				columns={employeeTableColumns}
-				onRowClick={handleRowClick}
-				rowKey="id"
-			/>
-			{/* Details Modal */}
-			<DetailsModal
-				open={modalOpen}
-				onClose={handleModalClose}
-				data={selectedEmployeeForModal}
-				onSave={handleModalSave}
-				title="Employee Details"
-				fields={employeeFields}
-			/>
-</div>
-</div>
 			{/* Add New Employee Modal */}
 			{showAddModal && (
 				<div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
@@ -532,86 +614,7 @@ const EmployeeTable = () => {
 										<label className="block text-sm font-medium text-gray-700 mb-1">
 											{field.label}
 										</label>
-										{field.type === "select" ? (
-											<select
-												name={field.name}
-												value={
-													(newEmployee[
-														field.name as keyof iCreateEmployeeDTO
-													] as string) || ""
-												}
-												onChange={(e) =>
-													setNewEmployee({
-														...newEmployee,
-														[field.name]: e.target.value,
-													})
-												}
-												className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
-													addFormErrors[field.name] ? "border-red-500" : ""
-												}`}
-											>
-												<option value="">Select {field.label}</option>
-												{statusOptions.map((option) => (
-													<option key={option.value} value={option.value}>
-														{option.label}
-													</option>
-												))}
-											</select>
-										) : (
-											<input
-												type={field.type}
-												name={field.name}
-												value={
-													field.type === "date"
-														? newEmployee[
-																field.name as keyof iCreateEmployeeDTO
-														  ]
-															? toDateInputString(
-																	newEmployee[
-																		field.name as keyof iCreateEmployeeDTO
-																	] as string | Date,
-															  )
-															: ""
-														: field.type === "number"
-														? newEmployee[
-																field.name as keyof iCreateEmployeeDTO
-														  ] !== undefined &&
-														  newEmployee[
-																field.name as keyof iCreateEmployeeDTO
-														  ] !== null
-															? Number(
-																	newEmployee[
-																		field.name as keyof iCreateEmployeeDTO
-																	],
-															  )
-															: ""
-														: newEmployee[
-																field.name as keyof iCreateEmployeeDTO
-														  ] !== undefined &&
-														  newEmployee[
-																field.name as keyof iCreateEmployeeDTO
-														  ] !== null
-														? String(
-																newEmployee[
-																	field.name as keyof iCreateEmployeeDTO
-																],
-														  )
-														: ""
-												}
-												onChange={(e) =>
-													setNewEmployee({
-														...newEmployee,
-														[field.name]:
-															field.type === "number"
-																? Number(e.target.value)
-																: e.target.value,
-													})
-												}
-												className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
-													addFormErrors[field.name] ? "border-red-500" : ""
-												}`}
-											/>
-										)}
+										{renderFormField(field)}
 										{addFormErrors[field.name] && (
 											<span className="text-xs text-red-600 mt-1">
 												{addFormErrors[field.name]}
@@ -652,137 +655,7 @@ const EmployeeTable = () => {
 										<label className="block text-sm font-medium text-gray-700 mb-1">
 											{field.label}
 										</label>
-										{field.type === "select" ? (
-											<select
-												name={field.name}
-												value={
-													(editingEmployee[
-														field.name as keyof iCreateEmployeeDTO
-													] as string) || ""
-												}
-												onChange={(e) =>
-													setEditingEmployee((prev) => ({
-														id: prev?.id,
-														name:
-															field.name === "name"
-																? e.target.value
-																: prev?.name ?? "",
-														email:
-															field.name === "email"
-																? e.target.value
-																: prev?.email ?? "",
-														phoneNumber:
-															field.name === "phoneNumber"
-																? e.target.value
-																: prev?.phoneNumber ?? "",
-														designation:
-															field.name === "designation"
-																? e.target.value
-																: prev?.designation ?? "",
-														salary:
-															field.name === "salary"
-																? Number(e.target.value)
-																: prev?.salary ?? 0,
-														statusId:
-															field.name === "statusId"
-																? e.target.value
-																: prev?.statusId ?? "",
-														joinedDate:
-															field.name === "joinedDate"
-																? e.target.value
-																: prev?.joinedDate ?? "",
-													}))
-												}
-												className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
-													editFormErrors[field.name] ? "border-red-500" : ""
-												}`}
-											>
-												<option value="">Select {field.label}</option>
-												{statusOptions.map((option) => (
-													<option key={option.value} value={option.value}>
-														{option.label}
-													</option>
-												))}
-											</select>
-										) : (
-											<input
-												type={field.type}
-												name={field.name}
-												value={
-													field.type === "date"
-														? editingEmployee[
-																field.name as keyof iCreateEmployeeDTO
-														  ]
-															? toDateInputString(
-																	editingEmployee[
-																		field.name as keyof iCreateEmployeeDTO
-																	] as string | Date,
-															  )
-															: ""
-														: field.type === "number"
-														? editingEmployee[
-																field.name as keyof iCreateEmployeeDTO
-														  ] !== undefined &&
-														  editingEmployee[
-																field.name as keyof iCreateEmployeeDTO
-														  ] !== null
-															? Number(
-																	editingEmployee[
-																		field.name as keyof iCreateEmployeeDTO
-																	],
-															  )
-															: ""
-														: editingEmployee[
-																field.name as keyof iCreateEmployeeDTO
-														  ] !== undefined &&
-														  editingEmployee[
-																field.name as keyof iCreateEmployeeDTO
-														  ] !== null
-														? String(
-																editingEmployee[
-																	field.name as keyof iCreateEmployeeDTO
-																],
-														  )
-														: ""
-												}
-												onChange={(e) =>
-													setEditingEmployee((prev) => ({
-														id: prev?.id,
-														name:
-															field.name === "name"
-																? e.target.value
-																: prev?.name ?? "",
-														email:
-															field.name === "email"
-																? e.target.value
-																: prev?.email ?? "",
-														phoneNumber:
-															field.name === "phoneNumber"
-																? e.target.value
-																: prev?.phoneNumber ?? "",
-														designation:
-															field.name === "designation"
-																? e.target.value
-																: prev?.designation ?? "",
-														salary:
-															field.name === "salary"
-																? Number(e.target.value)
-																: prev?.salary ?? 0,
-														statusId:
-															field.name === "statusId"
-																? e.target.value
-																: prev?.statusId ?? "",
-														joinedDate:
-															field.name === "joinedDate"
-																? e.target.value
-																: prev?.joinedDate ?? "",
-													}))
-												}
-												className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
-													editFormErrors[field.name] ? "border-red-500" : ""
-												}`}
-											/>
-										)}
+										{renderFormField(field)}
 										{editFormErrors[field.name] && (
 											<span className="text-xs text-red-600 mt-1">
 												{editFormErrors[field.name]}

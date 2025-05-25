@@ -6,7 +6,7 @@ import {RootState} from "../../store/RootReducer";
 import {iLoginCredentials} from "../../store/auth/Types";
 import {useAppDispatch} from "../../store/Hooks";
 import {Message, toaster} from "rsuite";
-import { showToast } from "@/utils/showToatify";
+import {showToast} from "@/utils/showToatify";
 
 // Custom CSS for animated background circles
 const bgCircleStyles = `
@@ -74,12 +74,17 @@ const Login: React.FC = () => {
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setError("");
-			const response: any = await dispatch(login(formData));
-				showToast({
+		const response: any = await dispatch(login(formData));
+		showToast({
 			response,
-			successMessage: 'Login successful',
-			errorMessage: 'Login failed'
+			successMessage: "Login successful",
+			errorMessage: "Login failed",
 		});
+
+		// Add navigation after successful login
+		if (response.payload?.data?.token?.accessToken) {
+			navigate("/dashboard");
+		}
 	};
 
 	const handleGoogleLogin = () => {

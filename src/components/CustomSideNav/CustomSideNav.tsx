@@ -10,6 +10,7 @@ import TrendIcon from "@rsuite/icons/Trend";
 import {ClipboardIcon} from "@radix-ui/react-icons";
 import {Tooltip, Whisper} from "rsuite";
 import {Link} from "react-router-dom"; // Import Link from React Router
+import GearCircleIcon from "@rsuite/icons/legacy/GearCircle";
 
 import {useThemeAwareObject} from "../../styles/theme/ThemingHelper";
 
@@ -47,7 +48,7 @@ const CustomSideNav = () => {
 									as={Link}
 									to="/services"
 									eventKey="1"
-									icon={<Icon as={SendToDashboardIcon} />}
+									icon={<Icon as={GearCircleIcon} />}
 								>
 									Services
 								</Nav.Item>

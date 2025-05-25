@@ -44,5 +44,5 @@ export const bookingValidationSchema = Joi.object({
 	serviceName: Joi.string().allow(""),
 	paymentStatus: Joi.string().allow(""),
 	bookingStatus: Joi.string().allow(""),
-
+	assignedEmployeeIds: Joi.array().items(Joi.string()).allow(null, ""),
 });

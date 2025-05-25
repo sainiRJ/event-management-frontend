@@ -23,11 +23,6 @@ export const employeeValidationSchema = Joi.object({
 		"string.empty": "Designation is required",
 		"string.min": "Designation must be at least 2 characters",
 	}),
-	salary: Joi.number().min(0).required().messages({
-		"number.base": "Salary must be a number",
-		"number.min": "Salary must be a positive number",
-		"any.required": "Salary is required",
-	}),
 	statusId: Joi.string().required().messages({
 		"string.empty": "Status is required",
 	}),

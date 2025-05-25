@@ -28,6 +28,9 @@ const BookingTable: React.FC<BookingTableProps> = ({
 	const {bookingList} = useAppSelector(
 		(state: RootState) => state.bookingReducer,
 	);
+	const {employeeList} = useAppSelector(
+		(state: RootState) => state.employeeReducer,
+	);
 
 	useEffect(() => {
 		dispatch(getAllBookings());
@@ -39,7 +42,6 @@ const BookingTable: React.FC<BookingTableProps> = ({
 			setLoading(false);
 		}
 	}, [bookingList]);
-	console.log(bookingList);
 
 	useEffect(() => {
 		let filtered = [...data];
@@ -95,6 +97,29 @@ const BookingTable: React.FC<BookingTableProps> = ({
 				return isNaN(budgetNum) || rowData.totalCost === ""
 					? "-"
 					: formatCurrency(budgetNum);
+			},
+		},
+		{
+			key: "assignedEmployees",
+			label: "Assigned Employees",
+			width: 200,
+			resizable: true,
+			render: (rowData: iBooking) => {
+				if (!rowData.assignedEmployees?.length) return "-";
+				return (
+					<div className="flex flex-wrap gap-1">
+						{rowData.assignedEmployees.map((employee) => {
+							return (
+								<span
+									key={employee.id}
+									className="px-2 py-1 bg-indigo-100 text-indigo-800 rounded-full text-xs"
+								>
+									{employee.name}
+								</span>
+							);
+						})}
+					</div>
+				);
 			},
 		},
 		{

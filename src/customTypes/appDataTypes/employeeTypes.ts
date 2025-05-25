@@ -4,7 +4,6 @@ export interface iCreateEmployeeDTO {
 	email: string;
 	phoneNumber: string;
 	designation: string;
-	salary: number;
 	statusId: string;
 	joinedDate: Date | string;
 }

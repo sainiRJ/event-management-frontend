@@ -65,7 +65,7 @@ export const apiEndpoints = Object.freeze({
 		},
 		signup: () => {
 			return "auth/signup";
-		}
+		},
 	},
 
 	employee: {
@@ -91,8 +91,11 @@ export const apiEndpoints = Object.freeze({
 			return "booking/bulk-delete";
 		},
 		bookingRequest: () => {
-			return "booking/request"
-		}
+			return "booking/request";
+		},
+		getFinanceData: (queryParams: string) => {
+			return `finance/all?${queryParams}`;
+		},
 	},
 
 	allStatus: {
@@ -109,6 +112,12 @@ export const apiEndpoints = Object.freeze({
 	service: {
 		getAllServices: () => {
 			return "/service/all";
+		},
+		createService: () => {
+			return "service/create";
+		},
+		updateService: (serviceId: string) => {
+			return `service//update/${serviceId}`;
 		},
 	},
 	status: {

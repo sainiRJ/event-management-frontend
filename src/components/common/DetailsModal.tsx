@@ -11,6 +11,7 @@ interface DetailsModalProps {
 		label: string;
 		type: "text" | "number" | "date" | "select" | "textarea";
 		options?: {label: string; value: string}[];
+		render?: (value: any) => React.ReactNode;
 	}[];
 	editMode?: boolean;
 	externalEdit?: boolean;
@@ -101,6 +102,11 @@ const DetailsModal: React.FC<DetailsModalProps> = ({
 						/>
 					);
 			}
+		}
+		if (field.render) {
+			return (
+				<div className="text-gray-800">{field.render(data[field.name])}</div>
+			);
 		}
 		return <div className="text-gray-800">{data[field.name]}</div>;
 	};
