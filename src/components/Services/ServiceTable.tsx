@@ -10,23 +10,18 @@ import {
 	Message,
 	Input,
 	SelectPicker,
+	Divider,
 } from "rsuite";
-import {
-	getAllEmployees,
-	deleteEmployee,
-	updateEmployee,
-	createEmployee,
-} from "@/store/employee/ThunkActions";
 import {fetchServices} from "@/store/services/ThunkActions";
-import {fetchStatus} from "@/store/status/ThunkActions";
 import {RootState} from "@/store";
 import RefreshIcon from "@rsuite/icons/Reload";
 import CustomTable from "../common/CustomTable";
 import CustomForm from "../common/CustomForm";
-import {iCreateEmployeeDTO} from "../../customTypes/appDataTypes/employeeTypes";
-import {employeeValidationSchema} from "../../validations/EmployeeValidationSchema";
 import Joi from "joi";
 import DetailsModal from "../common/DetailsModal";
+import {iService} from "@/store/services/Types";
+import {iCreateServiceDTO} from "@/customTypes/appDataTypes/serviceTypes";
+import {createService, updateService} from "@/store/services/ThunkActions";
 
 const formatDate = (dateString: string) => {
 	const date = new Date(dateString);
@@ -38,9 +33,9 @@ const formatDate = (dateString: string) => {
 };
 
 const formatCurrency = (amount: number) => {
-	return new Intl.NumberFormat("en-US", {
+	return new Intl.NumberFormat("en-IN", {
 		style: "currency",
-		currency: "USD",
+		currency: "INR",
 	}).format(amount);
 };
 
@@ -57,23 +52,36 @@ const StatusBadge = ({status}: {status: string}) => {
 	);
 };
 
+// Types for DetailsModal (no checkbox)
+type DetailsFormFieldType = "text" | "textarea" | "number" | "select" | "date";
+interface DetailsFormField {
+	name: keyof iCreateServiceDTO;
+	label: string;
+	type: DetailsFormFieldType;
+	options?: {label: string; value: string}[];
+}
+
+// Types for Add/Edit modals (can use checkbox)
+type ModalFormFieldType = DetailsFormFieldType | "checkbox";
+interface ModalFormField {
+	name: keyof iCreateServiceDTO;
+	label: string;
+	type: ModalFormFieldType;
+	options?: {label: string; value: string}[];
+}
+
 const ServiceTable = () => {
 	const [loading, setLoading] = useState(true);
-	const [data, setData] = useState<any[]>([]);
-	const [filteredData, setFilteredData] = useState<any[]>([]);
-	const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
+	const [data, setData] = useState<iService[]>([]);
+	const [filteredData, setFilteredData] = useState<iService[]>([]);
 	const [searchQuery, setSearchQuery] = useState("");
-	const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
-	const [selectedDesignation, setSelectedDesignation] = useState<string | null>(
-		null,
-	);
 	const [showEditModal, setShowEditModal] = useState(false);
-	const [editingEmployee, setEditingEmployee] =
-		useState<iCreateEmployeeDTO | null>(null);
+	const [editingService, setEditingService] =
+		useState<iCreateServiceDTO | null>(null);
 	const [showAddModal, setShowAddModal] = useState(false);
-	const [selectedEmployee, setSelectedEmployee] = useState<any | null>(null);
+	const [selectedService, setSelectedService] = useState<iService | null>(null);
 	const [modalOpen, setModalOpen] = useState(false);
-	const [filter, setFilter] = useState({name: "", designation: "", status: ""});
+	const [filter, setFilter] = useState({name: ""});
 	const [addFormErrors, setAddFormErrors] = useState<Record<string, string>>(
 		{},
 	);
@@ -81,327 +89,226 @@ const ServiceTable = () => {
 		{},
 	);
 
-	const {employeeList} = useAppSelector(
-		(state: RootState) => state.employeeReducer,
+	const {serviceList} = useAppSelector(
+		(state: RootState) => state.serviceReducer,
 	);
 	const dispatch = useAppDispatch();
 
 	const handleRefresh = () => {
 		setLoading(true);
-		dispatch(getAllEmployees());
+		dispatch(fetchServices());
 	};
 
 	useEffect(() => {
 		dispatch(fetchServices());
-		dispatch(fetchStatus());
 	}, [dispatch]);
 
-	const handleEdit = (rowData: any) => {
-		setEditingEmployee({
+	const handleEdit = (rowData: iService) => {
+		setModalOpen(false);
+		setEditingService({
 			id: rowData.id ?? "",
-			name: rowData.name ?? "",
-			email: rowData.email ?? "",
-			phoneNumber: rowData.phoneNumber ?? "",
-			designation: rowData.designation ?? "",
-			salary: rowData.salary ?? 0,
-			statusId: rowData.statusId ?? "",
-			joinedDate: rowData.joinedDate ?? "",
+			serviceName: rowData.serviceName ?? "",
+			description: rowData.description ?? null,
+			price: rowData.price ?? "",
+			available: rowData.available ?? false,
 		});
 		setShowEditModal(true);
 	};
 
-	const handleDelete = async (rowData: any) => {
-		try {
-			await dispatch(deleteEmployee(rowData.id));
-			toaster.push(
-				<Message type="success">Employee deleted successfully</Message>,
-			);
-			handleRefresh();
-		} catch (error) {
-			toaster.push(<Message type="error">Failed to delete employee</Message>);
-		}
+	const handleDelete = async (rowData: iService) => {
+		console.log("Delete service:", rowData);
+		toaster.push(
+			<Message type="info">Delete functionality not yet implemented</Message>,
+		);
 	};
 
-	const handleBulkDelete = async () => {
-		if (selectedKeys.length === 0) {
-			toaster.push(
-				<Message type="warning">Please select employees to delete</Message>,
-			);
-			return;
-		}
-
-		try {
-			await dispatch(deleteEmployee(selectedKeys));
-			toaster.push(
-				<Message type="success">
-					Selected employees deleted successfully
-				</Message>,
-			);
-			setSelectedKeys([]);
-			handleRefresh();
-		} catch (error) {
-			toaster.push(<Message type="error">Failed to delete employees</Message>);
-		}
-	};
-
-	const handleEditSubmit = async (formValue: iCreateEmployeeDTO) => {
-		try {
-			await dispatch(updateEmployee(formValue));
-			toaster.push(
-				<Message type="success">Employee updated successfully</Message>,
-			);
-			setShowEditModal(false);
-			handleRefresh();
-		} catch (error) {
-			toaster.push(<Message type="error">Failed to update employee</Message>);
-		}
+	const handleEditSubmit = async (formValue: iCreateServiceDTO) => {
+		console.log("Update service:", formValue);
+		toaster.push(
+			<Message type="info">Update functionality not yet implemented</Message>,
+		);
+		setShowEditModal(false);
 	};
 
 	useEffect(() => {
-		dispatch(getAllEmployees());
+		handleRefresh();
 	}, [dispatch]);
 
 	useEffect(() => {
-		if (employeeList) {
-			setData(employeeList);
+		if (serviceList) {
+			setData(serviceList);
 			setLoading(false);
 		}
-	}, [employeeList]);
+	}, [serviceList]);
 
 	useEffect(() => {
 		let filtered = [...data];
 
 		if (searchQuery) {
-			filtered = filtered.filter((employee) =>
-				employee.name.toLowerCase().includes(searchQuery.toLowerCase()),
-			);
-		}
-
-		if (selectedStatus) {
-			filtered = filtered.filter(
-				(employee) =>
-					employee.status.toLowerCase() === selectedStatus.toLowerCase(),
-			);
-		}
-
-		if (selectedDesignation) {
-			filtered = filtered.filter(
-				(employee) => employee.designation === selectedDesignation,
+			filtered = filtered.filter((service) =>
+				service.serviceName.toLowerCase().includes(searchQuery.toLowerCase()),
 			);
 		}
 
 		setFilteredData(filtered);
-	}, [data, searchQuery, selectedStatus, selectedDesignation]);
+	}, [data, searchQuery]);
 
 	const columns = [
 		{
-			key: "name",
-			label: "Name",
-			width: 200,
-			resizable: true,
-		},
-		{
-			key: "email",
-			label: "Email",
+			key: "serviceName",
+			label: "Service Name",
 			width: 250,
 			resizable: true,
 		},
 		{
-			key: "phoneNumber",
-			label: "Phone Number",
-			width: 150,
+			key: "description",
+			label: "Description",
+			width: 400,
 			resizable: true,
 		},
 		{
-			key: "designation",
-			label: "Designation",
-			width: 200,
+			key: "price",
+			label: "Price",
+			width: 100,
 			resizable: true,
+			render: (rowData: iService) => formatCurrency(parseFloat(rowData.price)),
 		},
 		{
-			key: "salary",
-			label: "Salary",
-			width: 150,
+			key: "available",
+			label: "Available",
+			width: 100,
 			resizable: true,
-			render: (rowData: any) => formatCurrency(rowData.salary),
-		},
-		{
-			key: "status",
-			label: "Status",
-			width: 120,
-			resizable: true,
-		},
-		{
-			key: "joinedDate",
-			label: "Joined Date",
-			width: 150,
-			resizable: true,
-			render: (rowData: any) => formatDate(rowData.joinedDate),
+			render: (rowData: iService) => (rowData.available ? "Yes" : "No"),
 		},
 		{
 			key: "actions",
 			label: "Actions",
-			width: 120,
-			render: (rowData: any) => (
-				<Button
-					size="sm"
-					onClick={() => handleEdit(rowData)}
-					appearance="subtle"
-				>
-					Edit
-				</Button>
+			width: 150,
+			render: (rowData: iService) => (
+				<Stack divider={<Divider />} spacing={5}>
+					<Button
+						size="sm"
+						onClick={() => handleEdit(rowData)}
+						appearance="subtle"
+					>
+						Edit
+					</Button>
+					<Button
+						size="sm"
+						onClick={() => handleDelete(rowData)}
+						appearance="subtle"
+						color="red"
+					>
+						Delete
+					</Button>
+				</Stack>
 			),
 		},
 	];
 
-	const {statusList} = useAppSelector(
-		(state: RootState) => state.statusReducer,
-	);
-
-	const employeeStatuses = statusList
-		.filter((status:any) => status.context === "employee")
-		.map((status) => ({label: status.name, value: status.id}));
-
-	const employeeFields = [
-		{
-			name: "name",
-			label: "Name",
-			type: "text" as const,
-		},
-		{
-			name: "email",
-			label: "Email",
-			type: "text" as const,
-		},
-		{
-			name: "phoneNumber",
-			label: "Phone Number",
-			type: "text" as const,
-		},
-		{
-			name: "designation",
-			label: "Designation",
-			type: "text" as const,
-		},
-		{
-			name: "status",
-			label: "Status",
-			type: "select" as const,
-			options: employeeStatuses.map((s) => ({label: s.label, value: s.value})),
-		},
-		{
-			name: "salary",
-			label: "Salary",
-			type: "number" as const,
-		},
-		{
-			name: "joinedDate",
-			label: "Joined Date",
-			type: "date" as const,
-		},
+	// For DetailsModal (display only, no checkbox)
+	const serviceDetailsFields: DetailsFormField[] = [
+		{name: "serviceName", label: "Service Name", type: "text"},
+		{name: "description", label: "Description", type: "textarea"},
+		{name: "price", label: "Price", type: "number"},
+		{name: "available", label: "Available", type: "text"}, // show as Yes/No
 	];
 
-	// Filter logic
-	const filtered = data.filter(
-		(row) =>
-			(filter.name === "" ||
-				row.name?.toLowerCase().includes(filter.name.toLowerCase())) &&
-			(filter.designation === "" ||
-				row.designation
-					?.toLowerCase()
-					.includes(filter.designation.toLowerCase())) &&
-			(filter.status === "" || row.status === filter.status),
-	);
+	// For Add/Edit modals (can use checkbox)
+	const serviceModalFields: ModalFormField[] = [
+		{name: "serviceName", label: "Service Name", type: "text"},
+		{name: "description", label: "Description", type: "textarea"},
+		{name: "price", label: "Price", type: "number"},
+		{name: "available", label: "Available", type: "checkbox"},
+	];
 
-	// Modal handlers
-	const handleRowClick = (row: any) => {
-		setSelectedEmployee(row);
+	const handleRowClick = (row: iService) => {
+		setShowEditModal(false);
+		setSelectedService(row);
 		setModalOpen(true);
 	};
 	const handleModalClose = () => {
 		setModalOpen(false);
-		setSelectedEmployee(null);
+		setSelectedService(null);
 	};
-	const handleModalSave = async (updated: any) => {
-		await dispatch(updateEmployee(updated));
-		setModalOpen(false);
-		setSelectedEmployee(null);
-		dispatch(getAllEmployees());
+	const handleModalSave = async (updated: iService) => {
+		console.log("Save service details:", updated);
+		try {
+			const serviceToUpdate = {
+				...updated,
+				price: String(updated.price),
+				available:
+					typeof updated.available === "boolean"
+						? updated.available
+						: updated.available === "Yes",
+			};
+			const result = await dispatch(updateService(serviceToUpdate)).unwrap();
+			toaster.push(
+				<Message type="success">Service updated successfully!</Message>,
+			);
+			handleRefresh();
+			setModalOpen(false);
+			setSelectedService(null);
+		} catch (error: any) {
+			console.error("Failed to update service:", error);
+			const errorMessage = getErrorMessage(error);
+			toaster.push(
+				<Message type="error">
+					Failed to update service: {errorMessage}
+				</Message>,
+			);
+		}
 	};
 
-	// Get unique designations and statuses for filter dropdowns
-	const designations = Array.from(
-		new Set(data.map((emp) => emp.designation)),
-	).filter(Boolean);
-	const statuses = Array.from(new Set(data.map((emp) => emp.status))).filter(
-		Boolean,
-	);
-
-	// Helper to format date as YYYY-MM-DD
 	const toDateInputString = (date: Date | string) => {
 		if (!date) return "";
 		if (typeof date === "string") return date.slice(0, 10);
 		return date.toISOString().slice(0, 10);
 	};
 
-	const [newEmployee, setNewEmployee] = useState<iCreateEmployeeDTO>({
-		name: "",
-		email: "",
-		phoneNumber: "",
-		designation: "",
-		salary: 0,
-		statusId: "",
-		joinedDate: toDateInputString(new Date()),
+	const [newService, setNewService] = useState<iCreateServiceDTO>({
+		serviceName: "",
+		description: null,
+		price: "",
+		available: false,
 	});
 
-	// For DetailsModal, always pass joinedDate as string
-	const selectedEmployeeForModal = selectedEmployee
-		? {
-				...selectedEmployee,
-				joinedDate: toDateInputString(selectedEmployee.joinedDate),
-		  }
-		: null;
+	const selectedServiceForModal = selectedService ? {...selectedService} : null;
 
-	const serviceTableColumns = [
-		{
-			key: "name",
-			label: "Name",
-		},
-		{
-			key: "designation",
-			label: "Designation",
-		},
-		{
-			key: "phoneNumber",
-			label: "Phone Number",
-		},
-		{
-			key: "status",
-			label: "Status",
-			render: (row: any) => <StatusBadge status={row.status || "-"} />,
-		},
-	];
+	const serviceTableColumns = columns;
 
-	// Add/Edit Employee Form fields
-	const employeeFormFields = [
-		{name: "name", label: "Name", type: "text"},
-		{name: "email", label: "Email", type: "email"},
-		{name: "phoneNumber", label: "Phone Number", type: "tel"},
-		{name: "designation", label: "Designation", type: "text"},
-		{name: "salary", label: "Salary", type: "number"},
-		{name: "statusId", label: "Status", type: "select"},
-		{name: "joinedDate", label: "Joined Date", type: "date"},
-	];
+	const serviceValidationSchema = Joi.object({
+		serviceName: Joi.string().required().messages({
+			"string.empty": "Service Name is required",
+			"any.required": "Service Name is required",
+		}),
+		description: Joi.string().allow(null, ""),
+		price: Joi.number().required().messages({
+			"number.base": "Price must be a number",
+			"any.required": "Price is required",
+		}),
+		available: Joi.boolean().required(),
+	});
 
-	// Use real status options from Redux
-	const statusOptions = statusList
-		.filter((status) => status.context === "employee")
-		.map((status) => ({label: status.name, value: status.id}));
+	// Helper to extract error message as string
+	function getErrorMessage(error: any): string {
+		if (typeof error === "string") {
+			return error;
+		} else if (error?.message) {
+			return error.message;
+		} else if (error?.error) {
+			return error.error;
+		} else if (error?.data?.message) {
+			return error.data.message;
+		} else if (typeof error === "object") {
+			return JSON.stringify(error);
+		}
+		return "Unknown error";
+	}
 
-	// Add Employee Modal Handlers
-	const handleAddEmployeeSubmit = async (e: React.FormEvent) => {
+	const handleAddServiceSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		const {error} = employeeValidationSchema.validate(newEmployee, {
+		const {error} = serviceValidationSchema.validate(newService, {
 			abortEarly: false,
 		});
 		if (error) {
@@ -413,25 +320,38 @@ const ServiceTable = () => {
 			return;
 		}
 		setAddFormErrors({});
-		await dispatch(createEmployee(newEmployee));
-		setShowAddModal(false);
-		setNewEmployee({
-			name: "",
-			email: "",
-			phoneNumber: "",
-			designation: "",
-			salary: 0,
-			statusId: "",
-			joinedDate: toDateInputString(new Date()),
-		});
-		handleRefresh();
+		console.log("Add new service:", newService);
+		try {
+			const serviceToAdd = {
+				...newService,
+				price: String(newService.price),
+				available: Boolean(newService.available),
+			};
+			const result = await dispatch(createService(serviceToAdd)).unwrap();
+			toaster.push(
+				<Message type="success">Service added successfully!</Message>,
+			);
+			setShowAddModal(false);
+			setNewService({
+				serviceName: "",
+				description: null,
+				price: "",
+				available: false,
+			});
+			handleRefresh();
+		} catch (error: any) {
+			console.error("Failed to add service:", error);
+			const errorMessage = getErrorMessage(error);
+			toaster.push(
+				<Message type="error">Failed to add service: {errorMessage}</Message>,
+			);
+		}
 	};
 
-	// Edit Employee Modal Handlers
-	const handleEditEmployeeSubmit = async (e: React.FormEvent) => {
+	const handleEditServiceSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		if (!editingEmployee) return;
-		const {error} = employeeValidationSchema.validate(editingEmployee, {
+		if (!editingService) return;
+		const {error} = serviceValidationSchema.validate(editingService, {
 			abortEarly: false,
 		});
 		if (error) {
@@ -443,105 +363,117 @@ const ServiceTable = () => {
 			return;
 		}
 		setEditFormErrors({});
-		await dispatch(updateEmployee(editingEmployee));
-		setShowEditModal(false);
-		setEditingEmployee(null);
-		handleRefresh();
+		console.log("Update service:", editingService);
+		try {
+			const serviceToUpdate = {
+				...editingService,
+				price: String(editingService.price),
+				available: Boolean(editingService.available),
+			};
+			const result = await dispatch(updateService(serviceToUpdate)).unwrap();
+			toaster.push(
+				<Message type="success">Service updated successfully!</Message>,
+			);
+			setShowEditModal(false);
+			setEditingService(null);
+			handleRefresh();
+		} catch (error: any) {
+			console.error("Failed to update service:", error);
+			const errorMessage = getErrorMessage(error);
+			toaster.push(
+				<Message type="error">
+					Failed to update service: {errorMessage}
+				</Message>,
+			);
+		}
 	};
 
 	return (
 		<div className="min-h-screen bg-gray-50 py-8 px-4 mt-10">
-						<div className="max-w-7xl mx-auto">
-											<div className="bg-white rounded-lg shadow p-8 mb-8">
+			<div className="max-w-7xl mx-auto">
+				<div className="bg-white rounded-lg shadow p-8 mb-8">
+					{/* Filters */}
+					<h1 className="text-3xl font-bold mb-2">Services</h1>
 
-			{/* Filters */}
-			<h1 className="text-3xl font-bold mb-2">Services</h1>
-
-			<div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-4 sticky top-0 z-10 py-2">
-				<div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
-					<input
-						type="text"
-						placeholder="Filter by name"
-						className="border rounded px-3 py-2 text-sm w-full md:w-48"
-						value={filter.name}
-						onChange={(e) => setFilter((f) => ({...f, name: e.target.value}))}
+					<div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-4 sticky top-0 z-10 py-2">
+						<div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+							<input
+								type="text"
+								placeholder="Filter by service name"
+								className="border rounded px-3 py-2 text-sm w-full md:w-48"
+								value={searchQuery}
+								onChange={(e) => setSearchQuery(e.target.value)}
+							/>
+						</div>
+						<button
+							onClick={() => setShowAddModal(true)}
+							className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded font-semibold transition w-full md:w-auto"
+						>
+							+ Add New Service
+						</button>
+					</div>
+					{/* Table */}
+					<CustomTable
+						data={filteredData}
+						loading={loading}
+						columns={serviceTableColumns}
+						onRowClick={handleRowClick}
+						rowKey="id"
 					/>
-					<select
-						className="border rounded px-3 py-2 text-sm w-full md:w-40"
-						value={filter.designation}
-						onChange={(e) =>
-							setFilter((f) => ({...f, designation: e.target.value}))
-						}
-					>
-						<option value="">All Designations</option>
-						{designations.map((d) => (
-							<option key={d} value={d}>
-								{d}
-							</option>
-						))}
-					</select>
-					<select
-						className="border rounded px-3 py-2 text-sm w-full md:w-40"
-						value={filter.status}
-						onChange={(e) => setFilter((f) => ({...f, status: e.target.value}))}
-					>
-						<option value="">All Statuses</option>
-						{statuses.map((s) => (
-							<option key={s} value={s}>
-								{s}
-							</option>
-						))}
-					</select>
+					{/* Details Modal */}
+					{modalOpen && !showEditModal && (
+						<DetailsModal
+							open={modalOpen}
+							onClose={handleModalClose}
+							data={
+								selectedServiceForModal
+									? {
+											...selectedServiceForModal,
+											available: selectedServiceForModal.available
+												? "Yes"
+												: "No",
+									  }
+									: null
+							}
+							onSave={handleModalSave}
+							title="Service Details"
+							fields={serviceDetailsFields}
+						/>
+					)}
 				</div>
-				<button
-					onClick={() => setShowAddModal(true)}
-					className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded font-semibold transition w-full md:w-auto"
-				>
-					+ Add New Employee
-				</button>
 			</div>
-			{/* Table */}
-			<CustomTable
-				data={filtered}
-				loading={loading}
-				columns={serviceTableColumns}
-				onRowClick={handleRowClick}
-				rowKey="id"
-			/>
-			{/* Details Modal */}
-			<DetailsModal
-				open={modalOpen}
-				onClose={handleModalClose}
-				data={selectedEmployeeForModal}
-				onSave={handleModalSave}
-				title="Employee Details"
-				fields={employeeFields}
-			/>
-</div>
-</div>
-			{/* Add New Employee Modal */}
+			{/* Add New Service Modal */}
 			{showAddModal && (
 				<div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
 					<div className="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 relative">
-						<h2 className="text-xl font-semibold mb-4">Add New Services</h2>
-						<form onSubmit={handleAddEmployeeSubmit} id="add-employee-form">
+						<h2 className="text-xl font-semibold mb-4">Add New Service</h2>
+						<form onSubmit={handleAddServiceSubmit} id="add-service-form">
 							<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-								{employeeFormFields.map((field) => (
+								{serviceModalFields.map((field: ModalFormField) => (
 									<div key={field.name} className="col-span-1 flex flex-col">
 										<label className="block text-sm font-medium text-gray-700 mb-1">
 											{field.label}
 										</label>
-										{field.type === "select" ? (
+										{field.type === "checkbox" ? (
+											<input
+												type="checkbox"
+												name={field.name}
+												checked={!!newService[field.name]}
+												onChange={(e) =>
+													setNewService({
+														...newService,
+														[field.name]: e.target.checked,
+													})
+												}
+												className="mt-1 block rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+											/>
+										) : field.type === "select" ? (
 											<select
 												name={field.name}
-												value={
-													(newEmployee[
-														field.name as keyof iCreateEmployeeDTO
-													] as string) || ""
-												}
+												value={(newService[field.name] as string) || ""}
 												onChange={(e) =>
-													setNewEmployee({
-														...newEmployee,
+													setNewService({
+														...newService,
 														[field.name]: e.target.value,
 													})
 												}
@@ -550,60 +482,52 @@ const ServiceTable = () => {
 												}`}
 											>
 												<option value="">Select {field.label}</option>
-												{statusOptions.map((option) => (
-													<option key={option.value} value={option.value}>
-														{option.label}
-													</option>
-												))}
+												{field.options?.map(
+													(option: {label: string; value: string}) => (
+														<option key={option.value} value={option.value}>
+															{option.label}
+														</option>
+													),
+												)}
 											</select>
+										) : field.type === "textarea" ? (
+											<textarea
+												name={field.name}
+												value={(newService[field.name] as string) || ""}
+												onChange={(e) =>
+													setNewService({
+														...newService,
+														[field.name]: e.target.value,
+													})
+												}
+												className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
+													addFormErrors[field.name] ? "border-red-500" : ""
+												}`}
+											/>
+										) : field.type === "number" ? (
+											<input
+												type="number"
+												name={field.name}
+												value={(newService[field.name] as string) || ""}
+												onChange={(e) =>
+													setNewService({
+														...newService,
+														[field.name]: e.target.value,
+													})
+												}
+												className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
+													addFormErrors[field.name] ? "border-red-500" : ""
+												}`}
+											/>
 										) : (
 											<input
-												type={field.type}
+												type="text"
 												name={field.name}
-												value={
-													field.type === "date"
-														? newEmployee[
-																field.name as keyof iCreateEmployeeDTO
-														  ]
-															? toDateInputString(
-																	newEmployee[
-																		field.name as keyof iCreateEmployeeDTO
-																	] as string | Date,
-															  )
-															: ""
-														: field.type === "number"
-														? newEmployee[
-																field.name as keyof iCreateEmployeeDTO
-														  ] !== undefined &&
-														  newEmployee[
-																field.name as keyof iCreateEmployeeDTO
-														  ] !== null
-															? Number(
-																	newEmployee[
-																		field.name as keyof iCreateEmployeeDTO
-																	],
-															  )
-															: ""
-														: newEmployee[
-																field.name as keyof iCreateEmployeeDTO
-														  ] !== undefined &&
-														  newEmployee[
-																field.name as keyof iCreateEmployeeDTO
-														  ] !== null
-														? String(
-																newEmployee[
-																	field.name as keyof iCreateEmployeeDTO
-																],
-														  )
-														: ""
-												}
+												value={(newService[field.name] as string) || ""}
 												onChange={(e) =>
-													setNewEmployee({
-														...newEmployee,
-														[field.name]:
-															field.type === "number"
-																? Number(e.target.value)
-																: e.target.value,
+													setNewService({
+														...newService,
+														[field.name]: e.target.value,
 													})
 												}
 												className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
@@ -631,7 +555,7 @@ const ServiceTable = () => {
 									type="submit"
 									className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded"
 								>
-									Add Employee
+									Add Service
 								</button>
 							</div>
 						</form>
@@ -639,57 +563,39 @@ const ServiceTable = () => {
 				</div>
 			)}
 
-			{/* Edit Employee Modal */}
-			{showEditModal && editingEmployee && (
+			{/* Edit Service Modal */}
+			{showEditModal && editingService && (
 				<div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
 					<div className="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 relative">
-						<h2 className="text-xl font-semibold mb-4">Edit Employee</h2>
-						<form onSubmit={handleEditEmployeeSubmit} id="edit-employee-form">
+						<h2 className="text-xl font-semibold mb-4">Edit Service</h2>
+						<form onSubmit={handleEditServiceSubmit} id="edit-service-form">
 							<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-								{employeeFormFields.map((field) => (
+								{serviceModalFields.map((field: ModalFormField) => (
 									<div key={field.name} className="col-span-1 flex flex-col">
 										<label className="block text-sm font-medium text-gray-700 mb-1">
 											{field.label}
 										</label>
-										{field.type === "select" ? (
+										{field.type === "checkbox" ? (
+											<input
+												type="checkbox"
+												name={field.name}
+												checked={!!editingService[field.name]}
+												onChange={(e) =>
+													setEditingService((prev) => ({
+														...prev!,
+														[field.name]: e.target.checked,
+													}))
+												}
+												className="mt-1 block rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+											/>
+										) : field.type === "select" ? (
 											<select
 												name={field.name}
-												value={
-													(editingEmployee[
-														field.name as keyof iCreateEmployeeDTO
-													] as string) || ""
-												}
+												value={(editingService[field.name] as string) || ""}
 												onChange={(e) =>
-													setEditingEmployee((prev) => ({
-														id: prev?.id,
-														name:
-															field.name === "name"
-																? e.target.value
-																: prev?.name ?? "",
-														email:
-															field.name === "email"
-																? e.target.value
-																: prev?.email ?? "",
-														phoneNumber:
-															field.name === "phoneNumber"
-																? e.target.value
-																: prev?.phoneNumber ?? "",
-														designation:
-															field.name === "designation"
-																? e.target.value
-																: prev?.designation ?? "",
-														salary:
-															field.name === "salary"
-																? Number(e.target.value)
-																: prev?.salary ?? 0,
-														statusId:
-															field.name === "statusId"
-																? e.target.value
-																: prev?.statusId ?? "",
-														joinedDate:
-															field.name === "joinedDate"
-																? e.target.value
-																: prev?.joinedDate ?? "",
+													setEditingService((prev) => ({
+														...prev!,
+														[field.name]: e.target.value,
 													}))
 												}
 												className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
@@ -697,91 +603,59 @@ const ServiceTable = () => {
 												}`}
 											>
 												<option value="">Select {field.label}</option>
-												{statusOptions.map((option) => (
-													<option key={option.value} value={option.value}>
-														{option.label}
-													</option>
-												))}
+												{field.options?.map(
+													(option: {label: string; value: string}) => (
+														<option key={option.value} value={option.value}>
+															{option.label}
+														</option>
+													),
+												)}
 											</select>
-										) : (
-											<input
-												type={field.type}
+										) : field.type === "textarea" ? (
+											<textarea
 												name={field.name}
-												value={
-													field.type === "date"
-														? editingEmployee[
-																field.name as keyof iCreateEmployeeDTO
-														  ]
-															? toDateInputString(
-																	editingEmployee[
-																		field.name as keyof iCreateEmployeeDTO
-																	] as string | Date,
-															  )
-															: ""
-														: field.type === "number"
-														? editingEmployee[
-																field.name as keyof iCreateEmployeeDTO
-														  ] !== undefined &&
-														  editingEmployee[
-																field.name as keyof iCreateEmployeeDTO
-														  ] !== null
-															? Number(
-																	editingEmployee[
-																		field.name as keyof iCreateEmployeeDTO
-																	],
-															  )
-															: ""
-														: editingEmployee[
-																field.name as keyof iCreateEmployeeDTO
-														  ] !== undefined &&
-														  editingEmployee[
-																field.name as keyof iCreateEmployeeDTO
-														  ] !== null
-														? String(
-																editingEmployee[
-																	field.name as keyof iCreateEmployeeDTO
-																],
-														  )
-														: ""
-												}
+												value={(editingService[field.name] as string) || ""}
 												onChange={(e) =>
-													setEditingEmployee((prev) => ({
-														id: prev?.id,
-														name:
-															field.name === "name"
-																? e.target.value
-																: prev?.name ?? "",
-														email:
-															field.name === "email"
-																? e.target.value
-																: prev?.email ?? "",
-														phoneNumber:
-															field.name === "phoneNumber"
-																? e.target.value
-																: prev?.phoneNumber ?? "",
-														designation:
-															field.name === "designation"
-																? e.target.value
-																: prev?.designation ?? "",
-														salary:
-															field.name === "salary"
-																? Number(e.target.value)
-																: prev?.salary ?? 0,
-														statusId:
-															field.name === "statusId"
-																? e.target.value
-																: prev?.statusId ?? "",
-														joinedDate:
-															field.name === "joinedDate"
-																? e.target.value
-																: prev?.joinedDate ?? "",
+													setEditingService((prev) => ({
+														...prev!,
+														[field.name]: e.target.value,
 													}))
 												}
 												className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
 													editFormErrors[field.name] ? "border-red-500" : ""
 												}`}
 											/>
-										)}
+										) : field.type === "number" ? (
+											<input
+												type="number"
+												name={field.name}
+												value={(editingService[field.name] as string) || ""}
+												onChange={(e) =>
+													setEditingService((prev) => ({
+														...prev!,
+														[field.name]: e.target.value,
+													}))
+												}
+												className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
+													editFormErrors[field.name] ? "border-red-500" : ""
+												}`}
+											/>
+										) : field.type === "text" ? (
+											<input
+												type="text"
+												name={field.name}
+												value={(editingService[field.name] as string) || ""}
+												onChange={(e) =>
+													setEditingService((prev) => ({
+														...prev!,
+														[field.name]: e.target.value,
+													}))
+												}
+												className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
+													editFormErrors[field.name] ? "border-red-500" : ""
+												}`}
+											/>
+										) : null}
 										{editFormErrors[field.name] && (
 											<span className="text-xs text-red-600 mt-1">
 												{editFormErrors[field.name]}

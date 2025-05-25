@@ -7,6 +7,7 @@ import {
 	apiResponseStatuses,
 	iAPIRequestStatus,
 } from "@/customTypes/NetworkTypes";
+import {iCreateEmployeeDTO} from "@/customTypes/appDataTypes/employeeTypes";
 
 export const REDUCER_NAME = "bookingSlice";
 
@@ -28,6 +29,12 @@ export interface iBooking {
 	bookedAt: string;
 	serviceName: string;
 	paymentStatus: string;
+	assignedEmployees?: {
+		id: string;
+		name: string;
+		designation?: string;
+		serviceName?: string;
+	}[];
 }
 
 export interface iBookingRequest {

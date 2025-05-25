@@ -13,7 +13,7 @@ export const REDUCER_NAME = "serviceSlice";
 export interface iService {
 	id: string;
 	serviceName: string;
-	description: string | null;
+	description?: string | null;
 	price: string;
 	available: boolean;
 }

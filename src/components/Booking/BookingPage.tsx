@@ -3,6 +3,7 @@ import {useAppDispatch, useAppSelector} from "../../store/Hooks";
 import {fetchServices} from "@/store/services/ThunkActions";
 import {fetchStatus} from "@/store/status/ThunkActions";
 import {createBooking, updateBooking} from "@/store/booking/ThunkActions";
+import {getAllEmployees} from "@/store/employee/ThunkActions";
 import {RootState} from "@store/index";
 import BookingTable from "./BookingTable";
 import {
@@ -39,14 +40,15 @@ const initialFormValue: iCreateBookingDTO = {
 	serviceName: "",
 	paymentStatus: "",
 	bookingStatus: "",
+	assignedEmployeeIds: [],
 };
 
 // Utility to clean payload
 function cleanBookingPayload(
 	payload: Record<string, any>,
 	excludeFields: string[] = [],
-) {
-	const cleaned: Record<string, any> = {};
+): iCreateBookingDTO {
+	const cleaned: Partial<iCreateBookingDTO> = {};
 	Object.entries(payload).forEach(([key, value]) => {
 		if (
 			value !== "" &&
@@ -54,10 +56,28 @@ function cleanBookingPayload(
 			value !== undefined &&
 			!excludeFields.includes(key)
 		) {
-			cleaned[key] = value;
+			if (key === "assignedEmployees" || key === "assignedEmployeeIds") {
+				cleaned["assignedEmployeeIds"] = (value as any[]).map((emp) => emp.id);
+			} else if (key in initialFormValue) {
+				(cleaned as any)[key] = value;
+			}
 		}
 	});
-	return cleaned;
+	const finalPayload: iCreateBookingDTO = {
+		...initialFormValue,
+		...cleaned,
+		id: cleaned.id as string,
+		assignedEmployeeIds: cleaned.assignedEmployeeIds || [],
+		serviceId:
+			cleaned.serviceId === undefined
+				? initialFormValue.serviceId
+				: cleaned.serviceId,
+		eventDate:
+			cleaned.eventDate === undefined
+				? initialFormValue.eventDate
+				: cleaned.eventDate,
+	};
+	return finalPayload as iCreateBookingDTO;
 }
 
 const BookingPage = () => {
@@ -81,9 +101,20 @@ const BookingPage = () => {
 	const {serviceList} = useAppSelector(
 		(state: RootState) => state.serviceReducer,
 	);
+	const {employeeList} = useAppSelector(
+		(state: RootState) => state.employeeReducer,
+	);
+
 	const bookingStatuses = statusList
 		.filter((status) => status.context === "booking")
 		.map((status) => ({label: status.name, value: status.id}));
+
+	// Filter active employees
+	const activeEmployees = employeeList.filter((emp: any) => {
+		return emp.status === "Working";
+	});
+	console.log("employeeList", employeeList);
+	console.log("activeEmployees", activeEmployees);
 
 	const handleSubmit = async () => {
 		const excludeFields = [
@@ -112,14 +143,19 @@ const BookingPage = () => {
 			setShowAddModal(false);
 			dispatch(fetchServices());
 			dispatch(fetchStatus());
+			dispatch(getAllEmployees());
 		} catch (error) {
 			console.error("Failed to create booking:", error);
 		}
 	};
 
 	const handleViewDetails = (booking: iBooking) => {
-		setSelectedBooking({...booking,eventDate: booking.eventDate ? new Date(booking.eventDate).toISOString().split("T")[0] : "",
-});
+		setSelectedBooking({
+			...booking,
+			eventDate: booking.eventDate
+				? new Date(booking.eventDate).toISOString().split("T")[0]
+				: "",
+		});
 		setShowDetailsModal(true);
 	};
 
@@ -130,9 +166,9 @@ const BookingPage = () => {
 			customerName: selected.customerName || "",
 			phoneNumber: selected.phoneNumber || "",
 			eventName: selected.eventName || "",
-			eventDate: selected.eventDate || "",
+			eventDate: selected.eventDate || null,
 			venueAddress: selected.venueAddress || "",
-			serviceId: selected.serviceId || "",
+			serviceId: selected.serviceId || null,
 			bookingStatus: selected.bookingStatusId || "",
 			budget: selected.totalCost || "",
 			advancePayment: selected.advancePayment || "",
@@ -142,13 +178,17 @@ const BookingPage = () => {
 			bookedAt: selected.bookedAt || "",
 			serviceName: selected.serviceName || "",
 			paymentStatus: selected.paymentStatus || "",
+			assignedEmployeeIds: (selected.assignedEmployees || []).map(
+				(emp) => emp.id,
+			),
 		});
 		setShowEditModal(true);
 	};
 
 	const handleEditSubmit = async () => {
 		if (!editingBooking) return;
-		const {error} = bookingValidationSchema.validate(editingBooking, {
+		const cleanedPayload = cleanBookingPayload(editingBooking);
+		const {error} = bookingValidationSchema.validate(cleanedPayload, {
 			abortEarly: false,
 		});
 		if (error) {
@@ -161,11 +201,12 @@ const BookingPage = () => {
 		}
 		setEditFormErrors({});
 		try {
-			await dispatch(updateBooking(editingBooking));
+			await dispatch(updateBooking(cleanedPayload));
 			setShowEditModal(false);
 			setEditingBooking(null);
 			dispatch(fetchServices());
 			dispatch(fetchStatus());
+			dispatch(getAllEmployees());
 		} catch (error) {
 			console.error("Failed to update booking:", error);
 		}
@@ -185,7 +226,16 @@ const BookingPage = () => {
 			type: "select" as const,
 			options: bookingStatuses,
 		},
-		{name: "additionalNotes", label: "Notes", type: "textarea" as const},
+		{
+			name: "assignedEmployees",
+			label: "Assigned Employees",
+			type: "text" as const,
+			render: (value: any) => {
+				if (!value?.length) return "-";
+				return value.map((emp: any) => emp.name).join(", ");
+			},
+		},
+		{name: "notes", label: "Notes", type: "textarea" as const},
 	];
 
 	// Prevent page scroll when modal is open
@@ -203,6 +253,7 @@ const BookingPage = () => {
 	useEffect(() => {
 		dispatch(fetchServices());
 		dispatch(fetchStatus());
+		dispatch(getAllEmployees());
 	}, [dispatch]);
 
 	return (
@@ -244,6 +295,7 @@ const BookingPage = () => {
 								onClick={() => {
 									dispatch(fetchServices());
 									dispatch(fetchStatus());
+									dispatch(getAllEmployees());
 								}}
 							>
 								Refresh

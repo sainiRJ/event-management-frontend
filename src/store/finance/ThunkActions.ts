@@ -1,50 +1,73 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
-import {setLoading, setError} from "./FinanceSlice";
+import {RootState} from "@store/index";
+import {curryGetThunkName} from "@/utils/ReduxUtil";
+import {httpStatusCodes} from "@/customTypes/NetworkTypes";
+import {iStateMessage} from "@/customTypes/GenericReduxTypes";
+import {iGenericResponse} from "@/customTypes/CommonServiceTypes";
+import {bookingService} from "@/services/api/eventManagementServer";
+import {REDUCER_NAME, FetchFinanceParams, FinanceData} from "./Types";
 
-// Simulated API call delay
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+const curriedGetThunkName = curryGetThunkName(REDUCER_NAME);
 
-// Thunk action to fetch financial data
-export const fetchFinancialData = createAsyncThunk(
-	"finance/fetchFinancialData",
-	async (_, {dispatch}) => {
+export const fetchFinanceData = createAsyncThunk<
+	iGenericResponse<FinanceData | null> | null,
+	FetchFinanceParams,
+	{
+		rejectValue: iStateMessage;
+	}
+>(
+	curriedGetThunkName("fetchFinanceData"),
+	async (params, {rejectWithValue}) => {
 		try {
-			dispatch(setLoading(true));
-			// Simulate API call
-			await delay(1000);
+			// Build query string from params
+			const queryParams = new URLSearchParams();
+			if (params.fromDate) queryParams.append("fromDate", params.fromDate);
+			if (params.toDate) queryParams.append("toDate", params.toDate);
+			if (params.bookingStatusId)
+				queryParams.append("bookingStatusId", params.bookingStatusId);
+			if (params.paymentStatusId)
+				queryParams.append("paymentStatusId", params.paymentStatusId);
+			if (params.serviceId) queryParams.append("serviceId", params.serviceId);
 
-			// In a real application, this would be an API call
-			const response = {
-				revenueData: [
-					{month: "Jan", revenue: 45000, expenses: 32000, profit: 13000},
-					{month: "Feb", revenue: 52000, expenses: 34000, profit: 18000},
-					{month: "Mar", revenue: 61000, expenses: 39000, profit: 22000},
-					{month: "Apr", revenue: 58000, expenses: 36000, profit: 22000},
-					{month: "May", revenue: 72000, expenses: 41000, profit: 31000},
-					{month: "Jun", revenue: 85000, expenses: 44000, profit: 41000},
-				],
-				expenseData: [
-					{name: "Decorations", value: 35000, color: "#8884d8"},
-					{name: "Labor", value: 25000, color: "#82ca9d"},
-					{name: "Transportation", value: 15000, color: "#ffc658"},
-					{name: "Marketing", value: 12000, color: "#ff8042"},
-					{name: "Utilities", value: 8000, color: "#0088fe"},
-				],
-				projectData: [
-					{name: "Wedding Decor", profit: 15000},
-					{name: "Corporate Events", profit: 12000},
-					{name: "Birthday Parties", profit: 8000},
-					{name: "Festival Decor", profit: 10000},
-					{name: "Home Decor", profit: 6000},
-				],
-			};
+			const response = await bookingService.getFinanceData(
+				queryParams.toString(),
+			);
 
-			return response;
-		} catch (error: any) {
-			dispatch(setError(error.message));
-			throw error;
-		} finally {
-			dispatch(setLoading(false));
+			if (response) {
+				const {httpStatusCode, data, message} = response;
+				switch (httpStatusCode) {
+					case httpStatusCodes.SUCCESS_OK: {
+						if (data && data.data) {
+							const payload = {
+								...data,
+								data: data.data,
+							};
+
+							return payload;
+						} else {
+							return rejectWithValue({
+								httpStatusCode,
+								message,
+							});
+						}
+					}
+
+					default: {
+						return rejectWithValue({
+							httpStatusCode,
+							message,
+						});
+					}
+				}
+			} else {
+				return rejectWithValue({
+					message: "No response received",
+				});
+			}
+		} catch (error) {
+			return rejectWithValue({
+				message: "Something went wrong",
+			});
 		}
 	},
 );
