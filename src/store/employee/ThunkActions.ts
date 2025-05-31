@@ -1,7 +1,13 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
 import {employeeService} from "../../services/api/eventManagementServer";
-import {iCreateEmployeeDTO} from "../../customTypes/appDataTypes/employeeTypes";
+import {
+	iCreateEmployeeDTO,
+	iEmployeePaymentUpdate,
+	iAssignedServicesResponse,
+	iEmployeeAssignedServices,
+} from "../../customTypes/appDataTypes/employeeTypes";
 import {iEmployeeResponse} from "../../customTypes/CommonServiceTypes";
+import {iStateMessage} from "@/customTypes/GenericReduxTypes";
 
 export const getAllEmployees = createAsyncThunk(
 	"employee/getAllEmployees",
@@ -136,6 +142,119 @@ export const deleteEmployee = createAsyncThunk(
 		} catch (error) {
 			return rejectWithValue({
 				message: "Failed to delete employee(s)",
+			});
+		}
+	},
+);
+
+export const getEmployeeStats = createAsyncThunk(
+	"employee/getEmployeeStats",
+	async (_, {rejectWithValue}) => {
+		try {
+			const response = await employeeService.getEmployeeStats();
+			console.log("Raw API Response:", response); // Debug log
+
+			if (!response) {
+				return rejectWithValue({
+					message: "No response received",
+				});
+			}
+
+			const {httpStatusCode, data, message} = response;
+			console.log("Response data:", data); // Debug log
+
+			if (httpStatusCode === 200) {
+				// Check if data exists and has the expected structure
+				if (data?.data?.employeeStats && data?.data?.ids) {
+					return {
+						httpStatusCode,
+						data: data.data,
+						message: message || "Employee stats fetched successfully",
+					};
+				} else {
+					console.log("Invalid data structure:", data); // Debug log
+					return rejectWithValue({
+						httpStatusCode,
+						message: "Invalid employee stats data structure",
+					});
+				}
+			}
+
+			return rejectWithValue({
+				httpStatusCode,
+				message: message || "Failed to fetch employee stats",
+			});
+		} catch (error) {
+			console.error("Error in getEmployeeStats:", error); // Debug log
+			return rejectWithValue({
+				message: "Failed to fetch employee stats",
+			});
+		}
+	},
+);
+
+export const updateEmployeePayment = createAsyncThunk(
+	"employee/updateEmployeePayment",
+	async (paymentData: iEmployeePaymentUpdate, {rejectWithValue}) => {
+		try {
+			const response = await employeeService.updateEmployeePayment(paymentData);
+			if (!response) {
+				return rejectWithValue({
+					message: "No response received",
+				});
+			}
+			return response;
+		} catch (error) {
+			return rejectWithValue({
+				message: "Failed to update employee payment",
+			});
+		}
+	},
+);
+
+export const getAssignedServices = createAsyncThunk(
+	"employee/getAssignedServices",
+	async (_, {rejectWithValue}) => {
+		try {
+			console.log("Fetching assigned services...");
+			const response = await employeeService.getAssignedServices();
+			console.log("Assigned services response:", response);
+
+			if (!response) {
+				console.error("No response received from getAssignedServices");
+				return rejectWithValue({
+					message: "No response received",
+				});
+			}
+
+			const {httpStatusCode, data, message} = response;
+			console.log("Response data:", data);
+
+			if (httpStatusCode === 200) {
+				if (data?.data) {
+					return {
+						httpStatusCode,
+						data: data.data,
+						message: message || "Assigned services fetched successfully",
+					};
+				} else {
+					console.error("Invalid data structure:", data);
+					return rejectWithValue({
+						httpStatusCode,
+						message: "Invalid data structure received",
+					});
+				}
+			}
+
+			console.error("Failed to fetch assigned services:", message);
+			return rejectWithValue({
+				httpStatusCode,
+				message: message || "Failed to fetch assigned services",
+			});
+		} catch (error) {
+			console.error("Error in getAssignedServices:", error);
+			return rejectWithValue({
+				message: "Failed to fetch assigned services",
 			});
 		}
 	},
