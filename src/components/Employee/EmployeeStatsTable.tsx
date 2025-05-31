@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, useRef} from "react";
 import {useAppDispatch, useAppSelector} from "../../store/Hooks";
 import {
 	iEmployeeStat,
@@ -53,12 +53,24 @@ const EmployeeStatsTable: React.FC<EmployeeStatsTableProps> = ({
 	const assignedServices = useAppSelector(
 		(state: RootState) => state.employeeReducer.assignedServices,
 	);
+	const hasFetchedServices = useRef(false);
 
+	// Separate effect for fetching services
 	useEffect(() => {
-		dispatch(getAssignedServices());
-	}, [dispatch]);
+		if (showEditModal && !hasFetchedServices.current) {
+			dispatch(getAssignedServices());
+			hasFetchedServices.current = true;
+		}
+	}, [showEditModal, dispatch]);
 
-	// Debug logs
+	// Reset the ref when modal closes
+	useEffect(() => {
+		if (!showEditModal) {
+			hasFetchedServices.current = false;
+		}
+	}, [showEditModal]);
+
+	// Debug logs in a separate effect
 	useEffect(() => {
 		console.log("Assigned Services:", assignedServices);
 		console.log("Selected Employee:", selectedEmployee);
@@ -99,7 +111,10 @@ const EmployeeStatsTable: React.FC<EmployeeStatsTableProps> = ({
 
 	// Get assigned services for the selected employee
 	const getSelectedEmployeeServices = () => {
-		if (!selectedEmployee || !assignedServices) return [];
+		if (!selectedEmployee || !assignedServices) {
+			console.log("No selected employee or assigned services");
+			return [];
+		}
 		const employeeServices = assignedServices.find(
 			(emp) => emp.employeeId === selectedEmployee.employeeId,
 		);
@@ -181,6 +196,30 @@ const EmployeeStatsTable: React.FC<EmployeeStatsTableProps> = ({
 		},
 	];
 
+	const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const value = e.target.value;
+		// Remove leading zeros and convert to number
+		const numericValue =
+			value === "" ? 0 : parseInt(value.replace(/^0+/, ""), 10);
+		setFormData((prev) => ({
+			...prev,
+			amount: numericValue,
+		}));
+	};
+
+	const handleServiceSelection = (serviceId: string) => {
+		setFormData((prev) => {
+			const currentIds = prev.assignedEmployeeIds || [];
+			const newIds = currentIds.includes(serviceId)
+				? currentIds.filter((id) => id !== serviceId)
+				: [...currentIds, serviceId];
+			return {
+				...prev,
+				assignedEmployeeIds: newIds,
+			};
+		});
+	};
+
 	return (
 		<div className="mt-8">
 			<h2 className="text-2xl font-bold mb-4">Employee Statistics</h2>
@@ -256,14 +295,10 @@ const EmployeeStatsTable: React.FC<EmployeeStatsTableProps> = ({
 								</label>
 								<input
 									type="number"
-									value={formData.amount}
-									onChange={(e) =>
-										setFormData((prev) => ({
-											...prev,
-											amount: Number(e.target.value),
-										}))
-									}
+									value={formData.amount || ""}
+									onChange={handleAmountChange}
 									className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+									min="0"
 								/>
 							</div>
 							<div>
@@ -290,33 +325,35 @@ const EmployeeStatsTable: React.FC<EmployeeStatsTableProps> = ({
 								<label className="block text-sm font-medium text-gray-700 mb-1">
 									Assigned Services
 								</label>
-								<select
-									multiple
-									value={formData.assignedEmployeeIds}
-									onChange={(e) => {
-										const values = Array.from(
-											e.target.selectedOptions,
-											(option) => option.value,
-										);
-										setFormData((prev) => ({
-											...prev,
-											assignedEmployeeIds: values,
-										}));
-									}}
-									className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-									size={5}
-								>
-									{getSelectedEmployeeServices().map((service) => (
-										<option
-											key={service.assignedEmployeeId}
-											value={service.assignedEmployeeId}
-										>
-											{formatServiceLabel(service)}
-										</option>
-									))}
-								</select>
+								<div className="relative">
+									<div className="max-h-48 overflow-y-auto border border-gray-300 rounded-md bg-white">
+										{getSelectedEmployeeServices().length > 0 ? (
+											getSelectedEmployeeServices().map((service) => (
+												<div
+													key={service.assignedEmployeeId}
+													onClick={() =>
+														handleServiceSelection(service.assignedEmployeeId)
+													}
+													className={`px-3 py-2 cursor-pointer hover:bg-gray-100 ${
+														formData.assignedEmployeeIds?.includes(
+															service.assignedEmployeeId,
+														)
+															? "bg-indigo-50 text-indigo-700"
+															: "text-gray-700"
+													}`}
+												>
+													{formatServiceLabel(service)}
+												</div>
+											))
+										) : (
+											<div className="px-3 py-2 text-gray-500">
+												No services assigned
+											</div>
+										)}
+									</div>
+								</div>
 								<p className="text-xs text-gray-500 mt-1">
-									Hold Ctrl/Cmd to select multiple services
+									Click to select/deselect services
 								</p>
 							</div>
 							<div className="flex items-center">
