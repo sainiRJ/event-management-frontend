@@ -17,6 +17,7 @@ import {
 	deleteEmployee,
 	updateEmployee,
 	createEmployee,
+	getEmployeeStats,
 } from "@/store/employee/ThunkActions";
 import {fetchServices} from "@/store/services/ThunkActions";
 import {fetchStatus} from "@/store/status/ThunkActions";
@@ -24,10 +25,14 @@ import {RootState} from "@/store";
 import RefreshIcon from "@rsuite/icons/Reload";
 import CustomTable from "../common/CustomTable";
 import CustomForm from "../common/CustomForm";
-import {iCreateEmployeeDTO} from "../../customTypes/appDataTypes/employeeTypes";
+import {
+	iCreateEmployeeDTO,
+	iEmployeeStat,
+} from "../../customTypes/appDataTypes/employeeTypes";
 import {employeeValidationSchema} from "../../validations/EmployeeValidationSchema";
 import Joi from "joi";
 import DetailsModal from "../common/DetailsModal";
+import EmployeeStatsTable from "./EmployeeStatsTable";
 
 const formatDate = (dateString: string) => {
 	const date = new Date(dateString);
@@ -85,11 +90,15 @@ const EmployeeTable = () => {
 	const {employeeList} = useAppSelector(
 		(state: RootState) => state.employeeReducer,
 	);
+	const employeeStats = useAppSelector(
+		(state: RootState) => state.employeeReducer.stats?.employeeStats || {},
+	);
 	const dispatch = useAppDispatch();
 
 	const handleRefresh = () => {
 		setLoading(true);
 		dispatch(getAllEmployees());
+		dispatch(getEmployeeStats());
 	};
 
 	useEffect(() => {
@@ -159,6 +168,7 @@ const EmployeeTable = () => {
 
 	useEffect(() => {
 		dispatch(getAllEmployees());
+		dispatch(getEmployeeStats());
 	}, [dispatch]);
 
 	useEffect(() => {
@@ -601,6 +611,11 @@ const EmployeeTable = () => {
 						fields={employeeFields}
 					/>
 				</div>
+
+				{/* Employee Stats Table */}
+				{employeeList.length > 0 && (
+					<EmployeeStatsTable stats={employeeStats} onRefresh={handleRefresh} />
+				)}
 			</div>
 			{/* Add New Employee Modal */}
 			{showAddModal && (

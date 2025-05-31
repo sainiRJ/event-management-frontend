@@ -1,16 +1,24 @@
 import {createSlice} from "@reduxjs/toolkit";
-import {iEmployeeState} from "../../customTypes/appDataTypes/employeeTypes";
+import {
+	iEmployeeState,
+	iEmployeeStatsResponse,
+} from "../../customTypes/appDataTypes/employeeTypes";
 import {
 	createEmployee,
 	getAllEmployees,
 	updateEmployee,
 	deleteEmployee,
+	getEmployeeStats,
+	updateEmployeePayment,
+	getAssignedServices,
 } from "./ThunkActions";
 
 const initialState: iEmployeeState = {
 	employeeList: [],
 	loading: false,
 	error: null,
+	stats: null,
+	assignedServices: null,
 };
 
 const employeeSlice = createSlice({
@@ -30,6 +38,38 @@ const employeeSlice = createSlice({
 		builder.addCase(getAllEmployees.rejected, (state, action) => {
 			state.loading = false;
 			state.error = action.error.message || "Failed to fetch employees";
+		});
+
+		// Get Employee Stats
+		builder.addCase(getEmployeeStats.pending, (state) => {
+			state.loading = true;
+			state.error = null;
+		});
+		builder.addCase(getEmployeeStats.fulfilled, (state, action) => {
+			state.loading = false;
+			console.log("Reducer received payload:", action.payload); // Debug log
+
+			if (action.payload?.data?.employeeStats && action.payload?.data?.ids) {
+				console.log("Setting stats:", action.payload.data); // Debug log
+				state.stats = action.payload.data;
+			} else {
+				console.log(
+					"No stats data found in response. Payload:",
+					action.payload,
+				); // Debug log
+				state.stats = null;
+			}
+		});
+		builder.addCase(getEmployeeStats.rejected, (state, action) => {
+			state.loading = false;
+			console.log("Stats fetch rejected:", action.payload); // Debug log
+			state.error =
+				typeof action.payload === "object" &&
+				action.payload !== null &&
+				"message" in action.payload
+					? (action.payload.message as string)
+					: "Failed to fetch employee stats";
+			state.stats = null;
 		});
 
 		// Create Employee
@@ -69,6 +109,34 @@ const employeeSlice = createSlice({
 		builder.addCase(deleteEmployee.rejected, (state, action) => {
 			state.loading = false;
 			state.error = action.error.message || "Failed to delete employee";
+		});
+
+		// Update Employee Payment
+		builder.addCase(updateEmployeePayment.pending, (state) => {
+			state.loading = true;
+			state.error = null;
+		});
+		builder.addCase(updateEmployeePayment.fulfilled, (state) => {
+			state.loading = false;
+		});
+		builder.addCase(updateEmployeePayment.rejected, (state, action) => {
+			state.loading = false;
+			state.error = action.error.message || "Failed to update employee payment";
+		});
+
+		// Get Assigned Services
+		builder.addCase(getAssignedServices.pending, (state) => {
+			state.loading = true;
+			state.error = null;
+		});
+		builder.addCase(getAssignedServices.fulfilled, (state, action) => {
+			state.loading = false;
+			state.assignedServices = action.payload?.data || null;
+		});
+		builder.addCase(getAssignedServices.rejected, (state, action) => {
+			state.loading = false;
+			state.error = action.error.message || "Failed to fetch assigned services";
+			state.assignedServices = null;
 		});
 	},
 });
