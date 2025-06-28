@@ -18,6 +18,7 @@ export interface iEmployeeState {
 	error: string | null;
 	stats: iEmployeeStatsResponse | null;
 	assignedServices: iEmployeeAssignedServices[] | null;
+	serviceHistory: iEmployeeServiceHistory | null;
 }
 
 export interface iServiceStat {
@@ -64,6 +65,8 @@ export interface iAssignedService {
 	customerName: string;
 	location: string;
 	eventName: string;
+	isPaid: boolean;
+	paidAt: string | null;
 }
 
 export interface iEmployeeAssignedServices {
@@ -75,4 +78,15 @@ export interface iEmployeeAssignedServices {
 export interface iAssignedServicesResponse {
 	success: boolean;
 	data: iEmployeeAssignedServices[];
+}
+
+export interface iEmployeeServiceHistory {
+	employeeId: string;
+	employeeName: string;
+	assignedServices: iAssignedService[];
+}
+
+export interface iEmployeeServiceHistoryResponse {
+	success: boolean;
+	data: iEmployeeServiceHistory;
 }

@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from "react";
 import {useAppDispatch, useAppSelector} from "../../store/Hooks";
+import {useNavigate} from "react-router-dom";
 import {
 	Stack,
 	Button,
@@ -94,6 +95,7 @@ const EmployeeTable = () => {
 		(state: RootState) => state.employeeReducer.stats?.employeeStats || {},
 	);
 	const dispatch = useAppDispatch();
+	const navigate = useNavigate();
 
 	const handleRefresh = () => {
 		setLoading(true);
@@ -107,15 +109,29 @@ const EmployeeTable = () => {
 	}, [dispatch]);
 
 	const handleEdit = (rowData: any) => {
-		setEditingEmployee({
+		console.log("Editing row data:", rowData);
+
+		// Find the status ID that matches the status name
+		const statusOption = employeeStatuses.find(
+			(status) => status.label === rowData.status,
+		);
+
+		const employeeData: iCreateEmployeeDTO = {
 			id: rowData.id ?? "",
 			name: rowData.name ?? "",
 			email: rowData.email ?? "",
 			phoneNumber: rowData.phoneNumber ?? "",
 			designation: rowData.designation ?? "",
-			statusId: rowData.statusId ?? "",
+			statusId: statusOption?.value ?? "", // Use the found status ID
 			joinedDate: rowData.joinedDate ?? "",
-		});
+		};
+
+		console.log("Setting employee data:", employeeData);
+		console.log("Available statuses:", employeeStatuses);
+		console.log("Found status option:", statusOption);
+
+		setEditingEmployee(employeeData);
+		setFormData(employeeData);
 		setShowEditModal(true);
 	};
 
@@ -153,15 +169,61 @@ const EmployeeTable = () => {
 		}
 	};
 
-	const handleEditSubmit = async (formValue: iCreateEmployeeDTO) => {
+	const handleEditEmployeeSubmit = async (e: React.FormEvent) => {
+		e.preventDefault();
+		console.log("Edit form submitted");
+		console.log("Current editingEmployee:", editingEmployee);
+		console.log("Current formData:", formData);
+
+		if (!editingEmployee) {
+			console.log("No editing employee found");
+			return;
+		}
+
+		// Create updated employee data
+		const updatedEmployee: iCreateEmployeeDTO = {
+			id: editingEmployee.id, // Ensure we keep the original ID
+			name: formData.name,
+			email: formData.email,
+			phoneNumber: formData.phoneNumber,
+			designation: formData.designation,
+			statusId: formData.statusId,
+			joinedDate: formData.joinedDate,
+		};
+
+		console.log("Updated employee data to be sent:", updatedEmployee);
+
+		// Validate the updated data
+		const {error} = employeeValidationSchema.validate(updatedEmployee, {
+			abortEarly: false,
+			allowUnknown: true, // Allow unknown fields like id
+		});
+
+		if (error) {
+			console.log("Validation errors:", error.details);
+			const errors: Record<string, string> = {};
+			error.details.forEach((detail: Joi.ValidationErrorItem) => {
+				errors[detail.path[0] as string] = detail.message;
+			});
+			setEditFormErrors(errors);
+			return;
+		}
+
 		try {
-			await dispatch(updateEmployee(formValue));
+			console.log("Dispatching update employee action");
+			setEditFormErrors({});
+			const result = await dispatch(updateEmployee(updatedEmployee));
+			console.log("Update result:", result);
+
 			toaster.push(
 				<Message type="success">Employee updated successfully</Message>,
 			);
 			setShowEditModal(false);
+			setEditingEmployee(null);
+			setFormData(initialFormValue);
 			handleRefresh();
 		} catch (error) {
+			console.error("Error updating employee:", error);
 			toaster.push(<Message type="error">Failed to update employee</Message>);
 		}
 	};
@@ -233,6 +295,7 @@ const EmployeeTable = () => {
 			label: "Status",
 			width: 120,
 			resizable: true,
+			render: (rowData: any) => <StatusBadge status={rowData.status || "-"} />,
 		},
 		{
 			key: "joinedDate",
@@ -248,7 +311,10 @@ const EmployeeTable = () => {
 			render: (rowData: any) => (
 				<Button
 					size="sm"
-					onClick={() => handleEdit(rowData)}
+					onClick={(e) => {
+						e.stopPropagation();
+						handleEdit(rowData);
+					}}
 					appearance="subtle"
 				>
 					Edit
@@ -313,18 +379,7 @@ const EmployeeTable = () => {
 
 	// Modal handlers
 	const handleRowClick = (row: any) => {
-		setSelectedEmployee(row);
-		setModalOpen(true);
-	};
-	const handleModalClose = () => {
-		setModalOpen(false);
-		setSelectedEmployee(null);
-	};
-	const handleModalSave = async (updated: any) => {
-		await dispatch(updateEmployee(updated));
-		setModalOpen(false);
-		setSelectedEmployee(null);
-		dispatch(getAllEmployees());
+		navigate(`/employee/${row.id}/service-history`);
 	};
 
 	// Get unique designations and statuses for filter dropdowns
@@ -376,6 +431,22 @@ const EmployeeTable = () => {
 			key: "status",
 			label: "Status",
 			render: (row: any) => <StatusBadge status={row.status || "-"} />,
+		},
+		{
+			key: "actions",
+			label: "Actions",
+			render: (row: any) => (
+				<Button
+					size="sm"
+					onClick={(e) => {
+						e.stopPropagation();
+						handleEdit(row);
+					}}
+					appearance="subtle"
+				>
+					Edit
+				</Button>
+			),
 		},
 	];
 
@@ -452,28 +523,6 @@ const EmployeeTable = () => {
 		handleRefresh();
 	};
 
-	// Edit Employee Modal Handlers
-	const handleEditEmployeeSubmit = async (e: React.FormEvent) => {
-		e.preventDefault();
-		if (!editingEmployee) return;
-		const {error} = employeeValidationSchema.validate(editingEmployee, {
-			abortEarly: false,
-		});
-		if (error) {
-			const errors: Record<string, string> = {};
-			error.details.forEach((detail: Joi.ValidationErrorItem) => {
-				errors[detail.path[0] as string] = detail.message;
-			});
-			setEditFormErrors(errors);
-			return;
-		}
-		setEditFormErrors({});
-		await dispatch(updateEmployee(editingEmployee));
-		setShowEditModal(false);
-		setEditingEmployee(null);
-		handleRefresh();
-	};
-
 	const initialFormValue: iCreateEmployeeDTO = {
 		name: "",
 		email: "",
@@ -487,10 +536,29 @@ const EmployeeTable = () => {
 		useState<iCreateEmployeeDTO>(initialFormValue);
 
 	const handleFormChange = (field: keyof iCreateEmployeeDTO, value: any) => {
+		// For phone number, ensure it's a string and remove any non-digit characters
+		if (field === "phoneNumber") {
+			value = value.replace(/\D/g, "");
+		}
+
+		// For status, ensure we're using the ID
+		if (field === "statusId") {
+			value = value || "";
+		}
+
 		setFormData((prev) => ({
 			...prev,
 			[field]: value,
 		}));
+
+		// Clear validation error for the field being changed
+		if (editFormErrors[field]) {
+			setEditFormErrors((prev) => {
+				const newErrors = {...prev};
+				delete newErrors[field];
+				return newErrors;
+			});
+		}
 	};
 
 	const renderFormField = (field: {
@@ -499,6 +567,13 @@ const EmployeeTable = () => {
 		type: "text" | "date" | "select";
 		options?: {label: string; value: string}[];
 	}) => {
+		let dateValue = "";
+		if (field.type === "date") {
+			dateValue = formData[field.name]
+				? new Date(formData[field.name] as string).toISOString().split("T")[0]
+				: "";
+		}
+
 		switch (field.type) {
 			case "text":
 				return (
@@ -507,32 +582,36 @@ const EmployeeTable = () => {
 						value={formData[field.name] as string}
 						onChange={(value) => handleFormChange(field.name, value)}
 						placeholder={`Enter ${field.label.toLowerCase()}`}
+						type={field.name === "phoneNumber" ? "tel" : "text"}
+						maxLength={field.name === "phoneNumber" ? 10 : undefined}
 					/>
 				);
 			case "date":
 				return (
-					<DatePicker
+					<input
+						type="date"
 						key={field.name}
-						value={
-							formData[field.name]
-								? new Date(formData[field.name] as string)
-								: null
-						}
-						onChange={(value) =>
-							handleFormChange(field.name, value?.toISOString())
-						}
-						placeholder={`Select ${field.label.toLowerCase()}`}
+						value={dateValue}
+						onChange={(e) => handleFormChange(field.name, e.target.value)}
+						className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
 					/>
 				);
 			case "select":
+				console.log(`Rendering select for ${field.name}:`, {
+					value: formData[field.name],
+					options: field.options,
+				}); // Debug log
 				return (
-					<SelectPicker
-						key={field.name}
-						value={formData[field.name] as string}
-						onChange={(value) => handleFormChange(field.name, value)}
-						data={field.options || []}
-						placeholder={`Select ${field.label.toLowerCase()}`}
-					/>
+					<div className="relative z-[1001]">
+						<SelectPicker
+							key={field.name}
+							value={formData[field.name] as string}
+							onChange={(value) => handleFormChange(field.name, value)}
+							data={field.options || []}
+							placeholder={`Select ${field.label.toLowerCase()}`}
+							menuStyle={{zIndex: 1001}}
+						/>
+					</div>
 				);
 			default:
 				return null;
@@ -587,7 +666,10 @@ const EmployeeTable = () => {
 							</select>
 						</div>
 						<button
-							onClick={() => setShowAddModal(true)}
+							onClick={() => {
+								setFormData(initialFormValue);
+								setShowAddModal(true);
+							}}
 							className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded font-semibold transition w-full md:w-auto"
 						>
 							+ Add New Employee
@@ -600,15 +682,6 @@ const EmployeeTable = () => {
 						columns={employeeTableColumns}
 						onRowClick={handleRowClick}
 						rowKey="id"
-					/>
-					{/* Details Modal */}
-					<DetailsModal
-						open={modalOpen}
-						onClose={handleModalClose}
-						data={selectedEmployeeForModal}
-						onSave={handleModalSave}
-						title="Employee Details"
-						fields={employeeFields}
 					/>
 				</div>
 
@@ -660,10 +733,14 @@ const EmployeeTable = () => {
 
 			{/* Edit Employee Modal */}
 			{showEditModal && editingEmployee && (
-				<div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+				<div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black bg-opacity-30">
 					<div className="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 relative">
 						<h2 className="text-xl font-semibold mb-4">Edit Employee</h2>
-						<form onSubmit={handleEditEmployeeSubmit} id="edit-employee-form">
+						<form
+							onSubmit={handleEditEmployeeSubmit}
+							id="edit-employee-form"
+							className="space-y-4"
+						>
 							<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 								{employeeFormFields.map((field) => (
 									<div key={field.name} className="col-span-1 flex flex-col">
@@ -682,7 +759,11 @@ const EmployeeTable = () => {
 							<div className="flex justify-end gap-2 mt-6">
 								<button
 									type="button"
-									onClick={() => setShowEditModal(false)}
+									onClick={() => {
+										setShowEditModal(false);
+										setEditingEmployee(null);
+										setEditFormErrors({});
+									}}
 									className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded mr-2"
 								>
 									Cancel

@@ -71,11 +71,13 @@ export const apiEndpoints = Object.freeze({
 	employee: {
 		createEmployee: () => "employee/create",
 		getAllEmployees: () => "employee/all",
-		updateEmployee: (id: string) => `employee/${id}`,
-		deleteEmployee: (id: string) => `employee/${id}`,
+		updateEmployee: (id: string) => `employee/update/${id}`,
+		deleteEmployee: (id: string) => `employee/delete/${id}`,
 		getEmployeeStats: () => "employee/stats",
 		updateEmployeePayment: () => "employee/payment/update",
 		getAssignedServices: () => "employee/assigned-services",
+		getEmployeeServiceHistory: (employeeId: string) =>
+			`employee/${employeeId}/service-history`,
 	},
 	booking: {
 		createBooking: () => {

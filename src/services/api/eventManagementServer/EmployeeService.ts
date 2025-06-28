@@ -8,6 +8,7 @@ import {
 	iEmployeePaymentUpdate,
 	iAssignedServicesResponse,
 	iEmployeeAssignedServices,
+	iEmployeeServiceHistory,
 } from "../../../customTypes/appDataTypes/employeeTypes";
 
 function EmployeeService(apiServer: AxiosInstance) {
@@ -72,31 +73,44 @@ function EmployeeService(apiServer: AxiosInstance) {
 	const updateEmployee = async (
 		employeeData: iCreateEmployeeDTO,
 	): Promise<APIResponse<iCreateEmployeeDTO> | null> => {
+		console.log(
+			"EmployeeService.updateEmployee called with data:",
+			employeeData,
+		);
 		let result = null;
 
-		await apiServer
-			.patch(
+		try {
+			console.log(
+				"Making PATCH request to:",
+				apiEndpoints.employee.updateEmployee(employeeData.id!),
+			);
+			const response = await apiServer.patch(
 				apiEndpoints.employee.updateEmployee(employeeData.id!),
 				employeeData,
-			)
-			.then(
-				(value) => {
-					result = NetworkUtil.buildResult<null>(
-						null,
-						value.status,
-						null,
-						value.data,
-					);
-				},
-				(reason) => {
-					const {response} = reason;
-					const {status, data} = response;
-					result = NetworkUtil.buildResult<null>(data, status, data, null);
-				},
-			)
-			.catch((error) => {
-				throw error;
-			});
+			);
+			console.log("Update employee API response:", response);
+
+			result = NetworkUtil.buildResult<iCreateEmployeeDTO>(
+				response.data,
+				response.status,
+				null,
+				null,
+			);
+			console.log("Built result:", result);
+		} catch (error: any) {
+			console.error("Error in updateEmployee service:", error);
+			if (error.response) {
+				const {status, data} = error.response;
+				result = NetworkUtil.buildResult<iCreateEmployeeDTO>(
+					data,
+					status,
+					data,
+					null,
+				);
+				console.log("Error response built:", result);
+			}
+			throw error;
+		}
 
 		return result;
 	};
@@ -265,6 +279,31 @@ function EmployeeService(apiServer: AxiosInstance) {
 		return result;
 	};
 
+	const getEmployeeServiceHistory = async (
+		employeeId: string,
+	): Promise<APIResponse<iEmployeeServiceHistory> | null> => {
+		try {
+			const response = await apiServer.get(
+				apiEndpoints.employee.getEmployeeServiceHistory(employeeId),
+			);
+			return NetworkUtil.buildResult<iEmployeeServiceHistory>(
+				response.data,
+				response.status,
+				null,
+				null,
+			);
+		} catch (error) {
+			console.error("Error fetching employee service history:", error);
+			const errorResponse = error as any;
+			return NetworkUtil.buildResult<iEmployeeServiceHistory>(
+				null,
+				errorResponse?.response?.status || 500,
+				errorResponse?.response?.data || errorResponse,
+				errorResponse,
+			);
+		}
+	};
+
 	return {
 		createEmployee,
 		getAllEmployees,
@@ -273,6 +312,7 @@ function EmployeeService(apiServer: AxiosInstance) {
 		getEmployeeStats,
 		updateEmployeePayment,
 		getAssignedServices,
+		getEmployeeServiceHistory,
 	};
 }
 
