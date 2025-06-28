@@ -2,6 +2,7 @@ import {createSlice} from "@reduxjs/toolkit";
 import {
 	iEmployeeState,
 	iEmployeeStatsResponse,
+	iEmployeeServiceHistory,
 } from "../../customTypes/appDataTypes/employeeTypes";
 import {
 	createEmployee,
@@ -11,6 +12,7 @@ import {
 	getEmployeeStats,
 	updateEmployeePayment,
 	getAssignedServices,
+	getEmployeeServiceHistory,
 } from "./ThunkActions";
 
 const initialState: iEmployeeState = {
@@ -19,6 +21,7 @@ const initialState: iEmployeeState = {
 	error: null,
 	stats: null,
 	assignedServices: null,
+	serviceHistory: null,
 };
 
 const employeeSlice = createSlice({
@@ -137,6 +140,26 @@ const employeeSlice = createSlice({
 			state.loading = false;
 			state.error = action.error.message || "Failed to fetch assigned services";
 			state.assignedServices = null;
+		});
+
+		// Get Employee Service History
+		builder.addCase(getEmployeeServiceHistory.pending, (state) => {
+			state.loading = true;
+			state.error = null;
+		});
+		builder.addCase(getEmployeeServiceHistory.fulfilled, (state, action) => {
+			state.loading = false;
+			if (action.payload?.data?.data) {
+				state.serviceHistory = action.payload.data.data;
+			} else {
+				state.serviceHistory = null;
+			}
+		});
+		builder.addCase(getEmployeeServiceHistory.rejected, (state, action) => {
+			state.loading = false;
+			state.error =
+				action.error.message || "Failed to fetch employee service history";
+			state.serviceHistory = null;
 		});
 	},
 });

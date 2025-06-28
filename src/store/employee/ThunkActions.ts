@@ -3,11 +3,7 @@ import {employeeService} from "../../services/api/eventManagementServer";
 import {
 	iCreateEmployeeDTO,
 	iEmployeePaymentUpdate,
-	iAssignedServicesResponse,
-	iEmployeeAssignedServices,
 } from "../../customTypes/appDataTypes/employeeTypes";
-import {iEmployeeResponse} from "../../customTypes/CommonServiceTypes";
-import {iStateMessage} from "@/customTypes/GenericReduxTypes";
 
 export const getAllEmployees = createAsyncThunk(
 	"employee/getAllEmployees",
@@ -257,5 +253,18 @@ export const getAssignedServices = createAsyncThunk(
 				message: "Failed to fetch assigned services",
 			});
 		}
+	},
+);
+
+export const getEmployeeServiceHistory = createAsyncThunk(
+	"employee/getEmployeeServiceHistory",
+	async (employeeId: string) => {
+		const response = await employeeService.getEmployeeServiceHistory(
+			employeeId,
+		);
+		if (!response) {
+			throw new Error("Failed to fetch employee service history");
+		}
+		return response;
 	},
 );
