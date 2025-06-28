@@ -57,7 +57,13 @@ function cleanBookingPayload(
 			!excludeFields.includes(key)
 		) {
 			if (key === "assignedEmployees" || key === "assignedEmployeeIds") {
-				cleaned["assignedEmployeeIds"] = (value as any[]).map((emp) => emp.id);
+				// Ensure we have a valid array and filter out any undefined/null values
+				const employeeIds = Array.isArray(value) 
+					? value
+						.map((emp) => emp?.id || emp)
+						.filter((id) => id !== null && id !== undefined && id !== "")
+					: [];
+				cleaned["assignedEmployeeIds"] = employeeIds;
 			} else if (key in initialFormValue) {
 				(cleaned as any)[key] = value;
 			}

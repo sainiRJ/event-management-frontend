@@ -93,7 +93,9 @@ const EmployeeServiceHistory: React.FC = () => {
 	};
 
 	const getSelectedEmployeeServices = () => {
-		return serviceHistory?.assignedServices || [];
+		return serviceHistory?.assignedServices.filter(
+			(service) => service.isPaid === false,
+		) || [];
 	};
 
 	const handleServiceSelection = (assignedEmployeeId: string) => {

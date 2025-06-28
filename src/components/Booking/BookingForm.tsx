@@ -228,9 +228,13 @@ const BookingForm: React.FC<BookingFormProps> = ({
 																(item: string) => item !== option.value,
 														  )
 														: [...currentValue, option.value];
+													// Ensure the array doesn't contain any undefined/null values
+													const cleanValue = newValue.filter(
+														(id: string) => id !== null && id !== undefined && id !== ""
+													);
 													setFormValue({
 														...formValue,
-														assignedEmployeeIds: newValue,
+														assignedEmployeeIds: cleanValue,
 													});
 												}}
 											>
