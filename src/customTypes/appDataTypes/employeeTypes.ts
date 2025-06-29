@@ -84,6 +84,7 @@ export interface iEmployeeServiceHistory {
 	employeeId: string;
 	employeeName: string;
 	assignedServices: iAssignedService[];
+	extraAmount?: number;
 }
 
 export interface iEmployeeServiceHistoryResponse {

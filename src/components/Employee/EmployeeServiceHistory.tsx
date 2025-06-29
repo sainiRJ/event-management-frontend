@@ -75,7 +75,7 @@ const EmployeeServiceHistory: React.FC = () => {
 	const handleEdit = (service: iAssignedService) => {
 		setSelectedEmployee(service);
 		setFormData({
-			employeeId: service.assignedEmployeeId,
+			employeeId: employeeId || "",
 			amount: service.amount,
 			paidAt: new Date().toISOString(),
 			autoPaid: false,
@@ -93,9 +93,11 @@ const EmployeeServiceHistory: React.FC = () => {
 	};
 
 	const getSelectedEmployeeServices = () => {
-		return serviceHistory?.assignedServices.filter(
-			(service) => service.isPaid === false,
-		) || [];
+		return (
+			serviceHistory?.assignedServices.filter(
+				(service) => service.isPaid === false,
+			) || []
+		);
 	};
 
 	const handleServiceSelection = (assignedEmployeeId: string) => {
@@ -119,7 +121,22 @@ const EmployeeServiceHistory: React.FC = () => {
 
 	const handleSubmit = async () => {
 		try {
-			await dispatch(updateEmployeePayment(formData));
+			let assignedEmployeeIdsToSend = formData.assignedEmployeeIds;
+			if (formData.autoPaid) {
+				// If autoPaid is true, send all unpaid assignedEmployeeIds
+				assignedEmployeeIdsToSend = getSelectedEmployeeServices().map(
+					(service) => service.assignedEmployeeId,
+				);
+			} else {
+				// If autoPaid is false, send only selected ids (already in formData.assignedEmployeeIds)
+				assignedEmployeeIdsToSend = formData.assignedEmployeeIds;
+			}
+			await dispatch(
+				updateEmployeePayment({
+					...formData,
+					assignedEmployeeIds: assignedEmployeeIdsToSend,
+				}),
+			);
 			alert("Payment updated successfully");
 			setShowEditModal(false);
 			// onRefresh();
@@ -230,6 +247,14 @@ const EmployeeServiceHistory: React.FC = () => {
 							<h3 className="text-sm font-medium text-red-600">Total Unpaid</h3>
 							<p className="text-2xl font-bold text-red-700">
 								{formatCurrency(totalUnpaid)}
+							</p>
+						</div>
+						<div className="bg-yellow-50 p-4 rounded-lg">
+							<h3 className="text-sm font-medium text-yellow-600">
+								Extra Amount
+							</h3>
+							<p className="text-2xl font-bold text-yellow-700">
+								{formatCurrency(serviceHistory?.extraAmount || 0)}
 							</p>
 						</div>
 					</div>
