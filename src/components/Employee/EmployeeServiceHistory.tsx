@@ -139,6 +139,7 @@ const EmployeeServiceHistory: React.FC = () => {
 			);
 			alert("Payment updated successfully");
 			setShowEditModal(false);
+			dispatch(getEmployeeServiceHistory(employeeId || ""));
 			// onRefresh();
 		} catch (error) {
 			alert("Failed to update payment");

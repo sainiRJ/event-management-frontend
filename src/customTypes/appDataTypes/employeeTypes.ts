@@ -69,10 +69,17 @@ export interface iAssignedService {
 	paidAt: string | null;
 }
 
+export interface iPaymentHistory {
+	id: string;
+	amount: string;
+	paidAt: string;
+}
+
 export interface iEmployeeAssignedServices {
 	employeeId: string;
 	employeeName: string;
 	assignedServices: iAssignedService[];
+	paymentHistory: iPaymentHistory[];
 }
 
 export interface iAssignedServicesResponse {

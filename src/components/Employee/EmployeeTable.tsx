@@ -379,7 +379,7 @@ const EmployeeTable = () => {
 
 	// Modal handlers
 	const handleRowClick = (row: any) => {
-		navigate(`/employee/${row.id}/service-history`);
+		navigate(`/employee/${row.id}/details`);
 	};
 
 	// Get unique designations and statuses for filter dropdowns
