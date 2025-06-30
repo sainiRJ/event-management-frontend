@@ -18,6 +18,7 @@ import {ImportSite} from "@rsuite/icons";
 import "./App.css";
 import ServiceTable from "./components/Services/ServiceTable";
 import EmployeeServiceHistory from "@/components/Employee/EmployeeServiceHistory";
+import EmployeeDetails from "@/components/Employee/EmployeeDetails";
 
 function App() {
 	const [showSideNav, setShowSideNav] = React.useState(false);
@@ -120,6 +121,10 @@ function App() {
 							/>
 							<Route path="/signup" element={<SignupPage />} />
 							<Route path="/auth/callback" element={<OAuthCallback />} />
+							<Route
+								path="/employee/:employeeId/details"
+								element={<EmployeeDetails />}
+							/>
 							<Route
 								path="/employee/:employeeId/service-history"
 								element={<EmployeeServiceHistory />}
