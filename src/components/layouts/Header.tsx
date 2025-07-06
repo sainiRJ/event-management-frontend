@@ -161,7 +161,10 @@ const HeaderTab = () => {
 						</button>
 						<div className="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 ease-in-out">
 							<div className="py-1">
-								<button className="w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-700">
+								<button
+									onClick={() => handleNavigation("/profile")}
+									className="w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-700"
+								>
 									Account Settings
 								</button>
 								<button
@@ -231,7 +234,10 @@ const HeaderTab = () => {
 						<User className="w-5 h-5" />
 						<span>Profile</span>
 					</button>
-					<button className="w-full px-4 py-2 hover:bg-gray-200 rounded text-left">
+					<button
+						onClick={() => handleNavigation("/profile")}
+						className="w-full px-4 py-2 hover:bg-gray-200 rounded text-left"
+					>
 						Account Settings
 					</button>
 					<button
