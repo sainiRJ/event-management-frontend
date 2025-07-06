@@ -65,7 +65,7 @@ export const apiEndpoints = Object.freeze({
 		},
 		signup: () => {
 			return "auth/signup";
-		}
+		},
 	},
 
 	employee: {
@@ -73,6 +73,11 @@ export const apiEndpoints = Object.freeze({
 		getAllEmployees: () => "employee/all",
 		updateEmployee: (id: string) => `employee/update/${id}`,
 		deleteEmployee: (id: string) => `employee/delete/${id}`,
+		getEmployeeStats: () => "employee/stats",
+		updateEmployeePayment: () => "employee/payment/update",
+		getAssignedServices: () => "employee/assigned-services",
+		getEmployeeServiceHistory: (employeeId: string) =>
+			`employee/${employeeId}/service-history`,
 	},
 	booking: {
 		createBooking: () => {
@@ -91,8 +96,11 @@ export const apiEndpoints = Object.freeze({
 			return "booking/bulk-delete";
 		},
 		bookingRequest: () => {
-			return "booking/request"
-		}
+			return "booking/request";
+		},
+		getFinanceData: (queryParams: string) => {
+			return `finance/all?${queryParams}`;
+		},
 	},
 
 	allStatus: {
@@ -109,6 +117,12 @@ export const apiEndpoints = Object.freeze({
 	service: {
 		getAllServices: () => {
 			return "/service/all";
+		},
+		createService: () => {
+			return "service/create";
+		},
+		updateService: (serviceId: string) => {
+			return `service//update/${serviceId}`;
 		},
 	},
 	status: {

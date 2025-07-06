@@ -12,9 +12,10 @@ export interface iCreateBookingDTO {
 	paymentStatusId: string;
 	bookingStatusId: string;
 	bookingStatus: string | null;
+	assignedEmployeeIds?: string[];
 }
 
-export interface iBookingRequest{
+export interface iBookingRequest {
 	id: string;
 	customerName: string;
 	phoneNumber: string;

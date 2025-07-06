@@ -44,5 +44,13 @@ export const bookingValidationSchema = Joi.object({
 	serviceName: Joi.string().allow(""),
 	paymentStatus: Joi.string().allow(""),
 	bookingStatus: Joi.string().allow(""),
-
+	assignedEmployeeIds: Joi.array()
+		.items(Joi.string().required())
+		.unique()
+		.optional()
+		.allow(null, "")
+		.messages({
+			"array.sparse": "Assigned employees array cannot contain empty values",
+			"array.unique": "Duplicate employees are not allowed",
+		}),
 });

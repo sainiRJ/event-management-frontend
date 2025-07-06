@@ -1,6 +1,7 @@
 import Joi from "joi";
 
 export const employeeValidationSchema = Joi.object({
+	id: Joi.string().optional(),
 	name: Joi.string().required().min(2).messages({
 		"string.empty": "Name is required",
 		"string.min": "Name must be at least 2 characters",
@@ -22,11 +23,6 @@ export const employeeValidationSchema = Joi.object({
 	designation: Joi.string().required().min(2).messages({
 		"string.empty": "Designation is required",
 		"string.min": "Designation must be at least 2 characters",
-	}),
-	salary: Joi.number().min(0).required().messages({
-		"number.base": "Salary must be a number",
-		"number.min": "Salary must be a positive number",
-		"any.required": "Salary is required",
 	}),
 	statusId: Joi.string().required().messages({
 		"string.empty": "Status is required",
