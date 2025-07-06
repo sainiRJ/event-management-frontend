@@ -1,6 +1,7 @@
 import Joi from "joi";
 
 export const employeeValidationSchema = Joi.object({
+	id: Joi.string().optional(),
 	name: Joi.string().required().min(2).messages({
 		"string.empty": "Name is required",
 		"string.min": "Name must be at least 2 characters",

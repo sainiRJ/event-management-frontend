@@ -1,4 +1,5 @@
 import Cookies from "js-cookie";
+import config from "../config";
 
 interface DecodedToken {
 	exp: number;
@@ -48,7 +49,7 @@ export const isRefreshTokenExpired = (): boolean => {
 export const refreshAccessToken = async (): Promise<string | null> => {
 	try {
 		const response = await fetch(
-			"http://localhost:3080/api/auth/refresh-token",
+			`${config.EVENT_MANAGEMENT_BASE_URL}/auth/refresh-token`,
 			{
 				method: "POST",
 				credentials: "include", // This is important to send cookies
