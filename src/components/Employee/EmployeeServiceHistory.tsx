@@ -1,16 +1,16 @@
 import React, {useState, useEffect, useRef} from "react";
 import {useParams} from "react-router-dom";
-import {useAppDispatch, useAppSelector} from "@/store/Hooks";
+import {useAppDispatch, useAppSelector} from "../../store/Hooks";
 import {
 	getAssignedServices,
 	getEmployeeServiceHistory,
 	updateEmployeePayment,
-} from "@/store/employee/ThunkActions";
+} from "../../store/employee/ThunkActions";
 import {
 	iAssignedService,
 	iEmployeePaymentUpdate,
 	iEmployeeStat,
-} from "@/customTypes/appDataTypes/employeeTypes";
+} from "../../customTypes/appDataTypes/employeeTypes";
 import {DatePicker, SelectPicker} from "rsuite";
 
 const formatDate = (dateString: string | Date) => {

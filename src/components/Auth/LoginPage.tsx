@@ -6,7 +6,7 @@ import {RootState} from "../../store/RootReducer";
 import {iLoginCredentials} from "../../store/auth/Types";
 import {useAppDispatch} from "../../store/Hooks";
 import {Message, toaster} from "rsuite";
-import {showToast} from "@/utils/showToatify";
+import {showToast} from "../../utils/showToatify";
 
 // Custom CSS for animated background circles
 const bgCircleStyles = `

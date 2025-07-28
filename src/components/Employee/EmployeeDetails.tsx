@@ -1,11 +1,13 @@
 import React, {useState, useEffect} from "react";
 import {useParams, useNavigate} from "react-router-dom";
-import {useAppDispatch, useAppSelector} from "@/store/Hooks";
+import {useAppDispatch, useAppSelector} from "../../store/Hooks";
 import {
 	getAllEmployees,
 	getEmployeeServiceHistory,
-} from "@/store/employee/ThunkActions";
-import {iCreateEmployeeDTO} from "@/customTypes/appDataTypes/employeeTypes";
+	updateEmployeePayment,
+	getAssignedServices,
+} from "../../store/employee/ThunkActions";
+import {iCreateEmployeeDTO} from "../../customTypes/appDataTypes/employeeTypes";
 import {
 	ArrowLeft,
 	User,
@@ -13,7 +15,9 @@ import {
 	CreditCard,
 	Pencil as Edit3,
 } from "lucide-react";
-import {fetchStatus} from "@/store/status/ThunkActions";
+import {fetchStatus} from "../../store/status/ThunkActions";
+import {DatePicker, SelectPicker} from "rsuite";
+import {iAssignedService, iEmployeePaymentUpdate} from "../../customTypes/appDataTypes/employeeTypes";
 
 const EmployeeDetails: React.FC = () => {
 	const {employeeId} = useParams<{employeeId: string}>();
@@ -373,6 +377,24 @@ const EmployeeProfile: React.FC<{employee: iCreateEmployeeDTO}> = ({
 const EmployeeServiceHistoryTab: React.FC<{serviceHistory: any}> = ({
 	serviceHistory,
 }) => {
+	const {employeeId} = useParams<{employeeId: string}>();
+	const dispatch = useAppDispatch();
+	const [showEditModal, setShowEditModal] = useState(false);
+	const [selectedService, setSelectedService] = useState<iAssignedService | null>(null);
+	const [formData, setFormData] = useState<iEmployeePaymentUpdate>({
+		employeeId: "",
+		amount: 0,
+		paidAt: new Date().toISOString(),
+		autoPaid: false,
+		assignedEmployeeIds: [],
+	});
+	const [filters, setFilters] = useState({
+		serviceName: "",
+		startDate: null as Date | null,
+		endDate: null as Date | null,
+		isPaid: null as boolean | null,
+	});
+
 	const formatDate = (dateString: string | Date) => {
 		const date = new Date(dateString);
 		return new Intl.DateTimeFormat("en-GB", {
@@ -389,6 +411,113 @@ const EmployeeServiceHistoryTab: React.FC<{serviceHistory: any}> = ({
 		}).format(amount);
 	};
 
+	const handleEdit = (service: iAssignedService) => {
+		setSelectedService(service);
+		setFormData({
+			employeeId: employeeId || "",
+			amount: service.amount,
+			paidAt: new Date().toISOString(),
+			autoPaid: false,
+			assignedEmployeeIds: [service.assignedEmployeeId],
+		});
+		setShowEditModal(true);
+	};
+
+	const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const value = parseFloat(e.target.value);
+		setFormData((prev) => ({
+			...prev,
+			amount: isNaN(value) ? 0 : value,
+		}));
+	};
+
+	const getSelectedEmployeeServices = () => {
+		return (
+			serviceHistory?.assignedServices.filter(
+				(service: any) => service.isPaid === false,
+			) || []
+		);
+	};
+
+	const handleServiceSelection = (assignedEmployeeId: string) => {
+		setFormData((prev) => {
+			const alreadySelected =
+				prev.assignedEmployeeIds?.includes(assignedEmployeeId);
+			return {
+				...prev,
+				assignedEmployeeIds: alreadySelected
+					? prev.assignedEmployeeIds?.filter((id) => id !== assignedEmployeeId)
+					: [...(prev.assignedEmployeeIds || []), assignedEmployeeId],
+			};
+		});
+	};
+
+	const formatServiceLabel = (service: iAssignedService) => {
+		return `${service.serviceName} (${formatDate(
+			service.eventDate,
+		)}) - ${formatCurrency(service.amount)}`;
+	};
+
+	const handleSubmit = async () => {
+		try {
+			let assignedEmployeeIdsToSend = formData.assignedEmployeeIds;
+			if (formData.autoPaid) {
+				// If autoPaid is true, send all unpaid assignedEmployeeIds
+				assignedEmployeeIdsToSend = getSelectedEmployeeServices().map(
+					(service: any) => service.assignedEmployeeId,
+				);
+			} else {
+				// If autoPaid is false, send only selected ids (already in formData.assignedEmployeeIds)
+				assignedEmployeeIdsToSend = formData.assignedEmployeeIds;
+			}
+			await dispatch(
+				updateEmployeePayment({
+					...formData,
+					assignedEmployeeIds: assignedEmployeeIdsToSend,
+				}),
+			);
+			alert("Payment updated successfully");
+			setShowEditModal(false);
+			dispatch(getEmployeeServiceHistory(employeeId || ""));
+		} catch (error) {
+			alert("Failed to update payment");
+		}
+	};
+
+	const handleDateSelect = (date: Date | null) => {
+		if (!date) return;
+
+		if (!filters.startDate) {
+			setFilters((prev) => ({...prev, startDate: date}));
+		} else if (!filters.endDate) {
+			if (date < filters.startDate) {
+				// If selected date is before start date, swap them
+				setFilters((prev) => ({
+					...prev,
+					startDate: date,
+					endDate: prev.startDate,
+				}));
+			} else {
+				setFilters((prev) => ({...prev, endDate: date}));
+			}
+		} else {
+			// Reset and start new selection
+			setFilters((prev) => ({
+				...prev,
+				startDate: date,
+				endDate: null,
+			}));
+		}
+	};
+
+	const clearDateRange = () => {
+		setFilters((prev) => ({
+			...prev,
+			startDate: null,
+			endDate: null,
+		}));
+	};
+
 	if (!serviceHistory) {
 		return (
 			<div className="text-center py-8">
@@ -400,12 +529,42 @@ const EmployeeServiceHistoryTab: React.FC<{serviceHistory: any}> = ({
 
 	const services = serviceHistory.assignedServices || [];
 
+	// Filter services based on current filters
+	const filteredServices = services.filter((service: any) => {
+		const matchesService =
+			!filters.serviceName || service.serviceName === filters.serviceName;
+
+		const serviceDate = new Date(service.eventDate);
+		const matchesDate =
+			(!filters.startDate || serviceDate >= filters.startDate) &&
+			(!filters.endDate || serviceDate <= filters.endDate);
+
+		const matchesPayment =
+			filters.isPaid === null || service.isPaid === filters.isPaid;
+
+		return matchesService && matchesDate && matchesPayment;
+	});
+
+	const totalServices = filteredServices.length;
+	const totalAmount = filteredServices.reduce(
+		(sum: number, service: any) => sum + service.amount,
+		0,
+	);
+	const totalPaid = filteredServices
+		.filter((service: any) => service.isPaid)
+		.reduce((sum: number, service: any) => sum + service.amount, 0);
+	const totalUnpaid = totalAmount - totalPaid;
+
+	const uniqueServiceNames = Array.from(
+		new Set(services.map((s: any) => s.serviceName) || []),
+	).map((name: any) => ({label: name as string, value: name as string}));
+
 	return (
 		<div className="space-y-6">
 			<div className="flex items-center justify-between">
 				<h2 className="text-xl font-semibold text-gray-900">Service History</h2>
 				<div className="text-sm text-gray-600">
-					{services.length} services completed
+					{filteredServices.length} services completed
 				</div>
 			</div>
 
@@ -413,31 +572,82 @@ const EmployeeServiceHistoryTab: React.FC<{serviceHistory: any}> = ({
 			<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
 				<div className="bg-blue-50 p-4 rounded-lg">
 					<h3 className="text-sm font-medium text-blue-600">Total Services</h3>
-					<p className="text-2xl font-bold text-blue-700">{services.length}</p>
+					<p className="text-2xl font-bold text-blue-700">{totalServices}</p>
 				</div>
 				<div className="bg-green-50 p-4 rounded-lg">
 					<h3 className="text-sm font-medium text-green-600">Total Amount</h3>
 					<p className="text-2xl font-bold text-green-700">
-						{formatCurrency(
-							services.reduce(
-								(sum: number, service: any) => sum + service.amount,
-								0,
-							),
-						)}
+						{formatCurrency(totalAmount)}
 					</p>
 				</div>
 				<div className="bg-purple-50 p-4 rounded-lg">
 					<h3 className="text-sm font-medium text-purple-600">Paid Services</h3>
 					<p className="text-2xl font-bold text-purple-700">
-						{services.filter((service: any) => service.isPaid).length}
+						{filteredServices.filter((service: any) => service.isPaid).length}
 					</p>
 				</div>
 				<div className="bg-red-50 p-4 rounded-lg">
 					<h3 className="text-sm font-medium text-red-600">Unpaid Services</h3>
 					<p className="text-2xl font-bold text-red-700">
-						{services.filter((service: any) => !service.isPaid).length}
+						{filteredServices.filter((service: any) => !service.isPaid).length}
 					</p>
 				</div>
+			</div>
+
+			{/* Filters */}
+			<div className="flex flex-col md:flex-row gap-4 mb-6">
+				<SelectPicker
+					placeholder="Filter by service"
+					data={[{label: "All Services", value: ""}, ...uniqueServiceNames]}
+					value={filters.serviceName}
+					onChange={(value: string | null) =>
+						setFilters((f) => ({...f, serviceName: value || ""}))
+					}
+					className="w-full md:w-48"
+				/>
+				<div className="flex items-center gap-2 w-full md:w-64">
+					<DatePicker
+						placeholder="Select date range"
+						value={filters.startDate}
+						onChange={handleDateSelect}
+						className="flex-1"
+						format="yyyy-MM-dd"
+					/>
+					{filters.startDate && (
+						<button
+							onClick={clearDateRange}
+							className="px-2 py-1 text-sm text-gray-600 hover:text-gray-800"
+						>
+							Clear
+						</button>
+					)}
+				</div>
+				{filters.startDate && (
+					<div className="text-sm text-gray-600">
+						{filters.endDate ? (
+							<span>
+								{formatDate(filters.startDate)} -{" "}
+								{formatDate(filters.endDate)}
+							</span>
+						) : (
+							<span>Select end date</span>
+						)}
+					</div>
+				)}
+				<SelectPicker
+					placeholder="Payment Status"
+					data={[
+						{label: "All", value: ""},
+						{label: "Paid", value: "true"},
+						{label: "Unpaid", value: "false"},
+					]}
+					value={filters.isPaid === null ? "" : filters.isPaid ? "true" : "false"}
+					onChange={(value: string | null) => {
+						const boolValue = value === "true" ? true : value === "false" ? false : null;
+						setFilters((f) => ({...f, isPaid: boolValue}));
+					}}
+					className="w-full md:w-48"
+				/>
 			</div>
 
 			{/* Services Table */}
@@ -464,10 +674,13 @@ const EmployeeServiceHistoryTab: React.FC<{serviceHistory: any}> = ({
 								<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
 									Status
 								</th>
+								<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+									Action
+								</th>
 							</tr>
 						</thead>
 						<tbody className="bg-white divide-y divide-gray-200">
-							{services.map((service: any) => (
+							{filteredServices.map((service: any) => (
 								<tr
 									key={service.assignedEmployeeId}
 									className="hover:bg-gray-50"
@@ -498,12 +711,149 @@ const EmployeeServiceHistoryTab: React.FC<{serviceHistory: any}> = ({
 											{service.isPaid ? "Paid" : "Unpaid"}
 										</span>
 									</td>
+									<td className="px-6 py-4 whitespace-nowrap text-sm">
+										<button
+											onClick={() => handleEdit(service)}
+											className="px-2 py-1 bg-blue-500 text-white rounded mr-2 hover:bg-blue-600 transition-colors"
+										>
+											Edit
+										</button>
+									</td>
 								</tr>
 							))}
 						</tbody>
 					</table>
 				</div>
 			</div>
+
+			{/* Edit Modal */}
+			{showEditModal && (
+				<div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+					<div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+						<div className="flex justify-between items-center mb-4">
+							<h3 className="text-lg font-semibold">
+								Update Employee Payment
+							</h3>
+							<button
+								onClick={() => setShowEditModal(false)}
+								className="text-gray-500 hover:text-gray-700"
+							>
+								×
+							</button>
+						</div>
+						<form
+							onSubmit={(e) => {
+								e.preventDefault();
+								handleSubmit();
+							}}
+							className="space-y-4"
+						>
+							<div>
+								<label className="block text-sm font-medium text-gray-700 mb-1">
+									Amount
+								</label>
+								<input
+									type="number"
+									value={formData.amount || ""}
+									onChange={handleAmountChange}
+									className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+									min="0"
+								/>
+							</div>
+							<div>
+								<label className="block text-sm font-medium text-gray-700 mb-1">
+									Payment Date
+								</label>
+								<input
+									type="date"
+									value={
+										formData.paidAt
+											? new Date(formData.paidAt).toISOString().split("T")[0]
+											: ""
+									}
+									onChange={(e) =>
+										setFormData((prev) => ({
+											...prev,
+											paidAt: new Date(e.target.value).toISOString(),
+										}))
+									}
+									className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+								/>
+							</div>
+							<div>
+								<label className="block text-sm font-medium text-gray-700 mb-1">
+									Assigned Services
+								</label>
+								<div className="relative">
+									<div className="max-h-48 overflow-y-auto border border-gray-300 rounded-md bg-white">
+										{getSelectedEmployeeServices().length > 0 ? (
+											getSelectedEmployeeServices().map((service: any) => (
+												<div
+													key={service.assignedEmployeeId}
+													onClick={() =>
+														handleServiceSelection(service.assignedEmployeeId)
+													}
+													className={`px-3 py-2 cursor-pointer hover:bg-gray-100 ${
+														formData.assignedEmployeeIds?.includes(
+															service.assignedEmployeeId,
+														)
+															? "bg-indigo-50 text-indigo-700"
+															: "text-gray-700"
+													}`}
+												>
+													{formatServiceLabel(service)}
+												</div>
+											))
+										) : (
+											<div className="px-3 py-2 text-gray-500">
+												No services assigned
+											</div>
+										)}
+									</div>
+								</div>
+								<p className="text-xs text-gray-500 mt-1">
+									Click to select/deselect services
+								</p>
+							</div>
+							<div className="flex items-center">
+								<input
+									type="checkbox"
+									id="autoPay"
+									checked={formData.autoPaid}
+									onChange={(e) =>
+										setFormData((prev) => ({
+											...prev,
+											autoPaid: e.target.checked,
+										}))
+									}
+									className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+								/>
+								<label
+									htmlFor="autoPay"
+									className="ml-2 block text-sm text-gray-700"
+								>
+									Auto Pay
+								</label>
+							</div>
+							<div className="flex justify-end space-x-3 mt-6">
+								<button
+									type="button"
+									onClick={() => setShowEditModal(false)}
+									className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500"
+								>
+									Cancel
+								</button>
+								<button
+									type="submit"
+									className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+								>
+									Update
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			)}
 		</div>
 	);
 };
