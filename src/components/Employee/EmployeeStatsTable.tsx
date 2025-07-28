@@ -5,11 +5,11 @@ import {
 	iEmployeePaymentUpdate,
 	iAssignedService,
 } from "../../customTypes/appDataTypes/employeeTypes";
-import {RootState} from "@/store";
+import {RootState} from "../../store";
 import {
 	updateEmployeePayment,
 	getAssignedServices,
-} from "@/store/employee/ThunkActions";
+} from "../../store/employee/ThunkActions";
 
 interface EmployeeStatsTableProps {
 	stats: Record<string, iEmployeeStat>;
