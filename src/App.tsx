@@ -17,8 +17,8 @@ import AuthGuard from "./Authguard";
 import {ImportSite} from "@rsuite/icons";
 import "./App.css";
 import ServiceTable from "./components/Services/ServiceTable";
-import EmployeeServiceHistory from "@/components/Employee/EmployeeServiceHistory";
-import EmployeeDetails from "@/components/Employee/EmployeeDetails";
+import EmployeeServiceHistory from "./components/Employee/EmployeeServiceHistory";
+import EmployeeDetails from "./components/Employee/EmployeeDetails";
 
 function App() {
 	const [showSideNav, setShowSideNav] = React.useState(false);
