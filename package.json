@@ -37,7 +37,7 @@
     "lint": "npm run run-eslint && npm run check-types",
     "format": "prettier --check \"src/**/*.ts\"",
     "start": "cross-env  PORT=8090 BROWSER=none craco start",
-    "build": "react-scripts build",
+    "build": "craco build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "prepare": "husky install"
