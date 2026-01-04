@@ -57,9 +57,9 @@ const SignupPage: React.FC = () => {
 		);
 	};
 
-	const formatPhoneDisplay = (phone: string) => {
+	const formatPhoneDisplay = (phoneNumber: string) => {
 		// Remove all non-digits
-		let cleanPhone = phone.replace(/\D/g, "");
+		let cleanPhone = phoneNumber.replace(/\D/g, "");
 
 		// If number starts with 91, remove it as we'll add +91 later
 		if (cleanPhone.startsWith("91")) {
@@ -104,7 +104,7 @@ const SignupPage: React.FC = () => {
 		if (phoneNumber.length !== 10) {
 			newErrors.phone = "Please enter a valid 10-digit mobile number";
 		} else if (!/^[6-9]\d{9}$/.test(phoneNumber)) {
-			newErrors.phone = "Please enter a valid Indian mobile number";
+			newErrors.phoneNumber = "Please enter a valid Indian mobile number";
 		}
 
 		// Password validation
@@ -121,7 +121,7 @@ const SignupPage: React.FC = () => {
 	};
 
 	const handleInputChange = (name: string, value: string) => {
-		if (name === "phone") {
+		if (name === "phoneNumber") {
 			// Remove all non-digits
 			let cleanPhone = value.replace(/\D/g, "");
 
@@ -248,14 +248,14 @@ const SignupPage: React.FC = () => {
 								<FaPhone />
 							</InputGroup.Addon>
 							<Input
-								name="phone"
+								name="phoneNumber"
 								value={formatPhoneDisplay(formData.phoneNumber)}
-								onChange={(value) => handleInputChange("phone", value)}
+								onChange={(value) => handleInputChange("phoneNumber", value)}
 								placeholder="Mobile Number (10 digits)"
 								disabled={loading}
 							/>
 						</InputGroup>
-						{errors.phone && <span className="error-text">{errors.phone}</span>}
+						{errors.phoneNumber && <span className="error-text">{errors.phoneNumber}</span>}
 					</div>
 
 					<div className="form-group">

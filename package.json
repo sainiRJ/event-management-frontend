@@ -25,7 +25,6 @@
     "react-scripts": "5.0.1",
     "recharts": "^2.15.1",
     "redux-logger": "^3.0.6",
-    "redux-react-hook": "^4.0.3",
     "rsuite": "^5.76.3",
     "sonner": "^2.0.3",
     "ts-loader": "^9.5.2"
@@ -36,7 +35,7 @@
     "run-eslint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "lint": "npm run run-eslint && npm run check-types",
     "format": "prettier --check \"src/**/*.ts\"",
-    "start": "cross-env  PORT=8090 BROWSER=none craco start",
+    "start": "cross-env  PORT=3000 BROWSER=none craco start",
     "build": "craco build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
