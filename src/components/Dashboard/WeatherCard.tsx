@@ -11,6 +11,8 @@ import {
 } from "react-icons/wi";
 import {Panel} from "rsuite";
 import "./WeatherCard.css";
+import config from "../../config";
+
 
 interface WeatherData {
 	location: string;
@@ -39,7 +41,7 @@ const WeatherCard: React.FC<WeatherCardProps> = ({location, eventDate}) => {
 		const fetchWeather = async () => {
 			try {
 				const response = await fetch(
-					`http://localhost:3080/api/weather/city?city=${location}&date=${eventDate}`,
+					`${config.EVENT_MANAGEMENT_BASE_URL}/weather/city?city=${location}&date=${eventDate}`,
 				);
 				const data = await response.json();
 
