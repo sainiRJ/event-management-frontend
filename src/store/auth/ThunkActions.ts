@@ -6,6 +6,7 @@ import {
 	iLoginResponse,
 	iSignupDTO,
 } from "@/customTypes/appDataTypes/authTypes";
+import config from "../../config"
 
 interface iSignupResponse {
 	message: string;
@@ -120,7 +121,7 @@ export const handleGoogleCallback = createAsyncThunk(
 	"auth/handleGoogleCallback",
 	async (userData: iGoogleUserData) => {
 		const response = await fetch(
-			"http://localhost:3080/api/auth/google/callback",
+		`${config.EVENT_MANAGEMENT_BASE_URL}/auth/google/callback`,
 			{
 				method: "POST",
 				headers: {
