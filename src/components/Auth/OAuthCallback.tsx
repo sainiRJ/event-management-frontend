@@ -24,7 +24,6 @@ const OAuthCallback: React.FC = () => {
 				return;
 			}
 
-
 			try {
 				const tokenResponse = await fetch(
 					"https://oauth2.googleapis.com/token",

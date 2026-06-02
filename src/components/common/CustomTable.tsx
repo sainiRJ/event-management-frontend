@@ -1,14 +1,14 @@
 import React, {useRef, useEffect} from "react";
-import { Loader2, Inbox, ChevronRight } from "lucide-react";
+import {Loader2, Inbox} from "lucide-react";
 
-interface CustomTableProps {
-	data: any[];
+interface CustomTableProps<T = Record<string, any>> {
+	data: T[];
 	loading?: boolean;
 	columns: {
 		key: string;
 		label: string;
 		width?: number;
-		render?: (rowData: any) => React.ReactNode;
+		render?: (rowData: T) => React.ReactNode;
 		className?: string;
 	}[];
 	selectable?: boolean;
@@ -16,16 +16,16 @@ interface CustomTableProps {
 	onSelectChange?: (selectedKeys: string[]) => void;
 	actions?: {
 		label: string;
-		action: (rowData: any) => void;
+		action: (rowData: T) => void;
 		icon?: React.ReactNode;
 		className?: string;
 	}[];
-	onRowClick?: (rowData: any) => void;
-	rowKey?: string;
+	onRowClick?: (rowData: T) => void;
+	rowKey?: keyof T;
 	className?: string;
 }
 
-const CustomTable: React.FC<CustomTableProps> = ({
+const CustomTable = <T extends Record<string, any>>({
 	data,
 	loading = false,
 	columns,
@@ -34,11 +34,11 @@ const CustomTable: React.FC<CustomTableProps> = ({
 	onSelectChange,
 	actions = [],
 	onRowClick,
-	rowKey = "id",
+	rowKey = "id" as keyof T,
 	className = "",
-}) => {
+}: CustomTableProps<T>) => {
 	const selectAllRef = useRef<HTMLInputElement>(null);
-	
+
 	useEffect(() => {
 		if (selectAllRef.current) {
 			selectAllRef.current.indeterminate =
@@ -53,7 +53,9 @@ const CustomTable: React.FC<CustomTableProps> = ({
 					<div className="w-16 h-16 border-4 border-indigo-50 border-t-indigo-600 rounded-full animate-spin" />
 					<Loader2 className="w-6 h-6 text-indigo-600 animate-spin absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
 				</div>
-				<p className="text-gray-900 font-black text-sm uppercase tracking-widest mt-6">Fetching records</p>
+				<p className="text-gray-900 font-black text-sm uppercase tracking-widest mt-6">
+					Fetching records
+				</p>
 				<p className="text-gray-400 text-xs mt-1">Please wait a moment...</p>
 			</div>
 		);
@@ -65,16 +67,21 @@ const CustomTable: React.FC<CustomTableProps> = ({
 				<div className="p-5 bg-gray-50 rounded-3xl mb-6">
 					<Inbox className="w-12 h-12 text-gray-300" />
 				</div>
-				<h3 className="text-gray-900 font-black text-xl mb-2">No Records Found</h3>
+				<h3 className="text-gray-900 font-black text-xl mb-2">
+					No Records Found
+				</h3>
 				<p className="text-gray-400 text-sm max-w-[280px] text-center font-medium leading-relaxed">
-					We couldn&apos;t find any data matching your current filters or criteria.
+					We couldn&apos;t find any data matching your current filters or
+					criteria.
 				</p>
 			</div>
 		);
 	}
 
 	return (
-		<div className={`w-full overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm ${className}`}>
+		<div
+			className={`w-full overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm ${className}`}
+		>
 			<div className="overflow-x-auto">
 				<table className="w-full border-separate border-spacing-0">
 					<thead>
@@ -84,11 +91,13 @@ const CustomTable: React.FC<CustomTableProps> = ({
 									<input
 										type="checkbox"
 										className="w-5 h-5 text-indigo-600 rounded-lg border-gray-200 focus:ring-indigo-500/20 transition-all cursor-pointer"
-										checked={data.length > 0 && selectedKeys.length === data.length}
+										checked={
+											data.length > 0 && selectedKeys.length === data.length
+										}
 										ref={selectAllRef}
 										onChange={(e) => {
 											if (e.target.checked) {
-												onSelectChange?.(data.map((item) => item[rowKey]));
+												onSelectChange?.(data.map((item) => item[rowKey] as unknown as string));
 											} else {
 												onSelectChange?.([]);
 											}
@@ -96,7 +105,7 @@ const CustomTable: React.FC<CustomTableProps> = ({
 									/>
 								</th>
 							)}
-							{columns.map((col, idx) => (
+							{columns.map((col) => (
 								<th
 									key={col.key}
 									className={`px-6 py-5 text-left text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] border-b border-gray-100 whitespace-nowrap ${
@@ -117,7 +126,7 @@ const CustomTable: React.FC<CustomTableProps> = ({
 					<tbody className="divide-y divide-gray-50">
 						{data.map((row, idx) => (
 							<tr
-								key={row[rowKey] || idx}
+								key={(row[rowKey] as unknown as string) || idx}
 								className="group hover:bg-indigo-50/30 transition-all duration-200 cursor-pointer"
 								onClick={onRowClick ? () => onRowClick(row) : undefined}
 							>
@@ -126,14 +135,14 @@ const CustomTable: React.FC<CustomTableProps> = ({
 										<input
 											type="checkbox"
 											className="w-5 h-5 text-indigo-600 rounded-lg border-gray-200 focus:ring-indigo-500/20 transition-all cursor-pointer"
-											checked={selectedKeys.includes(row[rowKey])}
+											checked={selectedKeys.includes(row[rowKey] as unknown as string)}
 											onChange={(e) => {
 												e.stopPropagation();
 												if (e.target.checked) {
-													onSelectChange?.([...selectedKeys, row[rowKey]]);
+													onSelectChange?.([...selectedKeys, row[rowKey] as unknown as string]);
 												} else {
 													onSelectChange?.(
-														selectedKeys.filter((key) => key !== row[rowKey]),
+														selectedKeys.filter((key) => key !== (row[rowKey] as unknown as string)),
 													);
 												}
 											}}
@@ -147,7 +156,7 @@ const CustomTable: React.FC<CustomTableProps> = ({
 											col.className || ""
 										}`}
 									>
-										{col.render ? col.render(row) : row[col.key] || "-"}
+										{col.render ? col.render(row) : (row[col.key] as React.ReactNode) || "-"}
 									</td>
 								))}
 								{actions.length > 0 && (
@@ -157,7 +166,8 @@ const CustomTable: React.FC<CustomTableProps> = ({
 												<button
 													key={i}
 													className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black transition-all hover:scale-105 active:scale-95 ${
-														action.className || "bg-white text-indigo-600 border border-indigo-100 hover:bg-indigo-600 hover:text-white shadow-sm"
+														action.className ||
+														"bg-white text-indigo-600 border border-indigo-100 hover:bg-indigo-600 hover:text-white shadow-sm"
 													}`}
 													onClick={(e) => {
 														e.stopPropagation();

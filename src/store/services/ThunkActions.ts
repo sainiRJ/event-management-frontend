@@ -1,7 +1,5 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
-import Decimal from "decimal.js";
 
-import {RootState} from "@store/index";
 import {curryGetThunkName} from "@/utils/ReduxUtil";
 
 import {httpStatusCodes} from "@/customTypes/NetworkTypes";
@@ -123,7 +121,12 @@ export const updateService = createAsyncThunk<
 >(curriedGetThunkName("updateService"), async (arg, {rejectWithValue}) => {
 	try {
 		const {id, ...updateData} = arg;
-		const response = await serviceService.updateService(id!, updateData);
+		if (!id) {
+			return rejectWithValue({
+				message: "Service ID is required",
+			});
+		}
+		const response = await serviceService.updateService(id, updateData);
 
 		if (response) {
 			const {httpStatusCode, data, message} = response;

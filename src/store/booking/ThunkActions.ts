@@ -1,14 +1,15 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
-import Decimal from "decimal.js";
 
-import {RootState} from "@store/index";
 import {curryGetThunkName} from "@/utils/ReduxUtil";
 
 import {httpStatusCodes} from "@/customTypes/NetworkTypes";
 import {iStateMessage} from "@/customTypes/GenericReduxTypes";
 import {iGenericResponse} from "@/customTypes/CommonServiceTypes";
 
-import {iCreateBookingDTO, iBookingRequest} from "@/customTypes/appDataTypes/bookingTypes";
+import {
+	iCreateBookingDTO,
+	iBookingRequest,
+} from "@/customTypes/appDataTypes/bookingTypes";
 import {bookingService} from "@/services/api/eventManagementServer";
 
 import {REDUCER_NAME} from "./Types";

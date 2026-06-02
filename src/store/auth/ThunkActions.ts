@@ -1,12 +1,12 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
 import {curryGetThunkName} from "@/utils/ReduxUtil";
-import {iGoogleUserData, iLoginCredentials, iAuthResponse} from "./Types";
+import {iGoogleUserData, iAuthResponse} from "./Types";
 import {
 	iLoginDTO,
 	iLoginResponse,
 	iSignupDTO,
 } from "@/customTypes/appDataTypes/authTypes";
-import config from "../../config"
+import config from "../../config";
 
 interface iSignupResponse {
 	message: string;
@@ -121,7 +121,7 @@ export const handleGoogleCallback = createAsyncThunk(
 	"auth/handleGoogleCallback",
 	async (userData: iGoogleUserData) => {
 		const response = await fetch(
-		`${config.EVENT_MANAGEMENT_BASE_URL}/auth/google/callback`,
+			`${config.EVENT_MANAGEMENT_BASE_URL}/auth/google/callback`,
 			{
 				method: "POST",
 				headers: {

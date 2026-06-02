@@ -1,7 +1,5 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
-import Decimal from "decimal.js";
 
-import {RootState} from "@store/index";
 import {curryGetThunkName} from "@/utils/ReduxUtil";
 
 import {httpStatusCodes} from "@/customTypes/NetworkTypes";

@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { X } from "lucide-react";
+import React, {useEffect} from "react";
+import {X} from "lucide-react";
 
 interface ModalProps {
 	isOpen: boolean;
@@ -46,13 +46,15 @@ const Modal: React.FC<ModalProps> = ({
 	return (
 		<div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
 			{/* Backdrop */}
-			<div 
-				className="fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity" 
+			<div
+				className="fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
 				onClick={onClose}
 			/>
 
 			{/* Modal content */}
-			<div className={`relative w-full ${sizes[size]} bg-white rounded-xl shadow-2xl transform transition-all flex flex-col max-h-[90vh]`}>
+			<div
+				className={`relative w-full ${sizes[size]} bg-white rounded-xl shadow-2xl transform transition-all flex flex-col max-h-[90vh]`}
+			>
 				{/* Header */}
 				<div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
 					<h3 className="text-lg font-semibold text-gray-900">{title}</h3>
@@ -65,9 +67,7 @@ const Modal: React.FC<ModalProps> = ({
 				</div>
 
 				{/* Body */}
-				<div className="px-6 py-4 overflow-y-auto flex-1">
-					{children}
-				</div>
+				<div className="px-6 py-4 overflow-y-auto flex-1">{children}</div>
 
 				{/* Footer */}
 				{footer && (

@@ -13,7 +13,7 @@ import AuthGuard from "./Authguard";
 import ServiceTable from "./components/Services/ServiceTable";
 import EmployeeServiceHistory from "./components/Employee/EmployeeServiceHistory";
 import EmployeeDetails from "./components/Employee/EmployeeDetails";
-import { Toaster } from "sonner";
+import {Toaster} from "sonner";
 import "./App.css";
 
 function App() {
@@ -34,23 +34,27 @@ function App() {
 	return (
 		<div className="min-h-screen bg-gray-50/50 font-sans text-gray-900">
 			<Toaster position="top-right" richColors />
-			
+
 			{token && (
 				<>
-					<Sidebar 
-						isCollapsed={isSidebarCollapsed} 
-						setIsCollapsed={setIsSidebarCollapsed} 
+					<Sidebar
+						isCollapsed={isSidebarCollapsed}
+						setIsCollapsed={setIsSidebarCollapsed}
 					/>
 					<HeaderTab />
 				</>
 			)}
-			
-			<div className={`transition-all duration-300 ${
-				token && !isMobile 
-					? isSidebarCollapsed ? "pl-20" : "pl-64" 
-					: ""
-			}`}>
-				<main className={`w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 ${token ? "pt-24" : ""}`}>
+
+			<div
+				className={`transition-all duration-300 ${
+					token && !isMobile ? (isSidebarCollapsed ? "pl-20" : "pl-64") : ""
+				}`}
+			>
+				<main
+					className={`w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 ${
+						token ? "pt-24" : ""
+					}`}
+				>
 					<Routes>
 						<Route
 							path="/"

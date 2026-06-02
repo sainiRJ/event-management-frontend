@@ -1,5 +1,4 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
-import {RootState} from "@store/index";
 import {curryGetThunkName} from "@/utils/ReduxUtil";
 import {httpStatusCodes} from "@/customTypes/NetworkTypes";
 import {iStateMessage} from "@/customTypes/GenericReduxTypes";

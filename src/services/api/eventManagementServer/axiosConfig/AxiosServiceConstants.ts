@@ -1,6 +1,5 @@
 import {AxiosRequestConfig} from "axios";
 import config from "../../../../config/index";
-import {setArgs} from "@craco/craco/dist/lib/args";
 
 /**
  * The base url of the api server's endpoint needs to be configured here.

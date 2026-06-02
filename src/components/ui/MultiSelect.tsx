@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from "react";
-import { Check, ChevronDown, X } from "lucide-react";
+import React, {useState, useRef, useEffect} from "react";
+import {Check, ChevronDown, X} from "lucide-react";
 
 interface Option {
 	label: string;
@@ -28,7 +28,10 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
 
 	useEffect(() => {
 		const handleClickOutside = (event: MouseEvent) => {
-			if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+			if (
+				containerRef.current &&
+				!containerRef.current.contains(event.target as Node)
+			) {
 				setIsOpen(false);
 			}
 		};
@@ -62,7 +65,9 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
 				<div
 					onClick={() => setIsOpen(!isOpen)}
 					className={`min-h-[38px] w-full p-1.5 rounded-md border shadow-sm cursor-pointer flex flex-wrap gap-1 items-center bg-white transition-colors ${
-						isOpen ? "border-indigo-500 ring-1 ring-indigo-500" : "border-gray-300"
+						isOpen
+							? "border-indigo-500 ring-1 ring-indigo-500"
+							: "border-gray-300"
 					} ${error ? "border-red-300 ring-red-500" : ""}`}
 				>
 					{selectedOptions.length > 0 ? (
@@ -85,7 +90,11 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
 						<span className="text-gray-400 text-sm ml-1">{placeholder}</span>
 					)}
 					<div className="ml-auto pr-1">
-						<ChevronDown className={`h-4 w-4 text-gray-400 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+						<ChevronDown
+							className={`h-4 w-4 text-gray-400 transition-transform ${
+								isOpen ? "rotate-180" : ""
+							}`}
+						/>
 					</div>
 				</div>
 
@@ -97,7 +106,9 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
 									key={opt.value}
 									onClick={() => toggleOption(opt.value)}
 									className={`px-3 py-2 text-sm cursor-pointer flex items-center justify-between hover:bg-gray-50 ${
-										value.includes(opt.value) ? "bg-indigo-50 text-indigo-700 font-medium" : "text-gray-700"
+										value.includes(opt.value)
+											? "bg-indigo-50 text-indigo-700 font-medium"
+											: "text-gray-700"
 									}`}
 								>
 									{opt.label}
@@ -105,7 +116,9 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
 								</div>
 							))
 						) : (
-							<div className="px-3 py-2 text-sm text-gray-500 text-center">No options available</div>
+							<div className="px-3 py-2 text-sm text-gray-500 text-center">
+								No options available
+							</div>
 						)}
 					</div>
 				)}

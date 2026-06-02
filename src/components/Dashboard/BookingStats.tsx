@@ -1,5 +1,11 @@
 import React from "react";
-import { CalendarCheck, CalendarX, CalendarDays, TrendingUp, Sparkles } from "lucide-react";
+import {
+	CalendarCheck,
+	CalendarX,
+	CalendarDays,
+	TrendingUp,
+	Sparkles,
+} from "lucide-react";
 import DashboardCard from "../common/DashboardCard";
 
 interface BookingStatsProps {
@@ -24,10 +30,10 @@ const BookingStats: React.FC<BookingStatsProps> = ({
 					value={total}
 					icon={<Sparkles className="w-6 h-6" />}
 					color="indigo"
-					trend={{ value: 12, isPositive: true }}
+					trend={{value: 12, isPositive: true}}
 					className="lg:col-span-1"
 				/>
-				
+
 				<DashboardCard
 					title="Upcoming"
 					value={upcoming}

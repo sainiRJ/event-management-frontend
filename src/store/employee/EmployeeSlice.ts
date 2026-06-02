@@ -1,9 +1,5 @@
 import {createSlice} from "@reduxjs/toolkit";
-import {
-	iEmployeeState,
-	iEmployeeStatsResponse,
-	iEmployeeServiceHistory,
-} from "../../customTypes/appDataTypes/employeeTypes";
+import {iEmployeeState} from "../../customTypes/appDataTypes/employeeTypes";
 import {
 	createEmployee,
 	getAllEmployees,

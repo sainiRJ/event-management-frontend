@@ -1,10 +1,7 @@
 // src/store/finance/Types.ts
 
 import {NullableNumber, NullableString} from "@/customTypes/CommonTypes";
-import {
-	apiResponseStatuses,
-	iAPIRequestStatus,
-} from "@/customTypes/NetworkTypes";
+import {apiResponseStatuses} from "@/customTypes/NetworkTypes";
 
 export const REDUCER_NAME = "financeSlice";
 

@@ -7,7 +7,7 @@ import {
 	deleteService,
 } from "../../store/services/ThunkActions";
 import {RootState} from "../../store";
-import { Plus, Search, Edit2, Trash2, Settings2, RefreshCw } from "lucide-react";
+import {Plus, Search, Edit2, Trash2, Settings2, RefreshCw} from "lucide-react";
 import CustomTable from "../common/CustomTable";
 import {iService} from "../../customTypes/appDataTypes/serviceTypes";
 import {serviceValidationSchema} from "@/validations/ServiceValidationSchema";
@@ -15,7 +15,7 @@ import Joi from "joi";
 import Button from "../ui/Button";
 import Input from "../ui/Input";
 import Modal from "../ui/Modal";
-import { toast } from "sonner";
+import {toast} from "sonner";
 
 const ServiceTable = () => {
 	const [loading, setLoading] = useState(true);
@@ -29,12 +29,18 @@ const ServiceTable = () => {
 		price: "0",
 		available: true,
 	});
-	const [addFormErrors, setAddFormErrors] = useState<Record<string, string>>({});
-	const [editFormErrors, setEditFormErrors] = useState<Record<string, string>>({});
+	const [addFormErrors, setAddFormErrors] = useState<Record<string, string>>(
+		{},
+	);
+	const [editFormErrors, setEditFormErrors] = useState<Record<string, string>>(
+		{},
+	);
 	const [isRefreshing, setIsRefreshing] = useState(false);
 
 	const dispatch = useAppDispatch();
-	const {serviceList} = useAppSelector((state: RootState) => state.serviceReducer);
+	const {serviceList} = useAppSelector(
+		(state: RootState) => state.serviceReducer,
+	);
 
 	const handleRefresh = async () => {
 		setIsRefreshing(true);
@@ -49,7 +55,9 @@ const ServiceTable = () => {
 	}, [dispatch]);
 
 	const handleAddService = async () => {
-		const {error} = serviceValidationSchema.validate(formData, {abortEarly: false});
+		const {error} = serviceValidationSchema.validate(formData, {
+			abortEarly: false,
+		});
 		if (error) {
 			const errors: Record<string, string> = {};
 			error.details.forEach((detail: Joi.ValidationErrorItem) => {
@@ -143,7 +151,9 @@ const ServiceTable = () => {
 			key: "description",
 			label: "Description",
 			render: (row: iService) => (
-				<div className="text-gray-500 max-w-md truncate">{row.description || "-"}</div>
+				<div className="text-gray-500 max-w-md truncate">
+					{row.description || "-"}
+				</div>
 			),
 		},
 		{
@@ -181,13 +191,19 @@ const ServiceTable = () => {
 						<Settings2 className="w-8 h-8 text-indigo-600" />
 						Services
 					</h1>
-					<p className="text-gray-500 mt-1">Manage the decoration services you offer to clients</p>
+					<p className="text-gray-500 mt-1">
+						Manage the decoration services you offer to clients
+					</p>
 				</div>
-				
+
 				<div className="flex items-center gap-3">
 					<Button
 						variant="outline"
-						icon={<RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />}
+						icon={
+							<RefreshCw
+								className={`w-4 h-4 ${isRefreshing ? "animate-spin" : ""}`}
+							/>
+						}
 						onClick={handleRefresh}
 						disabled={isRefreshing}
 					>
@@ -231,7 +247,9 @@ const ServiceTable = () => {
 				title="Add New Service"
 				footer={
 					<>
-						<Button variant="ghost" onClick={() => setShowAddModal(false)}>Cancel</Button>
+						<Button variant="ghost" onClick={() => setShowAddModal(false)}>
+							Cancel
+						</Button>
 						<Button onClick={handleAddService}>Create Service</Button>
 					</>
 				}
@@ -240,7 +258,9 @@ const ServiceTable = () => {
 					<Input
 						label="Service Name"
 						value={formData.serviceName}
-						onChange={(e) => setFormData({...formData, serviceName: e.target.value})}
+						onChange={(e) =>
+							setFormData({...formData, serviceName: e.target.value})
+						}
 						error={addFormErrors.serviceName}
 						placeholder="e.g. Wedding Decoration"
 					/>
@@ -249,7 +269,9 @@ const ServiceTable = () => {
 						as="textarea"
 						rows={4}
 						value={formData.description}
-						onChange={(e) => setFormData({...formData, description: e.target.value})}
+						onChange={(e) =>
+							setFormData({...formData, description: e.target.value})
+						}
 						error={addFormErrors.description}
 						placeholder="Briefly describe what this service includes..."
 					/>
@@ -266,10 +288,17 @@ const ServiceTable = () => {
 							type="checkbox"
 							id="available-add"
 							checked={formData.available}
-							onChange={(e) => setFormData({...formData, available: e.target.checked})}
+							onChange={(e) =>
+								setFormData({...formData, available: e.target.checked})
+							}
 							className="w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500"
 						/>
-						<label htmlFor="available-add" className="text-sm font-medium text-gray-700">Available for Booking</label>
+						<label
+							htmlFor="available-add"
+							className="text-sm font-medium text-gray-700"
+						>
+							Available for Booking
+						</label>
 					</div>
 				</div>
 			</Modal>
@@ -284,7 +313,9 @@ const ServiceTable = () => {
 				title="Edit Service"
 				footer={
 					<>
-						<Button variant="ghost" onClick={() => setShowEditModal(false)}>Cancel</Button>
+						<Button variant="ghost" onClick={() => setShowEditModal(false)}>
+							Cancel
+						</Button>
 						<Button onClick={handleUpdateService}>Save Changes</Button>
 					</>
 				}
@@ -294,7 +325,12 @@ const ServiceTable = () => {
 						<Input
 							label="Service Name"
 							value={editingService.serviceName}
-							onChange={(e) => setEditingService({...editingService, serviceName: e.target.value})}
+							onChange={(e) =>
+								setEditingService({
+									...editingService,
+									serviceName: e.target.value,
+								})
+							}
 							error={editFormErrors.serviceName}
 						/>
 						<Input
@@ -302,14 +338,21 @@ const ServiceTable = () => {
 							as="textarea"
 							rows={4}
 							value={editingService.description || ""}
-							onChange={(e) => setEditingService({...editingService, description: e.target.value})}
+							onChange={(e) =>
+								setEditingService({
+									...editingService,
+									description: e.target.value,
+								})
+							}
 							error={editFormErrors.description}
 						/>
 						<Input
 							label="Price"
 							type="number"
 							value={editingService.price}
-							onChange={(e) => setEditingService({...editingService, price: e.target.value})}
+							onChange={(e) =>
+								setEditingService({...editingService, price: e.target.value})
+							}
 							error={editFormErrors.price}
 						/>
 						<div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
@@ -317,10 +360,20 @@ const ServiceTable = () => {
 								type="checkbox"
 								id="available-edit"
 								checked={editingService.available}
-								onChange={(e) => setEditingService({...editingService, available: e.target.checked})}
+								onChange={(e) =>
+									setEditingService({
+										...editingService,
+										available: e.target.checked,
+									})
+								}
 								className="w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500"
 							/>
-							<label htmlFor="available-edit" className="text-sm font-medium text-gray-700">Available for Booking</label>
+							<label
+								htmlFor="available-edit"
+								className="text-sm font-medium text-gray-700"
+							>
+								Available for Booking
+							</label>
 						</div>
 					</div>
 				)}

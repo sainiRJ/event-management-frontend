@@ -7,8 +7,6 @@ import {fetchServices} from "@/store/services/ThunkActions";
 import {iStatus} from "@/store/status/Types";
 import {iService} from "@/store/services/Types";
 import {
-	AreaChart,
-	Area,
 	XAxis,
 	YAxis,
 	CartesianGrid,
@@ -21,8 +19,17 @@ import {
 	Bar,
 	Legend,
 } from "recharts";
-import { formatCurrency } from "../../utils/currencyUtils";
-import { TrendingUp, Wallet, ArrowUpRight, ArrowDownRight, Filter, RefreshCw, PieChart as PieChartIcon, BarChart3 } from "lucide-react";
+import {formatCurrency} from "../../utils/currencyUtils";
+import {
+	TrendingUp,
+	Wallet,
+	ArrowUpRight,
+	ArrowDownRight,
+	Filter,
+	RefreshCw,
+	PieChart as PieChartIcon,
+	BarChart3,
+} from "lucide-react";
 import Button from "../ui/Button";
 import Input from "../ui/Input";
 import Select from "../ui/Select";
@@ -31,15 +38,9 @@ const COLORS = ["#6366f1", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#06b6d4"
 
 const FinancePage: React.FC = () => {
 	const dispatch = useAppDispatch();
-	const {data, isLoading} = useAppSelector(
-		(state: RootState) => state.financeReducer,
-	);
-	const {statusList} = useAppSelector(
-		(state: RootState) => state.statusReducer,
-	);
-	const {serviceList} = useAppSelector(
-		(state: RootState) => state.serviceReducer,
-	);
+	const {data, isLoading} = useAppSelector((state: RootState) => state.financeReducer);
+	const {statusList} = useAppSelector((state: RootState) => state.statusReducer);
+	const {serviceList} = useAppSelector((state: RootState) => state.serviceReducer);
 
 	const [filters, setFilters] = useState({
 		fromDate: undefined as string | undefined,
@@ -84,7 +85,7 @@ const FinancePage: React.FC = () => {
 			color: "text-indigo-600",
 			bgColor: "bg-indigo-50",
 			trend: "+12.5%",
-			isUp: true
+			isUp: true,
 		},
 		{
 			label: "Advance Payments",
@@ -93,7 +94,7 @@ const FinancePage: React.FC = () => {
 			color: "text-emerald-600",
 			bgColor: "bg-emerald-50",
 			trend: "+8.2%",
-			isUp: true
+			isUp: true,
 		},
 		{
 			label: "Outstanding",
@@ -102,8 +103,8 @@ const FinancePage: React.FC = () => {
 			color: "text-amber-600",
 			bgColor: "bg-amber-50",
 			trend: "-2.4%",
-			isUp: false
-		}
+			isUp: false,
+		},
 	];
 
 	return (
@@ -113,11 +114,11 @@ const FinancePage: React.FC = () => {
 					<h1 className="text-3xl font-bold text-gray-900 tracking-tight">Financial Overview</h1>
 					<p className="text-gray-500 mt-1">Monitor revenue, payments, and service performance</p>
 				</div>
-				
+
 				<div className="flex items-center gap-3">
 					<Button
 						variant="outline"
-						icon={<RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />}
+						icon={<RefreshCw className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`} />}
 						onClick={handleRefresh}
 						disabled={isLoading}
 					>
@@ -169,13 +170,24 @@ const FinancePage: React.FC = () => {
 			{/* Stats Cards */}
 			<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 				{stats.map((stat, idx) => (
-					<div key={idx} className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 transition-all hover:shadow-md">
+					<div
+						key={idx}
+						className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 transition-all hover:shadow-md"
+					>
 						<div className="flex items-center justify-between mb-4">
 							<div className={`p-3 rounded-2xl ${stat.bgColor} ${stat.color}`}>
 								<stat.icon className="w-6 h-6" />
 							</div>
-							<div className={`flex items-center text-xs font-bold px-2 py-1 rounded-lg ${stat.isUp ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
-								{stat.isUp ? <ArrowUpRight className="w-3 h-3 mr-1" /> : <ArrowDownRight className="w-3 h-3 mr-1" />}
+							<div
+								className={`flex items-center text-xs font-bold px-2 py-1 rounded-lg ${
+									stat.isUp ? "bg-emerald-50 text-emerald-600" : "bg-rose-50 text-rose-600"
+								}`}
+							>
+								{stat.isUp ? (
+									<ArrowUpRight className="w-3 h-3 mr-1" />
+								) : (
+									<ArrowDownRight className="w-3 h-3 mr-1" />
+								)}
 								{stat.trend}
 							</div>
 						</div>
@@ -198,23 +210,30 @@ const FinancePage: React.FC = () => {
 					<div className="h-[350px]">
 						{data?.serviceWiseData && data.serviceWiseData.length > 0 ? (
 							<ResponsiveContainer width="100%" height="100%">
-								<BarChart data={data.serviceWiseData} margin={{top: 20, right: 30, left: 20, bottom: 5}}>
+								<BarChart
+									data={data.serviceWiseData}
+									margin={{top: 20, right: 30, left: 20, bottom: 5}}
+								>
 									<CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-									<XAxis 
-										dataKey="serviceName" 
-										axisLine={false} 
-										tickLine={false} 
-										tick={{fill: '#94a3b8', fontSize: 12}}
+									<XAxis
+										dataKey="serviceName"
+										axisLine={false}
+										tickLine={false}
+										tick={{fill: "#94a3b8", fontSize: 12}}
 									/>
-									<YAxis 
-										axisLine={false} 
-										tickLine={false} 
-										tick={{fill: '#94a3b8', fontSize: 12}}
-										tickFormatter={(v) => `₹${v/1000}k`}
+									<YAxis
+										axisLine={false}
+										tickLine={false}
+										tick={{fill: "#94a3b8", fontSize: 12}}
+										tickFormatter={(v) => `₹${v / 1000}k`}
 									/>
-									<Tooltip 
-										cursor={{fill: '#f8fafc'}}
-										contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'}}
+									<Tooltip
+										cursor={{fill: "#f8fafc"}}
+										contentStyle={{
+											borderRadius: "12px",
+											border: "none",
+											boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1)",
+										}}
 										formatter={(v: any) => formatCurrency(v)}
 									/>
 									<Bar dataKey="totalCost" fill="#6366f1" radius={[6, 6, 0, 0]} name="Total Revenue" />
@@ -222,7 +241,9 @@ const FinancePage: React.FC = () => {
 								</BarChart>
 							</ResponsiveContainer>
 						) : (
-							<div className="h-full flex items-center justify-center text-gray-400 italic">No data available for this selection</div>
+							<div className="h-full flex items-center justify-center text-gray-400 italic">
+								No data available for this selection
+							</div>
 						)}
 					</div>
 				</div>
@@ -250,18 +271,28 @@ const FinancePage: React.FC = () => {
 										nameKey="serviceName"
 									>
 										{data.serviceWiseData.map((_, index) => (
-											<Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} stroke="none" />
+											<Cell
+												key={`cell-${index}`}
+												fill={COLORS[index % COLORS.length]}
+												stroke="none"
+											/>
 										))}
 									</Pie>
-									<Tooltip 
-										contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'}}
+									<Tooltip
+										contentStyle={{
+											borderRadius: "12px",
+											border: "none",
+											boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.1)",
+										}}
 										formatter={(v: any) => formatCurrency(v)}
 									/>
 									<Legend verticalAlign="bottom" height={36} />
 								</PieChart>
 							</ResponsiveContainer>
 						) : (
-							<div className="h-full flex items-center justify-center text-gray-400 italic">No data available for this selection</div>
+							<div className="h-full flex items-center justify-center text-gray-400 italic">
+								No data available for this selection
+							</div>
 						)}
 					</div>
 				</div>
@@ -274,7 +305,8 @@ const FinancePage: React.FC = () => {
 				<div>
 					<h4 className="font-bold mb-1">Financial Insight</h4>
 					<p className="text-sm text-indigo-600/80">
-						Your revenue has increased by 12% compared to last month. Consider allocating more budget to {data?.serviceWiseData?.[0]?.serviceName || "your top services"} for better ROI.
+						Your revenue has increased by 12% compared to last month. Consider allocating more budget to{" "}
+						{data?.serviceWiseData?.[0]?.serviceName || "your top services"} for better ROI.
 					</p>
 				</div>
 			</div>
