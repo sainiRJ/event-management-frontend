@@ -34,10 +34,10 @@ const PhotoUploadModal: React.FC<PhotoUploadModalProps> = ({open, onClose}) => {
 		const newPreviews: string[] = [];
 
 		selectedFiles.forEach((file) => {
-			if (file.size > 5 * 1024 * 1024) {
-				toast.error(`${file.name} is too large (max 5MB)`);
-				return;
-			}
+			// if (file.size > 5 * 1024 * 1024) {
+			// 	toast.error(`${file.name} is too large (max 5MB)`);
+			// 	return;
+			// }
 			validFiles.push(file);
 			const reader = new FileReader();
 			reader.onloadend = () => {
