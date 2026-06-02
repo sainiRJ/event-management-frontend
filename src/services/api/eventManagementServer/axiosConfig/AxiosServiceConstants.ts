@@ -1,6 +1,5 @@
 import {AxiosRequestConfig} from "axios";
 import config from "../../../../config/index";
-import {setArgs} from "@craco/craco/dist/lib/args";
 
 /**
  * The base url of the api server's endpoint needs to be configured here.
@@ -122,7 +121,7 @@ export const apiEndpoints = Object.freeze({
 			return "service/create";
 		},
 		updateService: (serviceId: string) => {
-			return `service//update/${serviceId}`;
+			return `service/update/${serviceId}`;
 		},
 	},
 	status: {

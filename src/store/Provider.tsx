@@ -5,7 +5,6 @@ import React from "react";
 import {Provider} from "react-redux";
 
 import {injectStore} from "../services/api";
-import AppUtil from "../utils/AppUtil";
 
 import store from ".";
 

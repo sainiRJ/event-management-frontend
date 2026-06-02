@@ -7,7 +7,6 @@ import {
 	clearTokens,
 	getAccessToken,
 } from "../../../../utils/tokenUtils";
-import {useNavigate} from "react-router-dom";
 
 /**
  * NOTE: Currently we're not using redux in this project.
@@ -25,11 +24,11 @@ type StoreType = any;
  * Defined responseInterceptor closures needs to be registered to the constant object
  * axiosResponseInterceptors in order to get mapped.
  *
- * @param store
+ * @param _store
  * @param apiServer
  */
 function BIToolServerAxiosResponseInterceptors(
-	store: StoreType | null,
+	_store: StoreType | null,
 	apiServer: AxiosInstance,
 ): void {
 	/*
@@ -103,19 +102,15 @@ function BIToolServerAxiosResponseInterceptors(
 	};
 
 	/**
-	 * Extracting and mapping each responseInterceptor defined inside
-	 * AxiosInterceptors.responseInterceptors with the axios-instance
+	 * Extracting and mapping each responseInterceptors with the axios-instance
 	 * apiServer.
 	 */
-	Object.values(axiosResponseInterceptors).forEach(
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		(responseInterceptor: any) => {
-			apiServer.interceptors.response.use(
-				responseInterceptor.onFulfilled,
-				responseInterceptor.onRejected,
-			);
-		},
-	);
+	Object.values(axiosResponseInterceptors).forEach((responseInterceptor) => {
+		return apiServer.interceptors.response.use(
+			responseInterceptor.onFulfilled,
+			responseInterceptor.onRejected,
+		);
+	});
 }
 
 export default BIToolServerAxiosResponseInterceptors;

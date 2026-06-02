@@ -1,13 +1,13 @@
 import React, {useState, useEffect} from "react";
 
-interface DetailsModalProps {
+interface DetailsModalProps<T = Record<string, any>> {
 	open: boolean;
 	onClose: () => void;
-	data: any;
-	onSave: (updated: any) => void;
+	data: T | null;
+	onSave: (updated: T) => void;
 	title: string;
 	fields: {
-		name: string;
+		name: keyof T;
 		label: string;
 		type: "text" | "number" | "date" | "select" | "textarea";
 		options?: {label: string; value: string}[];
@@ -17,7 +17,7 @@ interface DetailsModalProps {
 	externalEdit?: boolean;
 }
 
-const DetailsModal: React.FC<DetailsModalProps> = ({
+const DetailsModal = <T extends Record<string, any>>({
 	open,
 	onClose,
 	data,
@@ -26,9 +26,9 @@ const DetailsModal: React.FC<DetailsModalProps> = ({
 	fields,
 	editMode: editModeProp,
 	externalEdit = false,
-}) => {
+}: DetailsModalProps<T>) => {
 	const [editMode, setEditMode] = useState(false);
-	const [form, setForm] = useState(data || {});
+	const [form, setForm] = useState<T>((data as T) || ({} as T));
 
 	useEffect(() => {
 		if (open) {
@@ -42,7 +42,7 @@ const DetailsModal: React.FC<DetailsModalProps> = ({
 	}, [open]);
 
 	useEffect(() => {
-		setForm(data || {});
+		setForm((data as T) || ({} as T));
 		setEditMode(!!editModeProp);
 	}, [data, open, editModeProp]);
 
@@ -54,7 +54,7 @@ const DetailsModal: React.FC<DetailsModalProps> = ({
 		>,
 	) => {
 		const {name, value} = e.target;
-		setForm((prev: any) => ({...prev, [name]: value}));
+		setForm((prev: T) => ({...prev, [name]: value}));
 	};
 
 	const handleSave = () => {
@@ -62,14 +62,14 @@ const DetailsModal: React.FC<DetailsModalProps> = ({
 		setEditMode(false);
 	};
 
-	const renderField = (field: DetailsModalProps["fields"][0]) => {
+	const renderField = (field: DetailsModalProps<T>["fields"][0]) => {
 		if (editMode && !externalEdit) {
 			switch (field.type) {
 				case "select":
 					return (
 						<select
-							name={field.name}
-							value={form[field.name] || ""}
+							name={field.name as string}
+							value={(form[field.name] as unknown as string) || ""}
 							onChange={handleChange}
 							className="w-full border rounded px-3 py-2 mt-1"
 						>
@@ -84,8 +84,8 @@ const DetailsModal: React.FC<DetailsModalProps> = ({
 				case "textarea":
 					return (
 						<textarea
-							name={field.name}
-							value={form[field.name] || ""}
+							name={field.name as string}
+							value={(form[field.name] as unknown as string) || ""}
 							onChange={handleChange}
 							className="w-full border rounded px-3 py-2 mt-1"
 							rows={4}
@@ -95,8 +95,8 @@ const DetailsModal: React.FC<DetailsModalProps> = ({
 					return (
 						<input
 							type={field.type}
-							name={field.name}
-							value={form[field.name] || ""}
+							name={field.name as string}
+							value={(form[field.name] as unknown as string) || ""}
 							onChange={handleChange}
 							className="w-full border rounded px-3 py-2 mt-1"
 						/>
@@ -108,7 +108,7 @@ const DetailsModal: React.FC<DetailsModalProps> = ({
 				<div className="text-gray-800">{field.render(data[field.name])}</div>
 			);
 		}
-		return <div className="text-gray-800">{data[field.name]}</div>;
+		return <div className="text-gray-800">{data[field.name] as React.ReactNode}</div>;
 	};
 
 	return (
@@ -123,7 +123,7 @@ const DetailsModal: React.FC<DetailsModalProps> = ({
 				<h2 className="text-xl font-bold mb-4 text-indigo-700">{title}</h2>
 				<div className="space-y-3">
 					{fields.map((field) => (
-						<div key={field.name}>
+						<div key={field.name as string}>
 							<label className="block text-sm font-semibold text-gray-600">
 								{field.label}
 							</label>

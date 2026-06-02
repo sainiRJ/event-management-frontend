@@ -1,12 +1,6 @@
-import {createSlice, PayloadAction} from "@reduxjs/toolkit";
-import Decimal from "decimal.js";
+import {createSlice} from "@reduxjs/toolkit";
 
 import {apiResponseStatuses} from "@/customTypes/NetworkTypes";
-import {
-	NullableNumber,
-	NullableString,
-	StringArray,
-} from "@/customTypes/CommonTypes";
 import {createBooking, getAllBookings, getBookingRequest} from "./ThunkActions";
 import {iBookingState, REDUCER_NAME, iBooking} from "./Types";
 
@@ -41,7 +35,7 @@ export const bookingSlice = createSlice({
 					state.responseStatus = apiResponseStatuses.SUCCESS;
 				}
 			})
-			.addCase(createBooking.rejected, (state, action) => {
+			.addCase(createBooking.rejected, (state) => {
 				state.message = "Failed to fetch order data";
 				state.isLoading = false;
 				state.responseStatus = apiResponseStatuses.ERROR;
@@ -57,7 +51,7 @@ export const bookingSlice = createSlice({
 					state.responseStatus = apiResponseStatuses.SUCCESS;
 				}
 			})
-			.addCase(getAllBookings.rejected, (state, action) => {
+			.addCase(getAllBookings.rejected, (state) => {
 				state.message = "Failed to fetch order data";
 				state.isLoading = false;
 				state.responseStatus = apiResponseStatuses.ERROR;
@@ -73,7 +67,7 @@ export const bookingSlice = createSlice({
 					state.responseStatus = apiResponseStatuses.SUCCESS;
 				}
 			})
-			.addCase(getBookingRequest.rejected, (state, action) => {
+			.addCase(getBookingRequest.rejected, (state) => {
 				state.message = "Failed to fetch order data";
 				state.isLoading = false;
 				state.responseStatus = apiResponseStatuses.ERROR;

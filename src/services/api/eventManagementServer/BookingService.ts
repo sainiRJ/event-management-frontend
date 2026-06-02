@@ -3,7 +3,6 @@ import {AxiosInstance} from "axios";
 import {APIResponse} from "@/customTypes/NetworkTypes";
 
 import NetworkUtil from "@/utils/NetworkUtil";
-import {NullableString} from "@/customTypes/CommonTypes";
 import {apiEndpoints} from "./axiosConfig/AxiosServiceConstants";
 
 import {
@@ -112,8 +111,13 @@ function BookingService(apiServer: AxiosInstance) {
 	): Promise<APIResponse<iCreateBookingDTO> | null> => {
 		let result = null;
 
+		const bookingId = booking.id;
+		if (!bookingId) {
+			throw new Error("Booking ID is required for updates");
+		}
+
 		await apiServer
-			.patch(apiEndpoints.booking.updateBooking(booking.id!), booking)
+			.patch(apiEndpoints.booking.updateBooking(bookingId), booking)
 			.then(
 				(value) => {
 					result = NetworkUtil.buildResult<iCreateBookingDTO>(

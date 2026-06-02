@@ -2,18 +2,6 @@ import React, {useState, useEffect} from "react";
 import {useAppDispatch, useAppSelector} from "../../store/Hooks";
 import {useNavigate} from "react-router-dom";
 import {
-	Stack,
-	Button,
-	IconButton,
-	ButtonGroup,
-	Modal,
-	toaster,
-	Message,
-	Input,
-	SelectPicker,
-	DatePicker,
-} from "rsuite";
-import {
 	getAllEmployees,
 	deleteEmployee,
 	updateEmployee,
@@ -23,19 +11,20 @@ import {
 import {fetchServices} from "@/store/services/ThunkActions";
 import {fetchStatus} from "@/store/status/ThunkActions";
 import {RootState} from "@/store";
-import RefreshIcon from "@rsuite/icons/Reload";
+import {Plus, RefreshCw, Search, Filter, Edit2, Trash2} from "lucide-react";
 import CustomTable from "../common/CustomTable";
-import CustomForm from "../common/CustomForm";
-import {
-	iCreateEmployeeDTO,
-	iEmployeeStat,
-} from "../../customTypes/appDataTypes/employeeTypes";
+import {iCreateEmployeeDTO} from "../../customTypes/appDataTypes/employeeTypes";
 import {employeeValidationSchema} from "../../validations/EmployeeValidationSchema";
 import Joi from "joi";
-import DetailsModal from "../common/DetailsModal";
 import EmployeeStatsTable from "./EmployeeStatsTable";
+import Button from "../ui/Button";
+import Input from "../ui/Input";
+import Select from "../ui/Select";
+import Modal from "../ui/Modal";
+import {toast} from "sonner";
 
 const formatDate = (dateString: string) => {
+	if (!dateString) return "-";
 	const date = new Date(dateString);
 	return new Intl.DateTimeFormat("en-GB", {
 		day: "2-digit",
@@ -44,21 +33,19 @@ const formatDate = (dateString: string) => {
 	}).format(date);
 };
 
-const formatCurrency = (amount: number) => {
-	return new Intl.NumberFormat("en-US", {
-		style: "currency",
-		currency: "USD",
-	}).format(amount);
-};
-
 const StatusBadge = ({status}: {status: string}) => {
-	let color = "bg-gray-200 text-gray-700";
-	if (status?.toLowerCase() === "active") color = "bg-green-100 text-green-700";
+	let color = "bg-gray-100 text-gray-700";
+	if (status?.toLowerCase() === "active" || status?.toLowerCase() === "working")
+		color = "bg-emerald-100 text-emerald-700";
 	if (status?.toLowerCase() === "inactive")
-		color = "bg-yellow-100 text-yellow-700";
-	if (status?.toLowerCase() === "terminated") color = "bg-red-100 text-red-700";
+		color = "bg-amber-100 text-yellow-700";
+	if (status?.toLowerCase() === "terminated")
+		color = "bg-rose-100 text-red-700";
+
 	return (
-		<span className={`px-2 py-1 rounded text-xs font-semibold ${color}`}>
+		<span
+			className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${color} border border-white shadow-sm`}
+		>
 			{status}
 		</span>
 	);
@@ -67,26 +54,20 @@ const StatusBadge = ({status}: {status: string}) => {
 const EmployeeTable = () => {
 	const [loading, setLoading] = useState(true);
 	const [data, setData] = useState<any[]>([]);
-	const [filteredData, setFilteredData] = useState<any[]>([]);
-	const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
 	const [searchQuery, setSearchQuery] = useState("");
-	const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
-	const [selectedDesignation, setSelectedDesignation] = useState<string | null>(
-		null,
-	);
+	const [selectedStatus, setSelectedStatus] = useState<string>("");
+	const [selectedDesignation, setSelectedDesignation] = useState<string>("");
 	const [showEditModal, setShowEditModal] = useState(false);
 	const [editingEmployee, setEditingEmployee] =
 		useState<iCreateEmployeeDTO | null>(null);
 	const [showAddModal, setShowAddModal] = useState(false);
-	const [selectedEmployee, setSelectedEmployee] = useState<any | null>(null);
-	const [modalOpen, setModalOpen] = useState(false);
-	const [filter, setFilter] = useState({name: "", designation: "", status: ""});
-	const [addFormErrors, setAddFormErrors] = useState<Record<string, string>>(
-		{},
-	);
 	const [editFormErrors, setEditFormErrors] = useState<Record<string, string>>(
 		{},
 	);
+	const [addFormErrors, setAddFormErrors] = useState<Record<string, string>>(
+		{},
+	);
+	const [isRefreshing, setIsRefreshing] = useState(false);
 
 	const {employeeList} = useAppSelector(
 		(state: RootState) => state.employeeReducer,
@@ -94,24 +75,46 @@ const EmployeeTable = () => {
 	const employeeStats = useAppSelector(
 		(state: RootState) => state.employeeReducer.stats?.employeeStats || {},
 	);
+	const {statusList} = useAppSelector(
+		(state: RootState) => state.statusReducer,
+	);
+
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
 
-	const handleRefresh = () => {
+	const handleRefresh = async () => {
+		setIsRefreshing(true);
 		setLoading(true);
-		dispatch(getAllEmployees());
-		dispatch(getEmployeeStats());
+		await Promise.all([
+			dispatch(getAllEmployees()),
+			dispatch(getEmployeeStats()),
+			dispatch(fetchServices()),
+			dispatch(fetchStatus()),
+		]);
+		setLoading(false);
+		setIsRefreshing(false);
 	};
 
 	useEffect(() => {
-		dispatch(fetchServices());
-		dispatch(fetchStatus());
+		handleRefresh();
 	}, [dispatch]);
 
-	const handleEdit = (rowData: any) => {
-		console.log("Editing row data:", rowData);
+	useEffect(() => {
+		if (employeeList) {
+			setData(employeeList);
+			setLoading(false);
+		}
+	}, [employeeList]);
 
-		// Find the status ID that matches the status name
+	const employeeStatuses = statusList
+		.filter((status: any) => status.context === "employee")
+		.map((status) => ({label: status.name, value: status.id}));
+
+	const designations = Array.from(
+		new Set(data.map((emp) => emp.designation)),
+	).filter(Boolean);
+
+	const handleEdit = (rowData: any) => {
 		const statusOption = employeeStatuses.find(
 			(status) => status.label === rowData.status,
 		);
@@ -122,383 +125,28 @@ const EmployeeTable = () => {
 			email: rowData.email ?? "",
 			phoneNumber: rowData.phoneNumber ?? "",
 			designation: rowData.designation ?? "",
-			statusId: statusOption?.value ?? "", // Use the found status ID
-			joinedDate: rowData.joinedDate ?? "",
+			statusId: statusOption?.value ?? "",
+			joinedDate: rowData.joinedDate ?? new Date().toISOString(),
 		};
 
-		console.log("Setting employee data:", employeeData);
-		console.log("Available statuses:", employeeStatuses);
-		console.log("Found status option:", statusOption);
-
 		setEditingEmployee(employeeData);
-		setFormData(employeeData);
 		setShowEditModal(true);
 	};
 
-	const handleDelete = async (rowData: any) => {
-		try {
-			await dispatch(deleteEmployee(rowData.id));
-			toaster.push(
-				<Message type="success">Employee deleted successfully</Message>,
-			);
-			handleRefresh();
-		} catch (error) {
-			toaster.push(<Message type="error">Failed to delete employee</Message>);
+	const handleDelete = async (id: string) => {
+		if (window.confirm("Are you sure you want to delete this employee?")) {
+			try {
+				await dispatch(deleteEmployee(id));
+				toast.success("Employee deleted successfully");
+				handleRefresh();
+			} catch (error) {
+				toast.error("Failed to delete employee");
+			}
 		}
 	};
 
-	const handleBulkDelete = async () => {
-		if (selectedKeys.length === 0) {
-			toaster.push(
-				<Message type="warning">Please select employees to delete</Message>,
-			);
-			return;
-		}
-
-		try {
-			await dispatch(deleteEmployee(selectedKeys));
-			toaster.push(
-				<Message type="success">
-					Selected employees deleted successfully
-				</Message>,
-			);
-			setSelectedKeys([]);
-			handleRefresh();
-		} catch (error) {
-			toaster.push(<Message type="error">Failed to delete employees</Message>);
-		}
-	};
-
-	const handleEditEmployeeSubmit = async (e: React.FormEvent) => {
-		e.preventDefault();
-		console.log("Edit form submitted");
-		console.log("Current editingEmployee:", editingEmployee);
-		console.log("Current formData:", formData);
-
-		if (!editingEmployee) {
-			console.log("No editing employee found");
-			return;
-		}
-
-		// Create updated employee data
-		const updatedEmployee: iCreateEmployeeDTO = {
-			id: editingEmployee.id, // Ensure we keep the original ID
-			name: formData.name,
-			email: formData.email,
-			phoneNumber: formData.phoneNumber,
-			designation: formData.designation,
-			statusId: formData.statusId,
-			joinedDate: formData.joinedDate,
-		};
-
-		console.log("Updated employee data to be sent:", updatedEmployee);
-
-		// Validate the updated data
-		const {error} = employeeValidationSchema.validate(updatedEmployee, {
-			abortEarly: false,
-			allowUnknown: true, // Allow unknown fields like id
-		});
-
-		if (error) {
-			console.log("Validation errors:", error.details);
-			const errors: Record<string, string> = {};
-			error.details.forEach((detail: Joi.ValidationErrorItem) => {
-				errors[detail.path[0] as string] = detail.message;
-			});
-			setEditFormErrors(errors);
-			return;
-		}
-
-		try {
-			console.log("Dispatching update employee action");
-			setEditFormErrors({});
-			const result = await dispatch(updateEmployee(updatedEmployee));
-			console.log("Update result:", result);
-
-			toaster.push(
-				<Message type="success">Employee updated successfully</Message>,
-			);
-			setShowEditModal(false);
-			setEditingEmployee(null);
-			setFormData(initialFormValue);
-			handleRefresh();
-		} catch (error) {
-			console.error("Error updating employee:", error);
-			toaster.push(<Message type="error">Failed to update employee</Message>);
-		}
-	};
-
-	useEffect(() => {
-		dispatch(getAllEmployees());
-		dispatch(getEmployeeStats());
-	}, [dispatch]);
-
-	useEffect(() => {
-		if (employeeList) {
-			setData(employeeList);
-			setLoading(false);
-		}
-	}, [employeeList]);
-
-	useEffect(() => {
-		let filtered = [...data];
-
-		if (searchQuery) {
-			filtered = filtered.filter((employee) =>
-				employee.name.toLowerCase().includes(searchQuery.toLowerCase()),
-			);
-		}
-
-		if (selectedStatus) {
-			filtered = filtered.filter(
-				(employee) =>
-					employee.status.toLowerCase() === selectedStatus.toLowerCase(),
-			);
-		}
-
-		if (selectedDesignation) {
-			filtered = filtered.filter(
-				(employee) => employee.designation === selectedDesignation,
-			);
-		}
-
-		setFilteredData(filtered);
-	}, [data, searchQuery, selectedStatus, selectedDesignation]);
-
-	const columns = [
-		{
-			key: "name",
-			label: "Name",
-			width: 200,
-			resizable: true,
-		},
-		{
-			key: "email",
-			label: "Email",
-			width: 250,
-			resizable: true,
-		},
-		{
-			key: "phoneNumber",
-			label: "Phone Number",
-			width: 150,
-			resizable: true,
-		},
-		{
-			key: "designation",
-			label: "Designation",
-			width: 200,
-			resizable: true,
-		},
-		{
-			key: "status",
-			label: "Status",
-			width: 120,
-			resizable: true,
-			render: (rowData: any) => <StatusBadge status={rowData.status || "-"} />,
-		},
-		{
-			key: "joinedDate",
-			label: "Joined Date",
-			width: 150,
-			resizable: true,
-			render: (rowData: any) => formatDate(rowData.joinedDate),
-		},
-		{
-			key: "actions",
-			label: "Actions",
-			width: 120,
-			render: (rowData: any) => (
-				<Button
-					size="sm"
-					onClick={(e) => {
-						e.stopPropagation();
-						handleEdit(rowData);
-					}}
-					appearance="subtle"
-				>
-					Edit
-				</Button>
-			),
-		},
-	];
-
-	const {statusList} = useAppSelector(
-		(state: RootState) => state.statusReducer,
-	);
-
-	const employeeStatuses = statusList
-		.filter((status: any) => status.context === "employee")
-		.map((status) => ({label: status.name, value: status.id}));
-
-	const employeeFields = [
-		{
-			name: "name",
-			label: "Name",
-			type: "text" as const,
-		},
-		{
-			name: "email",
-			label: "Email",
-			type: "text" as const,
-		},
-		{
-			name: "phoneNumber",
-			label: "Phone Number",
-			type: "text" as const,
-		},
-		{
-			name: "designation",
-			label: "Designation",
-			type: "text" as const,
-		},
-		{
-			name: "status",
-			label: "Status",
-			type: "select" as const,
-			options: employeeStatuses.map((s) => ({label: s.label, value: s.value})),
-		},
-		{
-			name: "joinedDate",
-			label: "Joined Date",
-			type: "date" as const,
-		},
-	];
-
-	// Filter logic
-	const filtered = data.filter(
-		(row) =>
-			(filter.name === "" ||
-				row.name?.toLowerCase().includes(filter.name.toLowerCase())) &&
-			(filter.designation === "" ||
-				row.designation
-					?.toLowerCase()
-					.includes(filter.designation.toLowerCase())) &&
-			(filter.status === "" || row.status === filter.status),
-	);
-
-	// Modal handlers
-	const handleRowClick = (row: any) => {
-		navigate(`/employee/${row.id}/details`);
-	};
-
-	// Get unique designations and statuses for filter dropdowns
-	const designations = Array.from(
-		new Set(data.map((emp) => emp.designation)),
-	).filter(Boolean);
-	const statuses = Array.from(new Set(data.map((emp) => emp.status))).filter(
-		Boolean,
-	);
-
-	// Helper to format date as YYYY-MM-DD
-	const toDateInputString = (date: Date | string) => {
-		if (!date) return "";
-		if (typeof date === "string") return date.slice(0, 10);
-		return date.toISOString().slice(0, 10);
-	};
-
-	const [newEmployee, setNewEmployee] = useState<iCreateEmployeeDTO>({
-		name: "",
-		email: "",
-		phoneNumber: "",
-		designation: "",
-		statusId: "",
-		joinedDate: new Date().toISOString(),
-	});
-
-	// For DetailsModal, always pass joinedDate as string
-	const selectedEmployeeForModal = selectedEmployee
-		? {
-				...selectedEmployee,
-				joinedDate: toDateInputString(selectedEmployee.joinedDate),
-		  }
-		: null;
-
-	const employeeTableColumns = [
-		{
-			key: "name",
-			label: "Name",
-		},
-		{
-			key: "designation",
-			label: "Designation",
-		},
-		{
-			key: "phoneNumber",
-			label: "Phone Number",
-		},
-		{
-			key: "status",
-			label: "Status",
-			render: (row: any) => <StatusBadge status={row.status || "-"} />,
-		},
-		{
-			key: "actions",
-			label: "Actions",
-			render: (row: any) => (
-				<Button
-					size="sm"
-					onClick={(e) => {
-						e.stopPropagation();
-						handleEdit(row);
-					}}
-					appearance="subtle"
-				>
-					Edit
-				</Button>
-			),
-		},
-	];
-
-	// Add/Edit Employee Form fields
-	const employeeFormFields: {
-		name: keyof iCreateEmployeeDTO;
-		label: string;
-		type: "text" | "date" | "select";
-		options?: {label: string; value: string}[];
-	}[] = [
-		{
-			name: "name",
-			label: "Name",
-			type: "text",
-		},
-		{
-			name: "email",
-			label: "Email",
-			type: "text",
-		},
-		{
-			name: "phoneNumber",
-			label: "Phone Number",
-			type: "text",
-		},
-		{
-			name: "designation",
-			label: "Designation",
-			type: "text",
-		},
-		{
-			name: "statusId",
-			label: "Status",
-			type: "select",
-			options: employeeStatuses.map((s) => ({label: s.label, value: s.value})),
-		},
-		{
-			name: "joinedDate",
-			label: "Joined Date",
-			type: "date",
-		},
-	];
-
-	// Use real status options from Redux
-	const statusOptions = statusList
-		.filter((status) => status.context === "employee")
-		.map((status) => ({label: status.name, value: status.id}));
-
-	// Add Employee Modal Handlers
-	const handleAddEmployeeSubmit = async (e: React.FormEvent) => {
-		e.preventDefault();
-		const {error} = employeeValidationSchema.validate(newEmployee, {
+	const handleAddEmployeeSubmit = async () => {
+		const {error} = employeeValidationSchema.validate(formData, {
 			abortEarly: false,
 		});
 		if (error) {
@@ -509,18 +157,46 @@ const EmployeeTable = () => {
 			setAddFormErrors(errors);
 			return;
 		}
+
 		setAddFormErrors({});
-		await dispatch(createEmployee(newEmployee));
-		setShowAddModal(false);
-		setNewEmployee({
-			name: "",
-			email: "",
-			phoneNumber: "",
-			designation: "",
-			statusId: "",
-			joinedDate: new Date().toISOString(),
+		try {
+			await dispatch(createEmployee(formData));
+			toast.success("Employee added successfully");
+			setShowAddModal(false);
+			setFormData(initialFormValue);
+			handleRefresh();
+		} catch (error) {
+			toast.error("Failed to add employee");
+		}
+	};
+
+	const handleEditEmployeeSubmit = async () => {
+		if (!editingEmployee) return;
+
+		const {error} = employeeValidationSchema.validate(editingEmployee, {
+			abortEarly: false,
+			allowUnknown: true,
 		});
-		handleRefresh();
+
+		if (error) {
+			const errors: Record<string, string> = {};
+			error.details.forEach((detail: Joi.ValidationErrorItem) => {
+				errors[detail.path[0] as string] = detail.message;
+			});
+			setEditFormErrors(errors);
+			return;
+		}
+
+		try {
+			setEditFormErrors({});
+			await dispatch(updateEmployee(editingEmployee));
+			toast.success("Employee updated successfully");
+			setShowEditModal(false);
+			setEditingEmployee(null);
+			handleRefresh();
+		} catch (error) {
+			toast.error("Failed to update employee");
+		}
 	};
 
 	const initialFormValue: iCreateEmployeeDTO = {
@@ -529,256 +205,321 @@ const EmployeeTable = () => {
 		phoneNumber: "",
 		designation: "",
 		statusId: "",
-		joinedDate: new Date().toISOString(),
+		joinedDate: new Date().toISOString().split("T")[0],
 	};
 
 	const [formData, setFormData] =
 		useState<iCreateEmployeeDTO>(initialFormValue);
 
-	const handleFormChange = (field: keyof iCreateEmployeeDTO, value: any) => {
-		// For phone number, ensure it's a string and remove any non-digit characters
+	const handleFormChange = (
+		field: keyof iCreateEmployeeDTO,
+		value: any,
+		isEdit = false,
+	) => {
 		if (field === "phoneNumber") {
-			value = value.replace(/\D/g, "");
+			value = value.replace(/\D/g, "").slice(0, 10);
 		}
 
-		// For status, ensure we're using the ID
-		if (field === "statusId") {
-			value = value || "";
-		}
-
-		setFormData((prev) => ({
-			...prev,
-			[field]: value,
-		}));
-
-		// Clear validation error for the field being changed
-		if (editFormErrors[field]) {
-			setEditFormErrors((prev) => {
-				const newErrors = {...prev};
-				delete newErrors[field];
-				return newErrors;
-			});
-		}
-	};
-
-	const renderFormField = (field: {
-		name: keyof iCreateEmployeeDTO;
-		label: string;
-		type: "text" | "date" | "select";
-		options?: {label: string; value: string}[];
-	}) => {
-		let dateValue = "";
-		if (field.type === "date") {
-			dateValue = formData[field.name]
-				? new Date(formData[field.name] as string).toISOString().split("T")[0]
-				: "";
-		}
-
-		switch (field.type) {
-			case "text":
-				return (
-					<Input
-						key={field.name}
-						value={formData[field.name] as string}
-						onChange={(value) => handleFormChange(field.name, value)}
-						placeholder={`Enter ${field.label.toLowerCase()}`}
-						type={field.name === "phoneNumber" ? "tel" : "text"}
-						maxLength={field.name === "phoneNumber" ? 10 : undefined}
-					/>
-				);
-			case "date":
-				return (
-					<input
-						type="date"
-						key={field.name}
-						value={dateValue}
-						onChange={(e) => handleFormChange(field.name, e.target.value)}
-						className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-					/>
-				);
-			case "select":
-				console.log(`Rendering select for ${field.name}:`, {
-					value: formData[field.name],
-					options: field.options,
-				}); // Debug log
-				return (
-					<div className="relative z-[1001]">
-						<SelectPicker
-							key={field.name}
-							value={formData[field.name] as string}
-							onChange={(value) => handleFormChange(field.name, value)}
-							data={field.options || []}
-							placeholder={`Select ${field.label.toLowerCase()}`}
-							menuStyle={{zIndex: 1001}}
-						/>
-					</div>
-				);
-			default:
-				return null;
+		if (isEdit) {
+			setEditingEmployee((prev) => (prev ? {...prev, [field]: value} : null));
+			if (editFormErrors[field]) {
+				setEditFormErrors((prev) => {
+					const newErrors = {...prev};
+					delete newErrors[field];
+					return newErrors;
+				});
+			}
+		} else {
+			setFormData((prev) => ({...prev, [field]: value}));
+			if (addFormErrors[field]) {
+				setAddFormErrors((prev) => {
+					const newErrors = {...prev};
+					delete newErrors[field];
+					return newErrors;
+				});
+			}
 		}
 	};
+
+	const filteredData = data.filter(
+		(row) =>
+			(searchQuery === "" ||
+				row.name?.toLowerCase().includes(searchQuery.toLowerCase())) &&
+			(selectedDesignation === "" || row.designation === selectedDesignation) &&
+			(selectedStatus === "" || row.status === selectedStatus),
+	);
+
+	const columns = [
+		{key: "name", label: "Name"},
+		{key: "designation", label: "Designation"},
+		{key: "phoneNumber", label: "Phone"},
+		{
+			key: "status",
+			label: "Status",
+			render: (row: any) => <StatusBadge status={row.status || "-"} />,
+		},
+		{
+			key: "joinedDate",
+			label: "Joined Date",
+			render: (row: any) => formatDate(row.joinedDate),
+		},
+		{
+			key: "actions",
+			label: "Actions",
+			render: (row: any) => (
+				<div className="flex gap-2">
+					<Button
+						variant="ghost"
+						size="sm"
+						icon={<Edit2 className="w-3.5 h-3.5" />}
+						onClick={(e) => {
+							e.stopPropagation();
+							handleEdit(row);
+						}}
+					>
+						Edit
+					</Button>
+					<Button
+						variant="ghost"
+						size="sm"
+						className="text-rose-600 hover:bg-rose-50 hover:text-rose-700"
+						icon={<Trash2 className="w-3.5 h-3.5" />}
+						onClick={(e) => {
+							e.stopPropagation();
+							handleDelete(row.id);
+						}}
+					>
+						Delete
+					</Button>
+				</div>
+			),
+		},
+	];
 
 	return (
-		<div className="min-h-screen bg-gray-50 py-8 px-4 mt-10">
-			<div className="max-w-7xl mx-auto">
-				<div className="bg-white rounded-lg shadow p-8 mb-8">
-					{/* Filters */}
-					<h1 className="text-3xl font-bold mb-2">Employees</h1>
-
-					<div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-4 sticky top-0 z-10 py-2">
-						<div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
-							<input
-								type="text"
-								placeholder="Filter by name"
-								className="border rounded px-3 py-2 text-sm w-full md:w-48"
-								value={filter.name}
-								onChange={(e) =>
-									setFilter((f) => ({...f, name: e.target.value}))
-								}
+		<div className="space-y-8 animate-in fade-in duration-500">
+			<div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+				<div>
+					<h1 className="text-3xl font-black text-gray-900 tracking-tight">
+						Employees
+					</h1>
+					<p className="text-gray-500 font-medium mt-1">
+						Manage your workforce and monitor performance
+					</p>
+				</div>
+				<div className="flex items-center gap-3">
+					<Button
+						variant="white"
+						icon={
+							<RefreshCw
+								className={`w-4 h-4 ${isRefreshing ? "animate-spin" : ""}`}
 							/>
-							<select
-								className="border rounded px-3 py-2 text-sm w-full md:w-40"
-								value={filter.designation}
-								onChange={(e) =>
-									setFilter((f) => ({...f, designation: e.target.value}))
-								}
-							>
-								<option value="">All Designations</option>
-								{designations.map((d) => (
-									<option key={d} value={d}>
-										{d}
-									</option>
-								))}
-							</select>
-							<select
-								className="border rounded px-3 py-2 text-sm w-full md:w-40"
-								value={filter.status}
-								onChange={(e) =>
-									setFilter((f) => ({...f, status: e.target.value}))
-								}
-							>
-								<option value="">All Statuses</option>
-								{statuses.map((s) => (
-									<option key={s} value={s}>
-										{s}
-									</option>
-								))}
-							</select>
-						</div>
-						<button
-							onClick={() => {
-								setFormData(initialFormValue);
-								setShowAddModal(true);
-							}}
-							className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded font-semibold transition w-full md:w-auto"
-						>
-							+ Add New Employee
-						</button>
-					</div>
-					{/* Table */}
-					<CustomTable
-						data={filtered}
-						loading={loading}
-						columns={employeeTableColumns}
-						onRowClick={handleRowClick}
-						rowKey="id"
+						}
+						onClick={handleRefresh}
+						disabled={isRefreshing}
+					>
+						Refresh
+					</Button>
+					<Button
+						variant="primary"
+						icon={<Plus className="w-4 h-4" />}
+						onClick={() => {
+							setFormData(initialFormValue);
+							setShowAddModal(true);
+						}}
+					>
+						Add Employee
+					</Button>
+				</div>
+			</div>
+
+			{/* Filters Section */}
+			<div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm space-y-6">
+				<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+					<Input
+						placeholder="Search by name..."
+						icon={<Search className="w-4 h-4" />}
+						value={searchQuery}
+						onChange={(e) => setSearchQuery(e.target.value)}
+					/>
+					<Select
+						placeholder="All Designations"
+						icon={<Filter className="w-4 h-4" />}
+						options={designations.map((d) => ({label: d, value: d}))}
+						value={selectedDesignation}
+						onChange={(e) => setSelectedDesignation(e.target.value)}
+					/>
+					<Select
+						placeholder="All Statuses"
+						icon={<Filter className="w-4 h-4" />}
+						options={Array.from(new Set(data.map((emp) => emp.status)))
+							.filter(Boolean)
+							.map((s) => ({label: s, value: s}))}
+						value={selectedStatus}
+						onChange={(e) => setSelectedStatus(e.target.value)}
 					/>
 				</div>
-
-				{/* Employee Stats Table */}
-				{employeeList.length > 0 && (
-					<EmployeeStatsTable stats={employeeStats} onRefresh={handleRefresh} />
-				)}
 			</div>
-			{/* Add New Employee Modal */}
-			{showAddModal && (
-				<div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
-					<div className="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 relative">
-						<h2 className="text-xl font-semibold mb-4">Add New Employee</h2>
-						<form onSubmit={handleAddEmployeeSubmit} id="add-employee-form">
-							<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-								{employeeFormFields.map((field) => (
-									<div key={field.name} className="col-span-1 flex flex-col">
-										<label className="block text-sm font-medium text-gray-700 mb-1">
-											{field.label}
-										</label>
-										{renderFormField(field)}
-										{addFormErrors[field.name] && (
-											<span className="text-xs text-red-600 mt-1">
-												{addFormErrors[field.name]}
-											</span>
-										)}
-									</div>
-								))}
-							</div>
-							<div className="flex justify-end gap-2 mt-6">
-								<button
-									type="button"
-									onClick={() => setShowAddModal(false)}
-									className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded mr-2"
-								>
-									Cancel
-								</button>
-								<button
-									type="submit"
-									className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded"
-								>
-									Add Employee
-								</button>
-							</div>
-						</form>
-					</div>
+
+			<div className="rounded-2xl overflow-hidden border border-gray-50">
+				<CustomTable
+					data={filteredData}
+					loading={loading}
+					columns={columns}
+					onRowClick={(row) => navigate(`/employee/${row.id}/details`)}
+					rowKey="id"
+				/>
+			</div>
+
+			{Object.keys(employeeStats).length > 0 && (
+				<div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
+					<h2 className="text-xl font-bold text-gray-900 mb-6">
+						Employee Statistics
+					</h2>
+					<EmployeeStatsTable stats={employeeStats} onRefresh={handleRefresh} />
 				</div>
 			)}
 
-			{/* Edit Employee Modal */}
-			{showEditModal && editingEmployee && (
-				<div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black bg-opacity-30">
-					<div className="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 relative">
-						<h2 className="text-xl font-semibold mb-4">Edit Employee</h2>
-						<form
-							onSubmit={handleEditEmployeeSubmit}
-							id="edit-employee-form"
-							className="space-y-4"
-						>
-							<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-								{employeeFormFields.map((field) => (
-									<div key={field.name} className="col-span-1 flex flex-col">
-										<label className="block text-sm font-medium text-gray-700 mb-1">
-											{field.label}
-										</label>
-										{renderFormField(field)}
-										{editFormErrors[field.name] && (
-											<span className="text-xs text-red-600 mt-1">
-												{editFormErrors[field.name]}
-											</span>
-										)}
-									</div>
-								))}
-							</div>
-							<div className="flex justify-end gap-2 mt-6">
-								<button
-									type="button"
-									onClick={() => {
-										setShowEditModal(false);
-										setEditingEmployee(null);
-										setEditFormErrors({});
-									}}
-									className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded mr-2"
-								>
-									Cancel
-								</button>
-								<button
-									type="submit"
-									className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded"
-								>
-									Save Changes
-								</button>
-							</div>
-						</form>
-					</div>
+			{/* Add Modal */}
+			<Modal
+				isOpen={showAddModal}
+				onClose={() => setShowAddModal(false)}
+				title="Add New Employee"
+				footer={
+					<>
+						<Button variant="ghost" onClick={() => setShowAddModal(false)}>
+							Cancel
+						</Button>
+						<Button onClick={handleAddEmployeeSubmit}>Add Employee</Button>
+					</>
+				}
+			>
+				<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+					<Input
+						label="Full Name"
+						value={formData.name}
+						onChange={(e) => handleFormChange("name", e.target.value)}
+						error={addFormErrors.name}
+						placeholder="John Doe"
+					/>
+					<Input
+						label="Email Address"
+						type="email"
+						value={formData.email}
+						onChange={(e) => handleFormChange("email", e.target.value)}
+						error={addFormErrors.email}
+						placeholder="john@example.com"
+					/>
+					<Input
+						label="Phone Number"
+						type="tel"
+						value={formData.phoneNumber}
+						onChange={(e) => handleFormChange("phoneNumber", e.target.value)}
+						error={addFormErrors.phoneNumber}
+						placeholder="10-digit number"
+					/>
+					<Input
+						label="Designation"
+						value={formData.designation}
+						onChange={(e) => handleFormChange("designation", e.target.value)}
+						error={addFormErrors.designation}
+						placeholder="e.g. Lead Decorator"
+					/>
+					<Select
+						label="Status"
+						options={employeeStatuses}
+						value={formData.statusId}
+						onChange={(e) => handleFormChange("statusId", e.target.value)}
+						error={addFormErrors.statusId}
+					/>
+					<Input
+						label="Joined Date"
+						type="date"
+						value={
+							typeof formData.joinedDate === "string"
+								? formData.joinedDate.split("T")[0]
+								: ""
+						}
+						onChange={(e) => handleFormChange("joinedDate", e.target.value)}
+						error={addFormErrors.joinedDate}
+					/>
 				</div>
-			)}
+			</Modal>
+
+			{/* Edit Modal */}
+			<Modal
+				isOpen={showEditModal}
+				onClose={() => {
+					setShowEditModal(false);
+					setEditingEmployee(null);
+				}}
+				title="Edit Employee"
+				footer={
+					<>
+						<Button variant="ghost" onClick={() => setShowEditModal(false)}>
+							Cancel
+						</Button>
+						<Button onClick={handleEditEmployeeSubmit}>Save Changes</Button>
+					</>
+				}
+			>
+				{editingEmployee && (
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+						<Input
+							label="Full Name"
+							value={editingEmployee.name}
+							onChange={(e) => handleFormChange("name", e.target.value, true)}
+							error={editFormErrors.name}
+						/>
+						<Input
+							label="Email Address"
+							type="email"
+							value={editingEmployee.email}
+							onChange={(e) => handleFormChange("email", e.target.value, true)}
+							error={editFormErrors.email}
+						/>
+						<Input
+							label="Phone Number"
+							type="tel"
+							value={editingEmployee.phoneNumber}
+							onChange={(e) =>
+								handleFormChange("phoneNumber", e.target.value, true)
+							}
+							error={editFormErrors.phoneNumber}
+						/>
+						<Input
+							label="Designation"
+							value={editingEmployee.designation}
+							onChange={(e) =>
+								handleFormChange("designation", e.target.value, true)
+							}
+							error={editFormErrors.designation}
+						/>
+						<Select
+							label="Status"
+							options={employeeStatuses}
+							value={editingEmployee.statusId}
+							onChange={(e) =>
+								handleFormChange("statusId", e.target.value, true)
+							}
+							error={editFormErrors.statusId}
+						/>
+						<Input
+							label="Joined Date"
+							type="date"
+							value={
+								typeof editingEmployee.joinedDate === "string"
+									? editingEmployee.joinedDate.split("T")[0]
+									: ""
+							}
+							onChange={(e) =>
+								handleFormChange("joinedDate", e.target.value, true)
+							}
+							error={editFormErrors.joinedDate}
+						/>
+					</div>
+				)}
+			</Modal>
 		</div>
 	);
 };

@@ -1,13 +1,5 @@
-import {
-	NullableNumber,
-	NullableString,
-	StringArray,
-} from "@/customTypes/CommonTypes";
-import {
-	apiResponseStatuses,
-	iAPIRequestStatus,
-} from "@/customTypes/NetworkTypes";
-import {iCreateEmployeeDTO} from "@/customTypes/appDataTypes/employeeTypes";
+import {NullableNumber, NullableString} from "@/customTypes/CommonTypes";
+import {apiResponseStatuses} from "@/customTypes/NetworkTypes";
 
 export const REDUCER_NAME = "bookingSlice";
 
@@ -23,9 +15,9 @@ export interface iBooking {
 	budget: string;
 	totalCost: string;
 	advancePayment: string;
-	bookingStatus?: string;
 	paymentStatusId: string;
 	bookingStatusId: string;
+	bookingStatus: string;
 	bookedAt: string;
 	serviceName: string;
 	paymentStatus: string;
@@ -45,7 +37,6 @@ export interface iBookingRequest {
 	location: string;
 	bookingRquestAt: string;
 	status: string;
-	serviceName: string;
 	serviceId: string;
 	statusId: string;
 	statusName: string;

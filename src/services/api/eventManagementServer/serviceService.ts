@@ -3,7 +3,6 @@ import {AxiosInstance} from "axios";
 import {APIResponse} from "@/customTypes/NetworkTypes";
 
 import NetworkUtil from "@/utils/NetworkUtil";
-import {NullableString} from "@/customTypes/CommonTypes";
 import {apiEndpoints} from "./axiosConfig/AxiosServiceConstants";
 
 import {iService} from "@/customTypes/appDataTypes/serviceTypes";
@@ -99,10 +98,44 @@ function ServiceService(apiServer: AxiosInstance) {
 		return result;
 	};
 
+	const deleteService = async (
+		serviceId: string,
+	): Promise<APIResponse<{message: string}> | null> => {
+		let result = null;
+
+		await apiServer
+			.delete(
+				apiEndpoints.service
+					.updateService(serviceId)
+					.replace("update", "delete"),
+			)
+			.then(
+				(value) => {
+					result = NetworkUtil.buildResult<{message: string}>(
+						value.data,
+						value.status,
+						null,
+						null,
+					);
+				},
+				(reason) => {
+					const {response} = reason;
+					const {status, data} = response;
+					result = NetworkUtil.buildResult<null>(data, status, data, null);
+				},
+			)
+			.catch((error) => {
+				throw error;
+			});
+
+		return result;
+	};
+
 	return {
 		fetchServices,
 		createService,
 		updateService,
+		deleteService,
 	};
 }
 

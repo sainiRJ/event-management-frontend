@@ -122,15 +122,6 @@ const BookingTable: React.FC<BookingTableProps> = ({
 				);
 			},
 		},
-		{
-			key: "bookingStatus",
-			label: "Status",
-			width: 120,
-			resizable: true,
-			render: (rowData: iBooking) => (
-				<StatusBadge status={rowData.bookingStatus || ""} />
-			),
-		},
 	];
 
 	return (

@@ -1,50 +1,14 @@
 import React, {useState, useEffect} from "react";
-import {useNavigate} from "react-router-dom";
+import {useNavigate, Link} from "react-router-dom";
 import {useSelector} from "react-redux";
 import {login} from "../../store/auth/ThunkActions";
 import {RootState} from "../../store/RootReducer";
 import {iLoginCredentials} from "../../store/auth/Types";
 import {useAppDispatch} from "../../store/Hooks";
-import {Message, toaster} from "rsuite";
 import {showToast} from "../../utils/showToatify";
-
-// Custom CSS for animated background circles
-const bgCircleStyles = `
-  .background-circles {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    overflow: hidden;
-  }
-  .background-circles::before, .background-circles::after {
-    content: '';
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(80px);
-    opacity: 0.5;
-    animation: float 8s ease-in-out infinite alternate;
-  }
-  .background-circles::before {
-    width: 400px;
-    height: 400px;
-    left: -120px;
-    top: -120px;
-    background: radial-gradient(circle, #ffb86c 0%, #ff6bcb 100%);
-    animation-delay: 0s;
-  }
-  .background-circles::after {
-    width: 300px;
-    height: 300px;
-    right: -100px;
-    bottom: -100px;
-    background: radial-gradient(circle, #667eea 0%, #764ba2 100%);
-    animation-delay: 2s;
-  }
-  @keyframes float {
-    0% { transform: translateY(0) scale(1); }
-    100% { transform: translateY(40px) scale(1.1); }
-  }
-`;
+import Button from "../ui/Button";
+import Input from "../ui/Input";
+import {LogIn, Sparkles, Star} from "lucide-react";
 
 const Login: React.FC = () => {
 	const navigate = useNavigate();
@@ -52,19 +16,11 @@ const Login: React.FC = () => {
 	const {isLoading, message} = useSelector(
 		(state: RootState) => state.authReducer,
 	);
-	const [error, setError] = useState("");
 
 	const [formData, setFormData] = useState<iLoginCredentials>({
 		emailOrPhone: "",
 		password: "",
 	});
-
-	useEffect(() => {
-		document.body.style.background = "#181a22";
-		return () => {
-			document.body.style.background = "";
-		};
-	}, []);
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const {name, value} = e.target;
@@ -73,7 +29,6 @@ const Login: React.FC = () => {
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		setError("");
 		const response: any = await dispatch(login(formData));
 		showToast({
 			response,
@@ -81,7 +36,6 @@ const Login: React.FC = () => {
 			errorMessage: "Login failed",
 		});
 
-		// Add navigation after successful login
 		if (response.payload?.data?.token?.accessToken) {
 			navigate("/dashboard");
 		}
@@ -92,127 +46,174 @@ const Login: React.FC = () => {
 	};
 
 	return (
-		<div className="relative min-h-screen flex items-center justify-center bg-[#181a22] overflow-hidden">
-			{/* Animated background circles */}
-			<style>{bgCircleStyles}</style>
-			<div className="background-circles" />
-			<div className="relative z-10 w-full max-w-5xl flex flex-col md:flex-row rounded-2xl shadow-2xl overflow-hidden bg-white/90 backdrop-blur-md">
+		<div className="min-h-screen flex items-center justify-center bg-gray-50 p-4 sm:p-6 lg:p-8">
+			<div className="w-full max-w-5xl bg-white rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:flex-row min-h-[600px] border border-gray-100">
 				{/* Left: Login Form */}
-				<div className="flex flex-col justify-center px-8 py-12 md:w-1/2 w-full bg-white/90">
-					<div className="mb-8 text-center">
-						<h2 className="text-3xl font-bold text-gray-900 mb-2">
-							Login Here
+				<div className="flex-1 p-8 sm:p-12 lg:p-16 flex flex-col justify-center">
+					<div className="mb-10">
+						<div className="inline-flex items-center justify-center p-3 bg-indigo-50 rounded-2xl mb-6">
+							<LogIn className="w-8 h-8 text-indigo-600" />
+						</div>
+						<h2 className="text-4xl font-black text-gray-900 tracking-tight mb-3">
+							Welcome Back
 						</h2>
-						<p className="text-gray-500 text-base">
-							Welcome back! Please login to your account.
+						<p className="text-gray-500 font-medium">
+							Sign in to manage your decoration events and team.
 						</p>
 					</div>
+
 					{message && (
-						<p className="text-red-500 text-sm mb-2 text-center">{message}</p>
-					)}
-					<form onSubmit={handleSubmit} className="flex flex-col gap-4">
-						<div>
-							<label className="block text-gray-700 text-sm mb-1">
-								Username
-							</label>
-							<input
-								type="text"
-								name="emailOrPhone"
-								placeholder="Email or Phone"
-								value={formData.emailOrPhone}
-								onChange={handleChange}
-								required
-								className="w-full px-4 py-2 rounded-md bg-gray-100 text-gray-900 border border-gray-300 focus:ring-2 focus:ring-indigo-400 focus:outline-none placeholder-gray-400 transition"
-							/>
+						<div className="mb-6 p-4 bg-rose-50 border border-rose-100 rounded-2xl text-rose-600 text-sm font-medium flex items-center gap-3">
+							<div className="w-2 h-2 bg-rose-600 rounded-full animate-pulse"></div>
+							{message}
 						</div>
-						<div>
-							<label className="block text-gray-700 text-sm mb-1">
-								Password
-							</label>
-							<input
-								type="password"
+					)}
+
+					<form onSubmit={handleSubmit} className="space-y-6">
+						<Input
+							label="Email or Phone"
+							name="emailOrPhone"
+							type="text"
+							placeholder="admin@example.com"
+							value={formData.emailOrPhone}
+							onChange={handleChange}
+							required
+							className="h-12"
+						/>
+
+						<div className="space-y-1">
+							<div className="flex justify-between items-center">
+								<label className="block text-sm font-bold text-gray-700">
+									Password
+								</label>
+								<Link
+									to="/forgot-password"
+									title="Forgot password link"
+									className="text-xs font-bold text-indigo-600 hover:text-indigo-700"
+								>
+									Forgot Password?
+								</Link>
+							</div>
+							<Input
 								name="password"
-								placeholder="Password"
+								type="password"
+								placeholder="••••••••"
 								value={formData.password}
 								onChange={handleChange}
 								required
-								className="w-full px-4 py-2 rounded-md bg-gray-100 text-gray-900 border border-gray-300 focus:ring-2 focus:ring-indigo-400 focus:outline-none placeholder-gray-400 transition"
+								className="h-12"
 							/>
 						</div>
-						<button
+
+						<Button
 							type="submit"
-							className="submit-btn w-full py-2 mt-2 rounded-md bg-gradient-to-r from-indigo-400 to-purple-500 text-white font-bold text-lg shadow hover:-translate-y-0.5 hover:shadow-lg transition disabled:opacity-60 relative"
-							disabled={isLoading}
+							className="w-full h-14 text-lg font-bold shadow-xl shadow-indigo-100 hover:shadow-indigo-200 transition-all active:scale-[0.98]"
+							isLoading={isLoading}
 						>
-							{isLoading ? (
-								<span className="flex items-center justify-center">
-									<svg
-										className="animate-spin h-5 w-5 mr-2 text-white"
-										xmlns="http://www.w3.org/2000/svg"
-										fill="none"
-										viewBox="0 0 24 24"
-									>
-										<circle
-											className="opacity-25"
-											cx="12"
-											cy="12"
-											r="10"
-											stroke="currentColor"
-											strokeWidth="4"
-										></circle>
-										<path
-											className="opacity-75"
-											fill="currentColor"
-											d="M4 12a8 8 0 018-8v8z"
-										></path>
-									</svg>
-									Logging in...
-								</span>
-							) : (
-								"Log In"
-							)}
-						</button>
+							Log In
+						</Button>
 					</form>
-					<div className="divider flex items-center my-6">
-						<div className="flex-grow h-px bg-gray-300" />
-						<span className="mx-3 text-gray-400">OR</span>
-						<div className="flex-grow h-px bg-gray-300" />
+
+					<div className="relative my-10">
+						<div className="absolute inset-0 flex items-center">
+							<div className="w-full border-t border-gray-100"></div>
+						</div>
+						<div className="relative flex justify-center text-sm font-bold uppercase tracking-widest">
+							<span className="px-4 bg-white text-gray-400">
+								or continue with
+							</span>
+						</div>
 					</div>
+
 					<button
+						type="button"
 						onClick={handleGoogleLogin}
-						className="google-btn w-full flex items-center justify-center gap-2 py-2 rounded-md bg-white text-gray-800 border border-gray-300 font-semibold text-lg hover:bg-gray-100 transition shadow"
+						className="w-full h-14 flex items-center justify-center gap-4 bg-white border-2 border-gray-100 rounded-2xl font-bold text-gray-700 hover:bg-gray-50 hover:border-gray-200 transition-all active:scale-[0.98]"
 					>
-						<img src="/google-icon.svg" alt="Google logo" className="w-5 h-5" />
-						Continue with Google
-					</button>
-				</div>
-				{/* Right: Welcome Section */}
-				<div className="flex flex-col justify-center items-center bg-[#6d5c57] px-8 py-12 md:w-1/2 w-full">
-					<div className="welcome-content text-center">
-						<h1 className="text-2xl md:text-3xl font-bold text-white mb-2">
-							Welcome to Saini Event Planner!
-						</h1>
-						<p className="text-white text-base mb-4">
-							we design events that speak your heart unforgettable.
-						</p>
 						<img
-							src="https://i.pinimg.com/736x/9e/f9/2f/9ef92f371c50e5757192fd194f20b471.jpg"
-							alt="Login visual"
-							className="rounded-lg shadow-lg w-full max-w-xs border-4 border-[#bbaea7] animate-slideIn"
+							src="https://www.svgrepo.com/show/475656/google-color.svg"
+							alt="Google logo"
+							className="w-6 h-6"
 						/>
+						Google Account
+					</button>
+
+					<p className="mt-10 text-center text-gray-500 font-medium">
+						Don&apos;t have an account?{" "}
+						<Link
+							to="/signup"
+							className="text-indigo-600 font-black hover:underline underline-offset-4"
+						>
+							Create Account
+						</Link>
+					</p>
+				</div>
+
+				{/* Right: Brand Section */}
+				<div className="hidden md:flex flex-1 bg-indigo-600 p-12 lg:p-16 flex-col justify-between relative overflow-hidden">
+					{/* Decorative background elements */}
+					<div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500 rounded-full -mr-32 -mt-32 opacity-20"></div>
+					<div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-700 rounded-full -ml-48 -mb-48 opacity-20"></div>
+
+					<div className="relative z-10">
+						<div className="flex items-center gap-3 mb-12">
+							<div className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center">
+								<Sparkles className="w-6 h-6 text-white" />
+							</div>
+							<span className="text-white font-black text-xl tracking-tighter">
+								Saini Events
+							</span>
+						</div>
+
+						<h1 className="text-5xl font-black text-white leading-tight mb-8">
+							Crafting Memories, <br />
+							<span className="text-indigo-200">One Event at a Time.</span>
+						</h1>
+
+						<div className="space-y-6">
+							<div className="flex items-start gap-4">
+								<div className="p-2 bg-indigo-500 rounded-lg text-indigo-100">
+									<Star className="w-5 h-5" />
+								</div>
+								<div>
+									<h4 className="text-white font-bold mb-1">
+										Elite Decoration
+									</h4>
+									<p className="text-indigo-100 text-sm font-medium opacity-80 leading-relaxed">
+										Professional-grade management tools for your creative
+										decoration business.
+									</p>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div className="relative z-10">
+						<div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-6">
+							<div className="flex -space-x-3 mb-4">
+								{[1, 2, 3, 4].map((i) => (
+									<div
+										key={i}
+										className="w-10 h-10 rounded-full border-2 border-indigo-600 bg-indigo-400 overflow-hidden shadow-lg"
+									>
+										<img
+											src={`https://i.pravatar.cc/100?img=${i + 10}`}
+											alt="User avatar"
+										/>
+									</div>
+								))}
+								<div className="w-10 h-10 rounded-full border-2 border-indigo-600 bg-white/20 backdrop-blur-md flex items-center justify-center text-xs font-bold text-white shadow-lg">
+									+50
+								</div>
+							</div>
+							<p className="text-white font-bold text-sm">
+								Join 50+ event planners managing their business with Saini
+								Events.
+							</p>
+						</div>
 					</div>
 				</div>
 			</div>
-			{/* Custom animation for image */}
-			<style>{`
-				@keyframes slideIn {
-					0% { opacity: 0; transform: translateY(40px); }
-					100% { opacity: 1; transform: translateY(0); }
-				}
-				.animate-slideIn {
-					animation: slideIn 1.2s cubic-bezier(0.23, 1, 0.32, 1) both;
-				}
-			`}</style>
 		</div>
 	);
 };

@@ -36,7 +36,6 @@
       "react/jsx-filename-extension": ["warn", { "extensions": [".js", ".jsx", ".tsx"] }],
       "quotes": ["warn", "double"],
       "semi": ["warn", "always"],
-      "indent": ["warn", "tab"],
 		  "react/no-unknown-property": ["error", {"ignore": ["css"]}]
 
     }

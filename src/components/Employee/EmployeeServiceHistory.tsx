@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useRef} from "react";
-import {useParams} from "react-router-dom";
+import {useParams, useNavigate} from "react-router-dom";
 import {useAppDispatch, useAppSelector} from "../../store/Hooks";
 import {
 	getAssignedServices,
@@ -9,36 +9,34 @@ import {
 import {
 	iAssignedService,
 	iEmployeePaymentUpdate,
-	iEmployeeStat,
 } from "../../customTypes/appDataTypes/employeeTypes";
-import {DatePicker, SelectPicker} from "rsuite";
-
-const formatDate = (dateString: string | Date) => {
-	const date = new Date(dateString);
-	return new Intl.DateTimeFormat("en-GB", {
-		day: "2-digit",
-		month: "short",
-		year: "numeric",
-	}).format(date);
-};
-
-const formatCurrency = (amount: number) => {
-	return new Intl.NumberFormat("en-IN", {
-		style: "currency",
-		currency: "INR",
-	}).format(amount);
-};
+import {
+	ArrowLeft,
+	Clock,
+	DollarSign,
+	Filter,
+	Search,
+	RefreshCw,
+	ChevronRight,
+	History,
+	Loader2,
+} from "lucide-react";
+import Button from "../ui/Button";
+import Input from "../ui/Input";
+import Select from "../ui/Select";
+import Modal from "../ui/Modal";
+import {toast} from "sonner";
+import {formatCurrency} from "../../utils/currencyUtils";
 
 const EmployeeServiceHistory: React.FC = () => {
 	const {employeeId} = useParams<{employeeId: string}>();
+	const navigate = useNavigate();
 	const dispatch = useAppDispatch();
 	const {serviceHistory, loading} = useAppSelector(
 		(state) => state.employeeReducer,
 	);
 	const [showEditModal, setShowEditModal] = useState(false);
 	const hasFetchedServices = useRef(false);
-	const [selectedEmployee, setSelectedEmployee] =
-		useState<iAssignedService | null>(null);
 	const [formData, setFormData] = useState<iEmployeePaymentUpdate>({
 		employeeId: "",
 		amount: 0,
@@ -48,15 +46,20 @@ const EmployeeServiceHistory: React.FC = () => {
 	});
 	const [filters, setFilters] = useState({
 		serviceName: "",
-		startDate: null as Date | null,
-		endDate: null as Date | null,
 		isPaid: null as boolean | null,
 	});
+	const [isRefreshing, setIsRefreshing] = useState(false);
+
+	const handleRefresh = async () => {
+		if (employeeId) {
+			setIsRefreshing(true);
+			await dispatch(getEmployeeServiceHistory(employeeId));
+			setIsRefreshing(false);
+		}
+	};
 
 	useEffect(() => {
-		if (employeeId) {
-			dispatch(getEmployeeServiceHistory(employeeId));
-		}
+		handleRefresh();
 	}, [dispatch, employeeId]);
 
 	useEffect(() => {
@@ -73,7 +76,6 @@ const EmployeeServiceHistory: React.FC = () => {
 	}, [showEditModal]);
 
 	const handleEdit = (service: iAssignedService) => {
-		setSelectedEmployee(service);
 		setFormData({
 			employeeId: employeeId || "",
 			amount: service.amount,
@@ -82,14 +84,6 @@ const EmployeeServiceHistory: React.FC = () => {
 			assignedEmployeeIds: [service.assignedEmployeeId],
 		});
 		setShowEditModal(true);
-	};
-
-	const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const value = parseFloat(e.target.value);
-		setFormData((prev) => ({
-			...prev,
-			amount: isNaN(value) ? 0 : value,
-		}));
 	};
 
 	const getSelectedEmployeeServices = () => {
@@ -113,36 +107,14 @@ const EmployeeServiceHistory: React.FC = () => {
 		});
 	};
 
-	const formatServiceLabel = (service: iAssignedService) => {
-		return `${service.serviceName} (${formatDate(
-			service.eventDate,
-		)}) - ${formatCurrency(service.amount)}`;
-	};
-
 	const handleSubmit = async () => {
 		try {
-			let assignedEmployeeIdsToSend = formData.assignedEmployeeIds;
-			if (formData.autoPaid) {
-				// If autoPaid is true, send all unpaid assignedEmployeeIds
-				assignedEmployeeIdsToSend = getSelectedEmployeeServices().map(
-					(service) => service.assignedEmployeeId,
-				);
-			} else {
-				// If autoPaid is false, send only selected ids (already in formData.assignedEmployeeIds)
-				assignedEmployeeIdsToSend = formData.assignedEmployeeIds;
-			}
-			await dispatch(
-				updateEmployeePayment({
-					...formData,
-					assignedEmployeeIds: assignedEmployeeIdsToSend,
-				}),
-			);
-			alert("Payment updated successfully");
+			await dispatch(updateEmployeePayment(formData));
+			toast.success("Payment updated successfully");
 			setShowEditModal(false);
-			dispatch(getEmployeeServiceHistory(employeeId || ""));
-			// onRefresh();
+			handleRefresh();
 		} catch (error) {
-			alert("Failed to update payment");
+			toast.error("Failed to update payment");
 		}
 	};
 
@@ -150,378 +122,288 @@ const EmployeeServiceHistory: React.FC = () => {
 		serviceHistory?.assignedServices.filter((service) => {
 			const matchesService =
 				!filters.serviceName || service.serviceName === filters.serviceName;
-
-			const serviceDate = new Date(service.eventDate);
-			const matchesDate =
-				(!filters.startDate || serviceDate >= filters.startDate) &&
-				(!filters.endDate || serviceDate <= filters.endDate);
-
 			const matchesPayment =
 				filters.isPaid === null || service.isPaid === filters.isPaid;
-
-			return matchesService && matchesDate && matchesPayment;
+			return matchesService && matchesPayment;
 		}) || [];
-
-	const totalServices = filteredServices.length;
-	const totalAmount = filteredServices.reduce(
-		(sum, service) => sum + service.amount,
-		0,
-	);
-	const totalPaid = filteredServices
-		.filter((service) => service.isPaid)
-		.reduce((sum, service) => sum + service.amount, 0);
-	const totalUnpaid = totalAmount - totalPaid;
 
 	const uniqueServiceNames = Array.from(
 		new Set(serviceHistory?.assignedServices.map((s) => s.serviceName) || []),
 	).map((name) => ({label: name, value: name}));
 
-	const handleDateSelect = (date: Date | null) => {
-		if (!date) return;
-
-		if (!filters.startDate) {
-			setFilters((prev) => ({...prev, startDate: date}));
-		} else if (!filters.endDate) {
-			if (date < filters.startDate) {
-				// If selected date is before start date, swap them
-				setFilters((prev) => ({
-					...prev,
-					startDate: date,
-					endDate: prev.startDate,
-				}));
-			} else {
-				setFilters((prev) => ({...prev, endDate: date}));
-			}
-		} else {
-			// Reset and start new selection
-			setFilters((prev) => ({
-				...prev,
-				startDate: date,
-				endDate: null,
-			}));
-		}
-	};
-
-	const clearDateRange = () => {
-		setFilters((prev) => ({
-			...prev,
-			startDate: null,
-			endDate: null,
-		}));
-	};
-
 	return (
-		<div className="min-h-screen bg-gray-50 space-y-10 py-8 px-4 mt-10">
-			<div className="max-w-7xl mx-auto">
-				<div className="bg-white rounded-lg shadow p-8">
-					<h1 className="text-3xl font-bold mb-2">
-						Service History - {serviceHistory?.employeeName}
-					</h1>
-
-					{/* Summary Cards */}
-					<div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-						<div className="bg-blue-50 p-4 rounded-lg">
-							<h3 className="text-sm font-medium text-blue-600">
-								Total Services
-							</h3>
-							<p className="text-2xl font-bold text-blue-700">
-								{totalServices}
-							</p>
-						</div>
-						<div className="bg-green-50 p-4 rounded-lg">
-							<h3 className="text-sm font-medium text-green-600">
-								Total Amount
-							</h3>
-							<p className="text-2xl font-bold text-green-700">
-								{formatCurrency(totalAmount)}
-							</p>
-						</div>
-						<div className="bg-purple-50 p-4 rounded-lg">
-							<h3 className="text-sm font-medium text-purple-600">
-								Total Paid
-							</h3>
-							<p className="text-2xl font-bold text-purple-700">
-								{formatCurrency(totalPaid)}
-							</p>
-						</div>
-						<div className="bg-red-50 p-4 rounded-lg">
-							<h3 className="text-sm font-medium text-red-600">Total Unpaid</h3>
-							<p className="text-2xl font-bold text-red-700">
-								{formatCurrency(totalUnpaid)}
-							</p>
-						</div>
-						<div className="bg-yellow-50 p-4 rounded-lg">
-							<h3 className="text-sm font-medium text-yellow-600">
-								Extra Amount
-							</h3>
-							<p className="text-2xl font-bold text-yellow-700">
-								{formatCurrency(serviceHistory?.extraAmount || 0)}
-							</p>
-						</div>
+		<div className="space-y-8 animate-in fade-in duration-500">
+			<div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+				<div className="flex items-center gap-6">
+					<button
+						onClick={() => navigate(-1)}
+						className="p-3 bg-gray-50 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-2xl transition-all"
+					>
+						<ArrowLeft className="w-6 h-6" />
+					</button>
+					<div>
+						<h1 className="text-3xl font-black text-gray-900 tracking-tight flex items-center gap-3">
+							<History className="w-8 h-8 text-indigo-600" />
+							Service History
+						</h1>
+						<p className="text-gray-500 font-bold mt-1">
+							{serviceHistory?.employeeName || "Employee Record"}
+						</p>
 					</div>
-
-					{/* Filters */}
-					<div className="flex flex-col md:flex-row gap-4 mb-6">
-						<SelectPicker
-							placeholder="Filter by service"
-							data={[{label: "All Services", value: ""}, ...uniqueServiceNames]}
-							value={filters.serviceName}
-							onChange={(value) =>
-								setFilters((f) => ({...f, serviceName: value || ""}))
-							}
-							className="w-full md:w-48"
-						/>
-						<div className="flex items-center gap-2 w-full md:w-64">
-							<DatePicker
-								placeholder="Select date range"
-								value={filters.startDate}
-								onChange={handleDateSelect}
-								className="flex-1"
-								format="yyyy-MM-dd"
-							/>
-							{filters.startDate && (
-								<button
-									onClick={clearDateRange}
-									className="px-2 py-1 text-sm text-gray-600 hover:text-gray-800"
-								>
-									Clear
-								</button>
-							)}
-						</div>
-						{filters.startDate && (
-							<div className="text-sm text-gray-600">
-								{filters.endDate ? (
-									<span>
-										{formatDate(filters.startDate)} -{" "}
-										{formatDate(filters.endDate)}
-									</span>
-								) : (
-									<span>Select end date</span>
-								)}
-							</div>
-						)}
-						<SelectPicker
-							placeholder="Payment Status"
-							data={[
-								{label: "All", value: null},
-								{label: "Paid", value: true},
-								{label: "Unpaid", value: false},
-							]}
-							value={filters.isPaid}
-							onChange={(value) => setFilters((f) => ({...f, isPaid: value}))}
-							className="w-full md:w-48"
-						/>
-					</div>
-
-					{/* Service History Table */}
-					{loading ? (
-						<div className="text-center py-4">Loading...</div>
-					) : (
-						<div className="overflow-x-auto">
-							<table className="min-w-full divide-y divide-gray-200">
-								<thead className="bg-gray-50">
-									<tr>
-										<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-											Service Name
-										</th>
-										<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-											Event Date
-										</th>
-										<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-											Customer
-										</th>
-										<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-											Location
-										</th>
-										<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-											Event Name
-										</th>
-										<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-											Amount
-										</th>
-										<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-											Payment Status
-										</th>
-										<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-											Action
-										</th>
-									</tr>
-								</thead>
-								<tbody className="bg-white divide-y divide-gray-200">
-									{filteredServices.map((service) => (
-										<tr key={service.assignedEmployeeId}>
-											<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-												{service.serviceName}
-											</td>
-											<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-												{formatDate(service.eventDate)}
-											</td>
-											<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-												{service.customerName}
-											</td>
-											<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-												{service.location}
-											</td>
-											<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-												{service.eventName}
-											</td>
-											<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-												{formatCurrency(service.amount)}
-											</td>
-											<td className="px-6 py-4 whitespace-nowrap text-sm">
-												<span
-													className={`px-2 py-1 rounded text-xs font-semibold ${
-														service.isPaid
-															? "bg-green-100 text-green-700"
-															: "bg-red-100 text-red-700"
-													}`}
-												>
-													{service.isPaid ? "Paid" : "Unpaid"}
-												</span>
-											</td>
-											<td className="px-6 py-4 whitespace-nowrap text-sm">
-												<button
-													onClick={() => handleEdit(service)}
-													className="px-2 py-1 bg-blue-500 text-gray-50 rounded mr-2"
-												>
-													Edit
-												</button>
-											</td>
-										</tr>
-									))}
-								</tbody>
-							</table>
-						</div>
-					)}
 				</div>
-				{showEditModal && (
-					<div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-						<div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
-							<div className="flex justify-between items-center mb-4">
-								<h3 className="text-lg font-semibold">
-									Update Employee Payment
-								</h3>
-								<button
-									onClick={() => setShowEditModal(false)}
-									className="text-gray-500 hover:text-gray-700"
-								>
-									×
-								</button>
-							</div>
-							<form
-								onSubmit={(e) => {
-									e.preventDefault();
-									handleSubmit();
-								}}
-								className="space-y-4"
-							>
-								<div>
-									<label className="block text-sm font-medium text-gray-700 mb-1">
-										Amount
-									</label>
-									<input
-										type="number"
-										value={formData.amount || ""}
-										onChange={handleAmountChange}
-										className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-										min="0"
-									/>
-								</div>
-								<div>
-									<label className="block text-sm font-medium text-gray-700 mb-1">
-										Payment Date
-									</label>
-									<input
-										type="date"
-										value={
-											formData.paidAt
-												? new Date(formData.paidAt).toISOString().split("T")[0]
-												: ""
-										}
-										onChange={(e) =>
-											setFormData((prev) => ({
-												...prev,
-												paidAt: new Date(e.target.value).toISOString(),
-											}))
-										}
-										className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-									/>
-								</div>
-								<div>
-									<label className="block text-sm font-medium text-gray-700 mb-1">
-										Assigned Services
-									</label>
-									<div className="relative">
-										<div className="max-h-48 overflow-y-auto border border-gray-300 rounded-md bg-white">
-											{getSelectedEmployeeServices().length > 0 ? (
-												getSelectedEmployeeServices().map((service) => (
-													<div
-														key={service.assignedEmployeeId}
-														onClick={() =>
-															handleServiceSelection(service.assignedEmployeeId)
-														}
-														className={`px-3 py-2 cursor-pointer hover:bg-gray-100 ${
-															formData.assignedEmployeeIds?.includes(
-																service.assignedEmployeeId,
-															)
-																? "bg-indigo-50 text-indigo-700"
-																: "text-gray-700"
-														}`}
-													>
-														{formatServiceLabel(service)}
-													</div>
-												))
-											) : (
-												<div className="px-3 py-2 text-gray-500">
-													No services assigned
-												</div>
+
+				<div className="flex items-center gap-3">
+					<Button
+						variant="outline"
+						icon={
+							<RefreshCw
+								className={`w-4 h-4 ${isRefreshing ? "animate-spin" : ""}`}
+							/>
+						}
+						onClick={handleRefresh}
+						disabled={isRefreshing}
+					>
+						Refresh
+					</Button>
+				</div>
+			</div>
+
+			<div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8">
+				<div className="flex flex-wrap gap-4 items-center mb-8">
+					<div className="relative flex-1 max-w-xs">
+						<Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+						<input
+							type="text"
+							placeholder="Search services..."
+							className="w-full pl-10 pr-4 py-2 bg-gray-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 transition-all"
+						/>
+					</div>
+
+					<Select
+						options={uniqueServiceNames}
+						value={filters.serviceName}
+						onChange={(e) =>
+							setFilters({...filters, serviceName: e.target.value})
+						}
+						className="max-w-[200px]"
+					/>
+
+					<div className="flex items-center gap-2 p-1 bg-gray-50 rounded-xl">
+						<Button
+							variant={filters.isPaid === null ? "primary" : "ghost"}
+							size="sm"
+							onClick={() => setFilters({...filters, isPaid: null})}
+						>
+							All
+						</Button>
+						<Button
+							variant={filters.isPaid === true ? "primary" : "ghost"}
+							size="sm"
+							onClick={() => setFilters({...filters, isPaid: true})}
+						>
+							Paid
+						</Button>
+						<Button
+							variant={filters.isPaid === false ? "primary" : "ghost"}
+							size="sm"
+							onClick={() => setFilters({...filters, isPaid: false})}
+						>
+							Unpaid
+						</Button>
+					</div>
+				</div>
+
+				<div className="overflow-x-auto rounded-2xl border border-gray-100">
+					<table className="min-w-full">
+						<thead className="bg-gray-50/50">
+							<tr>
+								<th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+									Service Info
+								</th>
+								<th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+									Customer & Date
+								</th>
+								<th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+									Earnings
+								</th>
+								<th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+									Status
+								</th>
+								<th className="px-6 py-4 text-right text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+									Action
+								</th>
+							</tr>
+						</thead>
+						<tbody className="divide-y divide-gray-50">
+							{loading ? (
+								<tr>
+									<td colSpan={5} className="px-6 py-20 text-center">
+										<Loader2 className="w-8 h-8 text-indigo-600 animate-spin mx-auto mb-4" />
+										<p className="text-gray-500 font-medium">
+											Loading history...
+										</p>
+									</td>
+								</tr>
+							) : filteredServices.length > 0 ? (
+								filteredServices.map((service) => (
+									<tr
+										key={service.assignedEmployeeId}
+										className="group hover:bg-gray-50/50 transition-colors"
+									>
+										<td className="px-6 py-4">
+											<div className="font-bold text-gray-900">
+												{service.serviceName}
+											</div>
+											<div className="text-xs text-gray-500 font-medium">
+												{service.location}
+											</div>
+										</td>
+										<td className="px-6 py-4">
+											<div className="text-sm font-bold text-gray-700">
+												{service.customerName}
+											</div>
+											<div className="text-xs text-gray-400 font-bold">
+												{new Date(service.eventDate).toLocaleDateString()}
+											</div>
+										</td>
+										<td className="px-6 py-4">
+											<div className="text-sm font-black text-indigo-600">
+												{formatCurrency(service.amount)}
+											</div>
+										</td>
+										<td className="px-6 py-4">
+											<span
+												className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
+													service.isPaid
+														? "bg-emerald-50 text-emerald-600"
+														: "bg-rose-50 text-rose-600"
+												}`}
+											>
+												{service.isPaid ? "Paid" : "Unpaid"}
+											</span>
+										</td>
+										<td className="px-6 py-4 text-right">
+											{!service.isPaid && (
+												<Button
+													variant="ghost"
+													size="sm"
+													icon={<DollarSign className="w-3.5 h-3.5" />}
+													onClick={() => handleEdit(service)}
+												>
+													Pay Now
+												</Button>
 											)}
-										</div>
-									</div>
-									<p className="text-xs text-gray-500 mt-1">
-										Click to select/deselect services
-									</p>
-								</div>
-								<div className="flex items-center">
-									<input
-										type="checkbox"
-										id="autoPay"
-										checked={formData.autoPaid}
-										onChange={(e) =>
-											setFormData((prev) => ({
-												...prev,
-												autoPaid: e.target.checked,
-											}))
-										}
-										className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-									/>
-									<label
-										htmlFor="autoPay"
-										className="ml-2 block text-sm text-gray-700"
+										</td>
+									</tr>
+								))
+							) : (
+								<tr>
+									<td
+										colSpan={5}
+										className="px-6 py-20 text-center text-gray-500"
 									>
-										Auto Pay
-									</label>
+										<Clock className="w-12 h-12 text-gray-200 mx-auto mb-4" />
+										No service records found.
+									</td>
+								</tr>
+							)}
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+			<Modal
+				isOpen={showEditModal}
+				onClose={() => setShowEditModal(false)}
+				title="Process Payment"
+				footer={
+					<>
+						<Button variant="ghost" onClick={() => setShowEditModal(false)}>
+							Cancel
+						</Button>
+						<Button onClick={handleSubmit}>Confirm Payment</Button>
+					</>
+				}
+			>
+				<div className="space-y-6">
+					<div className="bg-indigo-50 rounded-2xl p-4 flex justify-between items-center">
+						<span className="text-sm font-bold text-indigo-600">
+							Total Due:
+						</span>
+						<span className="text-lg font-black text-indigo-900">
+							{formatCurrency(formData.amount)}
+						</span>
+					</div>
+
+					<Input
+						label="Confirm Amount"
+						type="number"
+						value={formData.amount}
+						onChange={(e) =>
+							setFormData({...formData, amount: Number(e.target.value)})
+						}
+					/>
+
+					<Input
+						label="Payment Date"
+						type="date"
+						value={formData.paidAt?.split("T")[0]}
+						onChange={(e) =>
+							setFormData({
+								...formData,
+								paidAt: new Date(e.target.value).toISOString(),
+							})
+						}
+					/>
+
+					<div>
+						<label className="block text-sm font-bold text-gray-700 mb-2">
+							Selected Services
+						</label>
+						<div className="max-h-48 overflow-y-auto border border-gray-100 rounded-2xl bg-gray-50/50 p-2">
+							{getSelectedEmployeeServices().map((service) => (
+								<div
+									key={service.assignedEmployeeId}
+									onClick={() =>
+										handleServiceSelection(service.assignedEmployeeId)
+									}
+									className={`px-4 py-3 rounded-xl cursor-pointer flex items-center justify-between mb-1 last:mb-0 transition-all ${
+										formData.assignedEmployeeIds?.includes(
+											service.assignedEmployeeId,
+										)
+											? "bg-indigo-600 text-white shadow-lg shadow-indigo-200"
+											: "bg-white text-gray-600 hover:bg-gray-100"
+									}`}
+								>
+									<span className="text-xs font-bold">
+										{service.serviceName}
+									</span>
+									<ChevronRight className="w-4 h-4" />
 								</div>
-								<div className="flex justify-end space-x-3 mt-6">
-									<button
-										type="button"
-										onClick={() => setShowEditModal(false)}
-										className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500"
-									>
-										Cancel
-									</button>
-									<button
-										type="submit"
-										className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-									>
-										Update
-									</button>
-								</div>
-							</form>
+							))}
 						</div>
 					</div>
-				)}
-			</div>
+
+					<label className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl cursor-pointer hover:bg-gray-100 transition-colors border border-gray-100">
+						<input
+							type="checkbox"
+							checked={formData.autoPaid}
+							onChange={(e) =>
+								setFormData({...formData, autoPaid: e.target.checked})
+							}
+							className="w-5 h-5 text-indigo-600 rounded-lg border-gray-300 focus:ring-indigo-500"
+						/>
+						<div>
+							<p className="text-sm font-bold text-gray-900">
+								Auto-calculate total
+							</p>
+							<p className="text-[10px] text-gray-500 font-medium">
+								Includes all unpaid services automatically
+							</p>
+						</div>
+					</label>
+				</div>
+			</Modal>
 		</div>
 	);
 };

@@ -5,7 +5,6 @@ import {
 	getAllEmployees,
 	getEmployeeServiceHistory,
 	updateEmployeePayment,
-	getAssignedServices,
 } from "../../store/employee/ThunkActions";
 import {iCreateEmployeeDTO} from "../../customTypes/appDataTypes/employeeTypes";
 import {
@@ -13,11 +12,30 @@ import {
 	User,
 	Clock,
 	CreditCard,
-	Pencil as Edit3,
+	Edit2,
+	Mail,
+	Phone,
+	Calendar,
+	Briefcase,
+	CheckCircle2,
+	AlertCircle,
+	DollarSign,
+	Search,
+	Filter,
+	X,
+	Wallet,
 } from "lucide-react";
 import {fetchStatus} from "../../store/status/ThunkActions";
-import {DatePicker, SelectPicker} from "rsuite";
-import {iAssignedService, iEmployeePaymentUpdate} from "../../customTypes/appDataTypes/employeeTypes";
+import {
+	iAssignedService,
+	iEmployeePaymentUpdate,
+} from "../../customTypes/appDataTypes/employeeTypes";
+import Button from "../ui/Button";
+import Input from "../ui/Input";
+import Modal from "../ui/Modal";
+import Select from "../ui/Select";
+import {toast} from "sonner";
+import {formatCurrency} from "../../utils/currencyUtils";
 
 const EmployeeDetails: React.FC = () => {
 	const {employeeId} = useParams<{employeeId: string}>();
@@ -35,7 +53,6 @@ const EmployeeDetails: React.FC = () => {
 			dispatch(getAllEmployees());
 			dispatch(getEmployeeServiceHistory(employeeId));
 		}
-		// Always fetch status list on mount
 		dispatch(fetchStatus());
 	}, [dispatch, employeeId]);
 
@@ -53,6 +70,7 @@ const EmployeeDetails: React.FC = () => {
 	];
 
 	const formatDate = (dateString: string | Date) => {
+		if (!dateString) return "N/A";
 		const date = new Date(dateString);
 		return new Intl.DateTimeFormat("en-GB", {
 			day: "2-digit",
@@ -61,328 +79,241 @@ const EmployeeDetails: React.FC = () => {
 		}).format(date);
 	};
 
-	const formatCurrency = (amount: number) => {
-		return new Intl.NumberFormat("en-IN", {
-			style: "currency",
-			currency: "INR",
-		}).format(amount);
+	const getStatusBadge = (status: string) => {
+		let color = "bg-gray-100 text-gray-700";
+		if (
+			status?.toLowerCase() === "active" ||
+			status?.toLowerCase() === "working"
+		)
+			color = "bg-emerald-100 text-emerald-700";
+		if (status?.toLowerCase() === "inactive")
+			color = "bg-amber-100 text-yellow-700";
+		if (status?.toLowerCase() === "terminated")
+			color = "bg-rose-100 text-red-700";
+
+		return (
+			<span
+				className={`px-3 py-1 rounded-full text-xs font-bold ${color} border border-white shadow-sm`}
+			>
+				{status || "Unknown"}
+			</span>
+		);
 	};
 
-	const getStatusColor = (status: string) => {
-		switch (status?.toLowerCase()) {
-			case "active":
-				return "bg-green-100 text-green-700";
-			case "inactive":
-				return "bg-yellow-100 text-yellow-700";
-			case "terminated":
-				return "bg-red-100 text-red-700";
-			default:
-				return "bg-gray-100 text-gray-700";
-		}
-	};
-
-	// If loading but employeeList is loaded and employee is not found, show not found
 	if (loading && (!employeeList || employeeList.length === 0)) {
 		return (
-			<div className="min-h-screen bg-gray-50 flex items-center justify-center">
-				<div className="text-center">
-					<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-					<p className="mt-4 text-gray-600">Loading employee details...</p>
-				</div>
+			<div className="flex flex-col items-center justify-center py-20">
+				<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+				<p className="mt-4 text-gray-500 font-medium">
+					Loading employee records...
+				</p>
 			</div>
 		);
 	}
 
 	if (!employee) {
 		return (
-			<div className="min-h-screen bg-gray-50 flex items-center justify-center">
-				<div className="text-center">
-					<p className="text-gray-600">Employee not found</p>
-					<button
-						onClick={() => navigate("/employees")}
-						className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
-					>
-						Back to Employees
-					</button>
-				</div>
+			<div className="flex flex-col items-center justify-center py-20 text-center">
+				<AlertCircle className="w-16 h-16 text-gray-300 mb-4" />
+				<h3 className="text-xl font-bold text-gray-900">Employee Not Found</h3>
+				<p className="text-gray-500 mt-1 mb-6">
+					We couldn&apos;t find the employee you&apos;re looking for.
+				</p>
+				<Button onClick={() => navigate("/employees")}>
+					Back to Directory
+				</Button>
 			</div>
 		);
 	}
 
 	return (
-		<div className="min-h-screen bg-gray-50 py-8 px-4 mt-10">
-			<div className="max-w-7xl mx-auto">
-				{/* Header */}
-				<div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-					<div className="flex items-center justify-between">
-						<div className="flex items-center space-x-4">
-							<button
-								onClick={() => navigate("/employees")}
-								className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-colors"
-							>
-								<ArrowLeft size={20} />
-							</button>
-							<div>
-								<h1 className="text-3xl font-bold text-gray-900">
-									{employee.name}
-								</h1>
-								<p className="text-gray-600">{employee.designation}</p>
-							</div>
-						</div>
-						<div className="flex items-center space-x-3">
-							<span
-								className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
-									(employee as any).status || "",
-								)}`}
-							>
-								{(employee as any).status || "Unknown"}
-							</span>
-							<button className="p-2 text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors">
-								<Edit3 size={18} />
-							</button>
-						</div>
-					</div>
-				</div>
-
-				{/* Tabs */}
-				<div className="bg-white rounded-lg shadow-sm mb-6">
-					<div className="border-b border-gray-200">
-						<nav className="flex space-x-8 px-6">
-							{tabs.map((tab) => {
-								const Icon = tab.icon;
-								return (
-									<button
-										key={tab.id}
-										onClick={() => setActiveTab(tab.id)}
-										className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
-											activeTab === tab.id
-												? "border-indigo-500 text-indigo-600"
-												: "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-										}`}
-									>
-										<Icon size={16} />
-										<span>{tab.label}</span>
-									</button>
-								);
-							})}
-						</nav>
-					</div>
-
-					{/* Tab Content */}
-					<div className="p-6">
-						{activeTab === "profile" && <EmployeeProfile employee={employee} />}
-						{activeTab === "service-history" && (
-							<EmployeeServiceHistoryTab serviceHistory={serviceHistory} />
-						)}
-						{activeTab === "payment-history" && (
-							<EmployeePaymentHistoryTab serviceHistory={serviceHistory} />
-						)}
-					</div>
-				</div>
-			</div>
-		</div>
-	);
-};
-
-// Profile Tab Component
-const EmployeeProfile: React.FC<{employee: iCreateEmployeeDTO}> = ({
-	employee,
-}) => {
-	const [isEditing, setIsEditing] = useState(false);
-	const [formData, setFormData] = useState(employee);
-
-	const handleSave = () => {
-		// TODO: Implement save functionality
-		setIsEditing(false);
-	};
-
-	const formatDate = (dateString: string | Date) => {
-		const date = new Date(dateString);
-		return new Intl.DateTimeFormat("en-GB", {
-			day: "2-digit",
-			month: "short",
-			year: "numeric",
-		}).format(date);
-	};
-
-	return (
-		<div className="space-y-6">
-			<div className="flex items-center justify-between">
-				<h2 className="text-xl font-semibold text-gray-900">
-					Employee Profile
-				</h2>
-				<button
-					onClick={() => setIsEditing(!isEditing)}
-					className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
-				>
-					{isEditing ? "Cancel" : "Edit Profile"}
-				</button>
-			</div>
-
-			<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-				{/* Profile Picture */}
-				<div className="md:col-span-2">
-					<div className="flex items-center space-x-4">
-						<div className="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center">
-							<User size={32} className="text-indigo-600" />
+		<div className="space-y-8 animate-in fade-in duration-500">
+			{/* Header Card */}
+			<div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+				<div className="flex items-center gap-6">
+					<button
+						onClick={() => navigate("/employees")}
+						className="p-3 bg-gray-50 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-2xl transition-all"
+					>
+						<ArrowLeft className="w-6 h-6" />
+					</button>
+					<div className="flex items-center gap-5">
+						<div className="w-20 h-20 bg-indigo-50 rounded-3xl flex items-center justify-center text-indigo-600 border border-indigo-100 shadow-inner">
+							<User className="w-10 h-10" />
 						</div>
 						<div>
-							<h3 className="text-lg font-medium text-gray-900">
-								{employee.name}
-							</h3>
-							<p className="text-gray-600">{employee.designation}</p>
+							<div className="flex items-center gap-3 mb-1">
+								<h1 className="text-3xl font-black text-gray-900 tracking-tight">
+									{employee.name}
+								</h1>
+								{getStatusBadge((employee as any).status)}
+							</div>
+							<p className="text-gray-500 font-bold flex items-center gap-2">
+								<Briefcase className="w-4 h-4 text-indigo-400" />
+								{employee.designation}
+							</p>
 						</div>
 					</div>
 				</div>
 
-				{/* Personal Information */}
-				<div className="space-y-4">
-					<h3 className="text-lg font-medium text-gray-900">
-						Personal Information
-					</h3>
-
-					<div>
-						<label className="block text-sm font-medium text-gray-700 mb-1">
-							Full Name
-						</label>
-						{isEditing ? (
-							<input
-								type="text"
-								value={formData.name}
-								onChange={(e) =>
-									setFormData({...formData, name: e.target.value})
-								}
-								className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-							/>
-						) : (
-							<p className="text-gray-900">{employee.name}</p>
-						)}
-					</div>
-
-					<div>
-						<label className="block text-sm font-medium text-gray-700 mb-1">
-							Email Address
-						</label>
-						{isEditing ? (
-							<input
-								type="email"
-								value={formData.email}
-								onChange={(e) =>
-									setFormData({...formData, email: e.target.value})
-								}
-								className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-							/>
-						) : (
-							<p className="text-gray-900">{employee.email}</p>
-						)}
-					</div>
-
-					<div>
-						<label className="block text-sm font-medium text-gray-700 mb-1">
-							Phone Number
-						</label>
-						{isEditing ? (
-							<input
-								type="tel"
-								value={formData.phoneNumber}
-								onChange={(e) =>
-									setFormData({...formData, phoneNumber: e.target.value})
-								}
-								className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-							/>
-						) : (
-							<p className="text-gray-900">{employee.phoneNumber}</p>
-						)}
-					</div>
-				</div>
-
-				{/* Work Information */}
-				<div className="space-y-4">
-					<h3 className="text-lg font-medium text-gray-900">
-						Work Information
-					</h3>
-
-					<div>
-						<label className="block text-sm font-medium text-gray-700 mb-1">
-							Designation
-						</label>
-						{isEditing ? (
-							<input
-								type="text"
-								value={formData.designation}
-								onChange={(e) =>
-									setFormData({...formData, designation: e.target.value})
-								}
-								className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-							/>
-						) : (
-							<p className="text-gray-900">{employee.designation}</p>
-						)}
-					</div>
-
-					<div>
-						<label className="block text-sm font-medium text-gray-700 mb-1">
-							Joined Date
-						</label>
-						{isEditing ? (
-							<input
-								type="date"
-								value={
-									formData.joinedDate
-										? new Date(formData.joinedDate).toISOString().split("T")[0]
-										: ""
-								}
-								onChange={(e) =>
-									setFormData({...formData, joinedDate: e.target.value})
-								}
-								className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-							/>
-						) : (
-							<p className="text-gray-900">{formatDate(employee.joinedDate)}</p>
-						)}
-					</div>
-
-					<div>
-						<label className="block text-sm font-medium text-gray-700 mb-1">
-							Status
-						</label>
-						<p className="text-gray-900">
-							{(employee as any).status || "Unknown"}
-						</p>
-					</div>
+				<div className="flex items-center gap-3">
+					<Button variant="outline" icon={<Edit2 className="w-4 h-4" />}>
+						Edit Profile
+					</Button>
 				</div>
 			</div>
 
-			{isEditing && (
-				<div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
-					<button
-						onClick={() => setIsEditing(false)}
-						className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors"
-					>
-						Cancel
-					</button>
-					<button
-						onClick={handleSave}
-						className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
-					>
-						Save Changes
-					</button>
-				</div>
-			)}
+			{/* Tabs Navigation */}
+			<div className="flex flex-wrap gap-2 p-1 bg-gray-100/50 rounded-2xl w-fit">
+				{tabs.map((tab) => {
+					const Icon = tab.icon;
+					const isActive = activeTab === tab.id;
+					return (
+						<button
+							key={tab.id}
+							onClick={() => setActiveTab(tab.id)}
+							className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all ${
+								isActive
+									? "bg-white text-indigo-600 shadow-sm ring-1 ring-black/5"
+									: "text-gray-500 hover:text-gray-900 hover:bg-white/50"
+							}`}
+						>
+							<Icon
+								className={`w-4 h-4 ${
+									isActive ? "text-indigo-600" : "text-gray-400"
+								}`}
+							/>
+							{tab.label}
+						</button>
+					);
+				})}
+			</div>
+
+			{/* Tab Content */}
+			<div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 min-h-[400px]">
+				{activeTab === "profile" && (
+					<EmployeeProfileTab employee={employee} formatDate={formatDate} />
+				)}
+				{activeTab === "service-history" && (
+					<EmployeeServiceHistoryTab serviceHistory={serviceHistory} />
+				)}
+				{activeTab === "payment-history" && (
+					<EmployeePaymentHistoryTab serviceHistory={serviceHistory} />
+				)}
+			</div>
 		</div>
 	);
 };
 
-// Service History Tab Component
+const EmployeeProfileTab: React.FC<{
+	employee: iCreateEmployeeDTO;
+	formatDate: (d: any) => string;
+}> = ({employee, formatDate}) => {
+	const infoItems = [
+		{label: "Email Address", value: employee.email, icon: Mail, type: "email"},
+		{
+			label: "Phone Number",
+			value: employee.phoneNumber,
+			icon: Phone,
+			type: "tel",
+		},
+		{
+			label: "Designation",
+			value: employee.designation,
+			icon: Briefcase,
+			type: "text",
+		},
+		{
+			label: "Joined Date",
+			value: formatDate(employee.joinedDate),
+			icon: Calendar,
+			type: "text",
+		},
+	];
+
+	return (
+		<div className="grid grid-cols-1 md:grid-cols-2 gap-12 animate-in slide-in-from-bottom-4 duration-500">
+			<div className="space-y-8">
+				<h3 className="text-xl font-black text-gray-900 flex items-center gap-3">
+					<div className="w-1 h-6 bg-indigo-600 rounded-full"></div>
+					Basic Information
+				</h3>
+
+				<div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+					{infoItems.map((item, idx) => (
+						<div
+							key={idx}
+							className="group p-6 bg-gray-50/50 rounded-3xl border border-gray-50 hover:bg-white hover:border-indigo-100 hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-300"
+						>
+							<div className="p-2.5 bg-white rounded-xl text-indigo-600 w-fit mb-4 shadow-sm group-hover:scale-110 transition-transform">
+								<item.icon className="w-5 h-5" />
+							</div>
+							<p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+								{item.label}
+							</p>
+							<p className="text-sm font-bold text-gray-900 truncate">
+								{item.value || "Not provided"}
+							</p>
+						</div>
+					))}
+				</div>
+			</div>
+
+			<div className="space-y-8">
+				<h3 className="text-xl font-black text-gray-900 flex items-center gap-3">
+					<div className="w-1 h-6 bg-emerald-600 rounded-full"></div>
+					Activity Summary
+				</h3>
+
+				<div className="bg-gradient-to-br from-indigo-600 to-violet-700 rounded-[2.5rem] p-8 text-white relative overflow-hidden shadow-2xl shadow-indigo-200">
+					{/* Background Decorations */}
+					<div className="absolute -top-12 -right-12 w-48 h-48 bg-white/10 rounded-full blur-3xl"></div>
+					<div className="absolute -bottom-12 -left-12 w-48 h-48 bg-black/10 rounded-full blur-3xl"></div>
+
+					<div className="relative z-10 space-y-6">
+						<div>
+							<p className="text-indigo-100 text-xs font-bold uppercase tracking-[0.2em] mb-2 opacity-80">
+								Performance Score
+							</p>
+							<div className="flex items-end gap-3">
+								<span className="text-6xl font-black leading-none">94</span>
+								<span className="text-indigo-200 font-bold mb-2">/ 100</span>
+							</div>
+						</div>
+
+						<div className="h-2 w-full bg-white/10 rounded-full overflow-hidden">
+							<div className="h-full bg-white rounded-full w-[94%]"></div>
+						</div>
+
+						<div className="grid grid-cols-2 gap-4 pt-4">
+							<div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10">
+								<p className="text-[10px] font-bold text-indigo-100 uppercase mb-1">
+									Reliability
+								</p>
+								<p className="text-lg font-black text-white">Excellent</p>
+							</div>
+							<div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10">
+								<p className="text-[10px] font-bold text-indigo-100 uppercase mb-1">
+									Satisfaction
+								</p>
+								<p className="text-lg font-black text-white">4.8 / 5</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
+};
+
 const EmployeeServiceHistoryTab: React.FC<{serviceHistory: any}> = ({
 	serviceHistory,
 }) => {
 	const {employeeId} = useParams<{employeeId: string}>();
 	const dispatch = useAppDispatch();
 	const [showEditModal, setShowEditModal] = useState(false);
-	const [selectedService, setSelectedService] = useState<iAssignedService | null>(null);
 	const [formData, setFormData] = useState<iEmployeePaymentUpdate>({
-		employeeId: "",
+		employeeId: employeeId || "",
 		amount: 0,
 		paidAt: new Date().toISOString(),
 		autoPaid: false,
@@ -390,29 +321,10 @@ const EmployeeServiceHistoryTab: React.FC<{serviceHistory: any}> = ({
 	});
 	const [filters, setFilters] = useState({
 		serviceName: "",
-		startDate: null as Date | null,
-		endDate: null as Date | null,
 		isPaid: null as boolean | null,
 	});
 
-	const formatDate = (dateString: string | Date) => {
-		const date = new Date(dateString);
-		return new Intl.DateTimeFormat("en-GB", {
-			day: "2-digit",
-			month: "short",
-			year: "numeric",
-		}).format(date);
-	};
-
-	const formatCurrency = (amount: number) => {
-		return new Intl.NumberFormat("en-IN", {
-			style: "currency",
-			currency: "INR",
-		}).format(amount);
-	};
-
 	const handleEdit = (service: iAssignedService) => {
-		setSelectedService(service);
 		setFormData({
 			employeeId: employeeId || "",
 			amount: service.amount,
@@ -423,578 +335,315 @@ const EmployeeServiceHistoryTab: React.FC<{serviceHistory: any}> = ({
 		setShowEditModal(true);
 	};
 
-	const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const value = parseFloat(e.target.value);
-		setFormData((prev) => ({
-			...prev,
-			amount: isNaN(value) ? 0 : value,
-		}));
-	};
-
-	const getSelectedEmployeeServices = () => {
-		return (
-			serviceHistory?.assignedServices.filter(
-				(service: any) => service.isPaid === false,
-			) || []
-		);
-	};
-
-	const handleServiceSelection = (assignedEmployeeId: string) => {
-		setFormData((prev) => {
-			const alreadySelected =
-				prev.assignedEmployeeIds?.includes(assignedEmployeeId);
-			return {
-				...prev,
-				assignedEmployeeIds: alreadySelected
-					? prev.assignedEmployeeIds?.filter((id) => id !== assignedEmployeeId)
-					: [...(prev.assignedEmployeeIds || []), assignedEmployeeId],
-			};
-		});
-	};
-
-	const formatServiceLabel = (service: iAssignedService) => {
-		return `${service.serviceName} (${formatDate(
-			service.eventDate,
-		)}) - ${formatCurrency(service.amount)}`;
-	};
-
 	const handleSubmit = async () => {
 		try {
-			let assignedEmployeeIdsToSend = formData.assignedEmployeeIds;
-			if (formData.autoPaid) {
-				// If autoPaid is true, send all unpaid assignedEmployeeIds
-				assignedEmployeeIdsToSend = getSelectedEmployeeServices().map(
-					(service: any) => service.assignedEmployeeId,
-				);
-			} else {
-				// If autoPaid is false, send only selected ids (already in formData.assignedEmployeeIds)
-				assignedEmployeeIdsToSend = formData.assignedEmployeeIds;
-			}
-			await dispatch(
-				updateEmployeePayment({
-					...formData,
-					assignedEmployeeIds: assignedEmployeeIdsToSend,
-				}),
-			);
-			alert("Payment updated successfully");
+			await dispatch(updateEmployeePayment(formData));
+			toast.success("Payment updated successfully");
 			setShowEditModal(false);
 			dispatch(getEmployeeServiceHistory(employeeId || ""));
 		} catch (error) {
-			alert("Failed to update payment");
+			toast.error("Failed to update payment");
 		}
-	};
-
-	const handleDateSelect = (date: Date | null) => {
-		if (!date) return;
-
-		if (!filters.startDate) {
-			setFilters((prev) => ({...prev, startDate: date}));
-		} else if (!filters.endDate) {
-			if (date < filters.startDate) {
-				// If selected date is before start date, swap them
-				setFilters((prev) => ({
-					...prev,
-					startDate: date,
-					endDate: prev.startDate,
-				}));
-			} else {
-				setFilters((prev) => ({...prev, endDate: date}));
-			}
-		} else {
-			// Reset and start new selection
-			setFilters((prev) => ({
-				...prev,
-				startDate: date,
-				endDate: null,
-			}));
-		}
-	};
-
-	const clearDateRange = () => {
-		setFilters((prev) => ({
-			...prev,
-			startDate: null,
-			endDate: null,
-		}));
 	};
 
 	if (!serviceHistory) {
 		return (
-			<div className="text-center py-8">
-				<Clock size={48} className="mx-auto text-gray-400 mb-4" />
-				<p className="text-gray-600">No service history available</p>
+			<div className="flex flex-col items-center justify-center py-20 text-center">
+				<Clock className="w-12 h-12 text-gray-300 mb-4" />
+				<p className="text-gray-500 font-medium">
+					No service history records found.
+				</p>
 			</div>
 		);
 	}
 
 	const services = serviceHistory.assignedServices || [];
-
-	// Filter services based on current filters
 	const filteredServices = services.filter((service: any) => {
 		const matchesService =
 			!filters.serviceName || service.serviceName === filters.serviceName;
-
-		const serviceDate = new Date(service.eventDate);
-		const matchesDate =
-			(!filters.startDate || serviceDate >= filters.startDate) &&
-			(!filters.endDate || serviceDate <= filters.endDate);
-
 		const matchesPayment =
 			filters.isPaid === null || service.isPaid === filters.isPaid;
-
-		return matchesService && matchesDate && matchesPayment;
+		return matchesService && matchesPayment;
 	});
 
-	const totalServices = filteredServices.length;
-	const totalAmount = filteredServices.reduce(
-		(sum: number, service: any) => sum + service.amount,
-		0,
-	);
-	const totalPaid = filteredServices
-		.filter((service: any) => service.isPaid)
-		.reduce((sum: number, service: any) => sum + service.amount, 0);
-	const totalUnpaid = totalAmount - totalPaid;
-
-	const uniqueServiceNames = Array.from(
-		new Set(services.map((s: any) => s.serviceName) || []),
-	).map((name: any) => ({label: name as string, value: name as string}));
+	const stats = [
+		{
+			label: "Total Completed",
+			value: services.length,
+			color: "text-indigo-600",
+			bgColor: "bg-indigo-50",
+		},
+		{
+			label: "Paid Services",
+			value: services.filter((s: any) => s.isPaid).length,
+			color: "text-emerald-600",
+			bgColor: "bg-emerald-50",
+		},
+		{
+			label: "Unpaid Services",
+			value: services.filter((s: any) => !s.isPaid).length,
+			color: "text-rose-600",
+			bgColor: "bg-rose-50",
+		},
+	];
 
 	return (
-		<div className="space-y-6">
-			<div className="flex items-center justify-between">
-				<h2 className="text-xl font-semibold text-gray-900">Service History</h2>
-				<div className="text-sm text-gray-600">
-					{filteredServices.length} services completed
-				</div>
-			</div>
-
-			{/* Summary Cards */}
-			<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-				<div className="bg-blue-50 p-4 rounded-lg">
-					<h3 className="text-sm font-medium text-blue-600">Total Services</h3>
-					<p className="text-2xl font-bold text-blue-700">{totalServices}</p>
-				</div>
-				<div className="bg-green-50 p-4 rounded-lg">
-					<h3 className="text-sm font-medium text-green-600">Total Amount</h3>
-					<p className="text-2xl font-bold text-green-700">
-						{formatCurrency(totalAmount)}
-					</p>
-				</div>
-				<div className="bg-purple-50 p-4 rounded-lg">
-					<h3 className="text-sm font-medium text-purple-600">Paid Services</h3>
-					<p className="text-2xl font-bold text-purple-700">
-						{filteredServices.filter((service: any) => service.isPaid).length}
-					</p>
-				</div>
-				<div className="bg-red-50 p-4 rounded-lg">
-					<h3 className="text-sm font-medium text-red-600">Unpaid Services</h3>
-					<p className="text-2xl font-bold text-red-700">
-						{filteredServices.filter((service: any) => !service.isPaid).length}
-					</p>
-				</div>
-			</div>
-
-			{/* Filters */}
-			<div className="flex flex-col md:flex-row gap-4 mb-6">
-				<SelectPicker
-					placeholder="Filter by service"
-					data={[{label: "All Services", value: ""}, ...uniqueServiceNames]}
-					value={filters.serviceName}
-					onChange={(value: string | null) =>
-						setFilters((f) => ({...f, serviceName: value || ""}))
-					}
-					className="w-full md:w-48"
-				/>
-				<div className="flex items-center gap-2 w-full md:w-64">
-					<DatePicker
-						placeholder="Select date range"
-						value={filters.startDate}
-						onChange={handleDateSelect}
-						className="flex-1"
-						format="yyyy-MM-dd"
-					/>
-					{filters.startDate && (
-						<button
-							onClick={clearDateRange}
-							className="px-2 py-1 text-sm text-gray-600 hover:text-gray-800"
-						>
-							Clear
-						</button>
-					)}
-				</div>
-				{filters.startDate && (
-					<div className="text-sm text-gray-600">
-						{filters.endDate ? (
-							<span>
-								{formatDate(filters.startDate)} -{" "}
-								{formatDate(filters.endDate)}
-							</span>
-						) : (
-							<span>Select end date</span>
-						)}
-					</div>
-				)}
-				<SelectPicker
-					placeholder="Payment Status"
-					data={[
-						{label: "All", value: ""},
-						{label: "Paid", value: "true"},
-						{label: "Unpaid", value: "false"},
-					]}
-					value={filters.isPaid === null ? "" : filters.isPaid ? "true" : "false"}
-					onChange={(value: string | null) => {
-						const boolValue = value === "true" ? true : value === "false" ? false : null;
-						setFilters((f) => ({...f, isPaid: boolValue}));
-					}}
-					className="w-full md:w-48"
-				/>
-			</div>
-
-			{/* Services Table */}
-			<div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-				<div className="overflow-x-auto">
-					<table className="min-w-full divide-y divide-gray-200">
-						<thead className="bg-gray-50">
-							<tr>
-								<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-									Service Name
-								</th>
-								<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-									Event Date
-								</th>
-								<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-									Customer
-								</th>
-								<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-									Location
-								</th>
-								<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-									Amount
-								</th>
-								<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-									Status
-								</th>
-								<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-									Action
-								</th>
-							</tr>
-						</thead>
-						<tbody className="bg-white divide-y divide-gray-200">
-							{filteredServices.map((service: any) => (
-								<tr
-									key={service.assignedEmployeeId}
-									className="hover:bg-gray-50"
-								>
-									<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-										{service.serviceName}
-									</td>
-									<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-										{formatDate(service.eventDate)}
-									</td>
-									<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-										{service.customerName}
-									</td>
-									<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-										{service.location}
-									</td>
-									<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-										{formatCurrency(service.amount)}
-									</td>
-									<td className="px-6 py-4 whitespace-nowrap">
-										<span
-											className={`px-2 py-1 rounded text-xs font-semibold ${
-												service.isPaid
-													? "bg-green-100 text-green-700"
-													: "bg-red-100 text-red-700"
-											}`}
-										>
-											{service.isPaid ? "Paid" : "Unpaid"}
-										</span>
-									</td>
-									<td className="px-6 py-4 whitespace-nowrap text-sm">
-										<button
-											onClick={() => handleEdit(service)}
-											className="px-2 py-1 bg-blue-500 text-white rounded mr-2 hover:bg-blue-600 transition-colors"
-										>
-											Edit
-										</button>
-									</td>
-								</tr>
-							))}
-						</tbody>
-					</table>
-				</div>
-			</div>
-
-			{/* Edit Modal */}
-			{showEditModal && (
-				<div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-					<div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
-						<div className="flex justify-between items-center mb-4">
-							<h3 className="text-lg font-semibold">
-								Update Employee Payment
-							</h3>
-							<button
-								onClick={() => setShowEditModal(false)}
-								className="text-gray-500 hover:text-gray-700"
-							>
-								×
-							</button>
+		<div className="space-y-8 animate-in slide-in-from-bottom-4 duration-500">
+			<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+				{stats.map((stat, idx) => (
+					<div
+						key={idx}
+						className={`p-6 rounded-3xl border border-gray-50 ${stat.bgColor} flex items-center justify-between`}
+					>
+						<div>
+							<p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">
+								{stat.label}
+							</p>
+							<p className={`text-2xl font-black ${stat.color}`}>
+								{stat.value}
+							</p>
 						</div>
-						<form
-							onSubmit={(e) => {
-								e.preventDefault();
-								handleSubmit();
-							}}
-							className="space-y-4"
+						<div
+							className={`p-3 rounded-2xl bg-white/80 shadow-sm ${stat.color}`}
 						>
-							<div>
-								<label className="block text-sm font-medium text-gray-700 mb-1">
-									Amount
-								</label>
-								<input
-									type="number"
-									value={formData.amount || ""}
-									onChange={handleAmountChange}
-									className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-									min="0"
-								/>
-							</div>
-							<div>
-								<label className="block text-sm font-medium text-gray-700 mb-1">
-									Payment Date
-								</label>
-								<input
-									type="date"
-									value={
-										formData.paidAt
-											? new Date(formData.paidAt).toISOString().split("T")[0]
-											: ""
-									}
-									onChange={(e) =>
-										setFormData((prev) => ({
-											...prev,
-											paidAt: new Date(e.target.value).toISOString(),
-										}))
-									}
-									className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-								/>
-							</div>
-							<div>
-								<label className="block text-sm font-medium text-gray-700 mb-1">
-									Assigned Services
-								</label>
-								<div className="relative">
-									<div className="max-h-48 overflow-y-auto border border-gray-300 rounded-md bg-white">
-										{getSelectedEmployeeServices().length > 0 ? (
-											getSelectedEmployeeServices().map((service: any) => (
-												<div
-													key={service.assignedEmployeeId}
-													onClick={() =>
-														handleServiceSelection(service.assignedEmployeeId)
-													}
-													className={`px-3 py-2 cursor-pointer hover:bg-gray-100 ${
-														formData.assignedEmployeeIds?.includes(
-															service.assignedEmployeeId,
-														)
-															? "bg-indigo-50 text-indigo-700"
-															: "text-gray-700"
-													}`}
-												>
-													{formatServiceLabel(service)}
-												</div>
-											))
-										) : (
-											<div className="px-3 py-2 text-gray-500">
-												No services assigned
-											</div>
-										)}
-									</div>
-								</div>
-								<p className="text-xs text-gray-500 mt-1">
-									Click to select/deselect services
-								</p>
-							</div>
-							<div className="flex items-center">
-								<input
-									type="checkbox"
-									id="autoPay"
-									checked={formData.autoPaid}
-									onChange={(e) =>
-										setFormData((prev) => ({
-											...prev,
-											autoPaid: e.target.checked,
-										}))
-									}
-									className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-								/>
-								<label
-									htmlFor="autoPay"
-									className="ml-2 block text-sm text-gray-700"
-								>
-									Auto Pay
-								</label>
-							</div>
-							<div className="flex justify-end space-x-3 mt-6">
-								<button
-									type="button"
-									onClick={() => setShowEditModal(false)}
-									className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500"
-								>
-									Cancel
-								</button>
-								<button
-									type="submit"
-									className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-								>
-									Update
-								</button>
-							</div>
-						</form>
+							<CheckCircle2 className="w-6 h-6" />
+						</div>
 					</div>
+				))}
+			</div>
+
+			<div className="flex flex-wrap gap-4 items-center">
+				<div className="relative flex-1 max-w-xs">
+					<Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+					<input
+						type="text"
+						placeholder="Search services..."
+						className="w-full pl-10 pr-4 py-2 bg-gray-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-indigo-500"
+					/>
 				</div>
-			)}
+				<div className="flex items-center gap-2">
+					<Button
+						variant={filters.isPaid === null ? "primary" : "ghost"}
+						size="sm"
+						onClick={() => setFilters({...filters, isPaid: null})}
+					>
+						All
+					</Button>
+					<Button
+						variant={filters.isPaid === true ? "primary" : "ghost"}
+						size="sm"
+						onClick={() => setFilters({...filters, isPaid: true})}
+					>
+						Paid
+					</Button>
+					<Button
+						variant={filters.isPaid === false ? "primary" : "ghost"}
+						size="sm"
+						onClick={() => setFilters({...filters, isPaid: false})}
+					>
+						Unpaid
+					</Button>
+				</div>
+			</div>
+
+			<div className="overflow-x-auto rounded-2xl border border-gray-100">
+				<table className="min-w-full">
+					<thead className="bg-gray-50/50">
+						<tr>
+							<th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+								Service Details
+							</th>
+							<th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+								Customer & Date
+							</th>
+							<th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+								Earnings
+							</th>
+							<th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+								Status
+							</th>
+							<th className="px-6 py-4 text-right text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+								Action
+							</th>
+						</tr>
+					</thead>
+					<tbody className="divide-y divide-gray-50">
+						{filteredServices.map((service: any) => (
+							<tr
+								key={service.assignedEmployeeId}
+								className="group hover:bg-gray-50/50 transition-colors"
+							>
+								<td className="px-6 py-4">
+									<div className="font-bold text-gray-900">
+										{service.serviceName}
+									</div>
+									<div className="text-xs text-gray-500 font-medium">
+										{service.location}
+									</div>
+								</td>
+								<td className="px-6 py-4">
+									<div className="text-sm font-bold text-gray-700">
+										{service.customerName}
+									</div>
+									<div className="text-xs text-gray-400 font-bold">
+										{new Date(service.eventDate).toLocaleDateString()}
+									</div>
+								</td>
+								<td className="px-6 py-4">
+									<div className="text-sm font-black text-indigo-600">
+										{formatCurrency(service.amount)}
+									</div>
+								</td>
+								<td className="px-6 py-4">
+									<span
+										className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
+											service.isPaid
+												? "bg-emerald-50 text-emerald-600"
+												: "bg-rose-50 text-rose-600"
+										}`}
+									>
+										{service.isPaid ? "Paid" : "Unpaid"}
+									</span>
+								</td>
+								<td className="px-6 py-4 text-right">
+									{!service.isPaid && (
+										<Button
+											variant="ghost"
+											size="sm"
+											icon={<DollarSign className="w-3.5 h-3.5" />}
+											onClick={() => handleEdit(service)}
+										>
+											Pay Now
+										</Button>
+									)}
+								</td>
+							</tr>
+						))}
+					</tbody>
+				</table>
+			</div>
+
+			<Modal
+				isOpen={showEditModal}
+				onClose={() => setShowEditModal(false)}
+				title="Process Payment"
+				footer={
+					<>
+						<Button variant="ghost" onClick={() => setShowEditModal(false)}>
+							Cancel
+						</Button>
+						<Button onClick={handleSubmit}>Confirm Payment</Button>
+					</>
+				}
+			>
+				<div className="space-y-4">
+					<Input
+						label="Amount"
+						type="number"
+						value={formData.amount}
+						onChange={(e) =>
+							setFormData({...formData, amount: Number(e.target.value)})
+						}
+					/>
+					<Input
+						label="Date"
+						type="date"
+						value={formData.paidAt?.split("T")[0]}
+						onChange={(e) =>
+							setFormData({
+								...formData,
+								paidAt: new Date(e.target.value).toISOString(),
+							})
+						}
+					/>
+				</div>
+			</Modal>
 		</div>
 	);
 };
 
-// Payment History Tab Component
 const EmployeePaymentHistoryTab: React.FC<{serviceHistory: any}> = ({
 	serviceHistory,
 }) => {
-	const formatDate = (dateString: string | Date) => {
-		const date = new Date(dateString);
-		return new Intl.DateTimeFormat("en-GB", {
-			day: "2-digit",
-			month: "short",
-			year: "numeric",
-		}).format(date);
-	};
-
-	const formatCurrency = (amount: number) => {
-		return new Intl.NumberFormat("en-IN", {
-			style: "currency",
-			currency: "INR",
-		}).format(amount);
-	};
-
-	if (!serviceHistory) {
+	if (!serviceHistory?.paymentHistory?.length) {
 		return (
-			<div className="text-center py-8">
-				<CreditCard size={48} className="mx-auto text-gray-400 mb-4" />
-				<p className="text-gray-600">No payment history available</p>
+			<div className="flex flex-col items-center justify-center py-20 text-center">
+				<CreditCard className="w-12 h-12 text-gray-300 mb-4" />
+				<p className="text-gray-500 font-medium">
+					No payment history records found.
+				</p>
 			</div>
 		);
 	}
 
-	// Extract payment history from service history
-	const paymentHistory = serviceHistory.paymentHistory || [];
-	const services = serviceHistory.assignedServices || [];
-
-	// Calculate payment statistics
-	const totalEarned = services.reduce(
-		(sum: number, service: any) => sum + service.amount,
+	const totalPaid = serviceHistory.paymentHistory.reduce(
+		(sum: number, p: any) => sum + parseFloat(p.amount),
 		0,
 	);
-	const totalPaid = services
-		.filter((service: any) => service.isPaid)
-		.reduce((sum: number, service: any) => sum + service.amount, 0);
-	const totalUnpaid = totalEarned - totalPaid;
 
 	return (
-		<div className="space-y-6">
-			<div className="flex items-center justify-between">
-				<h2 className="text-xl font-semibold text-gray-900">Payment History</h2>
-				<div className="text-sm text-gray-600">
-					{paymentHistory.length} payments made
+		<div className="space-y-8 animate-in slide-in-from-bottom-4 duration-500">
+			<div className="bg-indigo-600 rounded-[2rem] p-8 text-white flex items-center justify-between shadow-xl shadow-indigo-200">
+				<div>
+					<p className="text-indigo-100 text-xs font-bold uppercase tracking-[0.2em] mb-1">
+						Lifetime Total Paid
+					</p>
+					<p className="text-4xl font-black">{formatCurrency(totalPaid)}</p>
+				</div>
+				<div className="p-4 bg-white/10 backdrop-blur-md rounded-3xl border border-white/10">
+					<Wallet className="w-10 h-10 text-white" />
 				</div>
 			</div>
 
-			{/* Payment Summary Cards */}
-			<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-				<div className="bg-blue-50 p-4 rounded-lg">
-					<h3 className="text-sm font-medium text-blue-600">Total Earned</h3>
-					<p className="text-2xl font-bold text-blue-700">
-						{formatCurrency(totalEarned)}
-					</p>
-				</div>
-				<div className="bg-green-50 p-4 rounded-lg">
-					<h3 className="text-sm font-medium text-green-600">Total Paid</h3>
-					<p className="text-2xl font-bold text-green-700">
-						{formatCurrency(totalPaid)}
-					</p>
-				</div>
-				<div className="bg-red-50 p-4 rounded-lg">
-					<h3 className="text-sm font-medium text-red-600">Total Unpaid</h3>
-					<p className="text-2xl font-bold text-red-700">
-						{formatCurrency(totalUnpaid)}
-					</p>
-				</div>
-				<div className="bg-yellow-50 p-4 rounded-lg">
-					<h3 className="text-sm font-medium text-yellow-600">Extra Amount</h3>
-					<p className="text-2xl font-bold text-yellow-700">
-						{formatCurrency(serviceHistory.extraAmount || 0)}
-					</p>
-				</div>
-			</div>
-
-			{/* Payment History Table */}
-			<div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-				<div className="overflow-x-auto">
-					<table className="min-w-full divide-y divide-gray-200">
-						<thead className="bg-gray-50">
-							<tr>
-								<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-									Payment ID
-								</th>
-								<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-									Amount
-								</th>
-								<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-									Payment Date
-								</th>
-								<th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-									Status
-								</th>
+			<div className="overflow-x-auto rounded-2xl border border-gray-100">
+				<table className="min-w-full">
+					<thead className="bg-gray-50/50">
+						<tr>
+							<th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+								Transaction ID
+							</th>
+							<th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+								Amount
+							</th>
+							<th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+								Date
+							</th>
+							<th className="px-6 py-4 text-right text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+								Status
+							</th>
+						</tr>
+					</thead>
+					<tbody className="divide-y divide-gray-50">
+						{serviceHistory.paymentHistory.map((payment: any) => (
+							<tr
+								key={payment.id}
+								className="hover:bg-gray-50/50 transition-colors"
+							>
+								<td className="px-6 py-4">
+									<div className="text-xs font-bold text-gray-400 font-mono">
+										#{payment.id.slice(-8).toUpperCase()}
+									</div>
+								</td>
+								<td className="px-6 py-4">
+									<div className="text-sm font-black text-gray-900">
+										{formatCurrency(parseFloat(payment.amount))}
+									</div>
+								</td>
+								<td className="px-6 py-4">
+									<div className="text-sm font-bold text-gray-600">
+										{new Date(payment.paidAt).toLocaleDateString()}
+									</div>
+								</td>
+								<td className="px-6 py-4 text-right">
+									<span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-600">
+										<CheckCircle2 className="w-3 h-3" />
+										Successful
+									</span>
+								</td>
 							</tr>
-						</thead>
-						<tbody className="bg-white divide-y divide-gray-200">
-							{paymentHistory.length > 0 ? (
-								paymentHistory.map((payment: any) => (
-									<tr key={payment.id} className="hover:bg-gray-50">
-										<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-											{payment.id}
-										</td>
-										<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-											{formatCurrency(parseFloat(payment.amount))}
-										</td>
-										<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-											{formatDate(payment.paidAt)}
-										</td>
-										<td className="px-6 py-4 whitespace-nowrap">
-											<span className="px-2 py-1 rounded text-xs font-semibold bg-green-100 text-green-700">
-												Completed
-											</span>
-										</td>
-									</tr>
-								))
-							) : (
-								<tr>
-									<td
-										colSpan={4}
-										className="px-6 py-8 text-center text-gray-500"
-									>
-										<CreditCard
-											size={32}
-											className="mx-auto mb-2 text-gray-400"
-										/>
-										No payment history available
-									</td>
-								</tr>
-							)}
-						</tbody>
-					</table>
-				</div>
+						))}
+					</tbody>
+				</table>
 			</div>
 		</div>
 	);
