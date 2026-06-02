@@ -162,3 +162,51 @@ export const updateService = createAsyncThunk<
 		});
 	}
 });
+
+export const deleteService = createAsyncThunk<
+	iGenericResponse<{message: string} | null> | null,
+	string,
+	{
+		rejectValue: iStateMessage;
+	}
+>(curriedGetThunkName("deleteService"), async (arg, {rejectWithValue}) => {
+	try {
+		const response = await serviceService.deleteService(arg);
+
+		if (response) {
+			const {httpStatusCode, data, message} = response;
+			switch (httpStatusCode) {
+				case httpStatusCodes.SUCCESS_OK: {
+					if (data && data.data) {
+						const payload = {
+							...data,
+							data: data.data,
+						};
+
+						return payload;
+					} else {
+						return rejectWithValue({
+							httpStatusCode,
+							message,
+						});
+					}
+				}
+
+				default: {
+					return rejectWithValue({
+						httpStatusCode,
+						message,
+					});
+				}
+			}
+		} else {
+			return rejectWithValue({
+				message: "No response received",
+			});
+		}
+	} catch (error) {
+		return rejectWithValue({
+			message: "Something went wrong",
+		});
+	}
+});

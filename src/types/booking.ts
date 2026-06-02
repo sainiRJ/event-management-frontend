@@ -11,10 +11,7 @@ export interface iCreateBookingDTO {
 	notes: string;
 	paymentStatusId: string;
 	bookingStatusId: string;
-	bookingStatus: string | null;
 	bookedAt: string;
-	serviceName: string;
-	paymentStatus: string;
 	assignedEmployeeIds?: string[];
 }
 

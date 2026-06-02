@@ -1,6 +1,4 @@
-// utils/showToast.ts
-import React from "react";
-import {Message, toaster} from "rsuite";
+import { toast } from "sonner";
 
 interface ToastOptions {
   successMessage?: string;
@@ -10,17 +8,14 @@ interface ToastOptions {
 
 export const showToast = ({ response, successMessage, errorMessage }: ToastOptions) => {
   if (response?.meta?.requestStatus === 'fulfilled') {
-	toaster.push(<Message type="success">{successMessage}</Message>);
-
+    toast.success(successMessage || "Operation successful");
   } else if (response?.meta?.requestStatus === 'rejected') {
     const payload = response?.payload;
-
     const errMsg =
       payload?.message?.error?.validationErrors?.body?.message ||
       payload?.message?.error?.message ||
       errorMessage ||
       'An unknown error occurred';
-		toaster.push(<Message type="success">{errMsg}</Message>);
-
+    toast.error(errMsg);
   }
 };
