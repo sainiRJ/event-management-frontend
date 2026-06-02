@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from "react";
-import DashboardCard from "../common/DashboardCard";
 import {
 	WiDaySunny,
 	WiRain,
@@ -9,10 +8,8 @@ import {
 	WiStrongWind,
 	WiThermometer,
 } from "react-icons/wi";
-import {Panel} from "rsuite";
-import "./WeatherCard.css";
 import config from "../../config";
-
+import { MapPin, Calendar as CalendarIcon, Loader2, CloudOff } from "lucide-react";
 
 interface WeatherData {
 	location: string;
@@ -66,234 +63,92 @@ const WeatherCard: React.FC<WeatherCardProps> = ({location, eventDate}) => {
 
 	const getWeatherIcon = (condition: string) => {
 		const lowerCondition = condition.toLowerCase();
-		if (lowerCondition.includes("rain")) return <WiRain size={32} />;
-		if (lowerCondition.includes("cloud")) return <WiCloudy size={32} />;
-		if (lowerCondition.includes("snow")) return <WiSnow size={32} />;
-		if (lowerCondition.includes("thunder")) return <WiThunderstorm size={32} />;
-		return <WiDaySunny size={32} />;
+		if (lowerCondition.includes("rain")) return <WiRain className="w-12 h-12 text-blue-500" />;
+		if (lowerCondition.includes("cloud")) return <WiCloudy className="w-12 h-12 text-gray-400" />;
+		if (lowerCondition.includes("snow")) return <WiSnow className="w-12 h-12 text-blue-200" />;
+		if (lowerCondition.includes("thunder")) return <WiThunderstorm className="w-12 h-12 text-indigo-600" />;
+		return <WiDaySunny className="w-12 h-12 text-amber-500" />;
 	};
 
 	if (loading) {
 		return (
-			<DashboardCard
-				title="Weather"
-				value="Loading..."
-				icon={<WiDaySunny />}
-				color="#722ed1"
-			/>
+			<div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 flex flex-col items-center justify-center min-h-[300px]">
+				<div className="relative">
+					<div className="w-16 h-16 border-4 border-indigo-50 border-t-indigo-600 rounded-full animate-spin" />
+					<Loader2 className="w-6 h-6 text-indigo-600 animate-spin absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+				</div>
+				<p className="text-gray-900 font-black text-sm uppercase tracking-widest mt-6">Fetching Forecast</p>
+			</div>
 		);
 	}
 
-	if (error) {
+	if (error || !weather) {
 		return (
-			<DashboardCard
-				title="Weather"
-				value="Weather data unavailable"
-				icon={<WiCloudy />}
-				color="#722ed1"
-			/>
+			<div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 flex flex-col items-center justify-center min-h-[300px] text-center">
+				<div className="p-5 bg-gray-50 rounded-3xl mb-6">
+					<CloudOff className="w-10 h-10 text-gray-300" />
+				</div>
+				<h4 className="text-gray-900 font-black text-xl mb-2">Forecast Unavailable</h4>
+				<p className="text-gray-400 text-sm max-w-[240px] font-medium leading-relaxed">
+					We couldn&apos;t retrieve the weather data for this specific event location.
+				</p>
+			</div>
 		);
 	}
 
 	return (
-		<Panel className="weather-card" bordered>
-			<div className="weather-header">
-				<div className="weather-icon">
-					{weather && getWeatherIcon(weather.current.condition)}
+		<div className="group bg-white rounded-3xl shadow-sm border border-gray-100 p-8 w-full transition-all duration-300 hover:shadow-xl hover:shadow-gray-200/50 hover:-translate-y-1">
+			<div className="flex items-start justify-between mb-10">
+				<div className="flex items-center gap-5">
+					<div className="p-4 bg-gray-50 rounded-3xl group-hover:bg-indigo-50 transition-colors duration-300">
+						{getWeatherIcon(weather.current.condition)}
+					</div>
+					<div>
+						<div className="flex items-center text-gray-900 font-black text-2xl tracking-tight mb-1">
+							<MapPin className="w-5 h-5 mr-2 text-indigo-600" />
+							{weather.location}
+						</div>
+						<p className="text-gray-400 font-bold text-sm uppercase tracking-widest">{weather.current.condition}</p>
+					</div>
 				</div>
-				<div className="weather-info">
-					<h3>{weather?.location}</h3>
-					<p className="condition">{weather?.current.condition}</p>
+				<div className="text-right">
+					<div className="text-5xl font-black text-gray-900 tracking-tighter leading-none mb-2">
+						{weather.current.temperature}
+					</div>
+					<div className="text-xs font-black text-indigo-600 uppercase tracking-[0.2em]">Live Now</div>
 				</div>
 			</div>
 
-			<div className="weather-details">
-				<div className="weather-detail-item">
-					<WiThermometer size={24} />
-					<div>
-						<p className="label">Temperature</p>
-						<p className="value">{weather?.current.temperature}</p>
-						<p className="sub-value">
-							H: {weather?.maxTemperature} L: {weather?.minTemperature}
-						</p>
-					</div>
+			<div className="grid grid-cols-3 gap-6 mb-10">
+				<div className="bg-gray-50/50 rounded-3xl p-5 border border-gray-50 flex flex-col items-center text-center group-hover:bg-white group-hover:border-indigo-100 transition-all duration-300">
+					<WiThermometer className="w-8 h-8 text-indigo-600 mb-3" />
+					<div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Range</div>
+					<div className="text-sm font-black text-gray-900">{weather.maxTemperature} / {weather.minTemperature}</div>
 				</div>
-
-				<div className="weather-detail-item">
-					<WiStrongWind size={24} />
-					<div>
-						<p className="label">Wind Speed</p>
-						<p className="value">{weather?.current.windSpeed}</p>
-					</div>
+				
+				<div className="bg-gray-50/50 rounded-3xl p-5 border border-gray-50 flex flex-col items-center text-center group-hover:bg-white group-hover:border-indigo-100 transition-all duration-300">
+					<WiStrongWind className="w-8 h-8 text-indigo-600 mb-3" />
+					<div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Wind</div>
+					<div className="text-sm font-black text-gray-900">{weather.current.windSpeed}</div>
 				</div>
-
-				<div className="weather-detail-item">
-					<WiRain size={24} />
-					<div>
-						<p className="label">Rain Chance</p>
-						<p className="value">{weather?.rainProbability}</p>
-					</div>
+				
+				<div className="bg-gray-50/50 rounded-3xl p-5 border border-gray-50 flex flex-col items-center text-center group-hover:bg-white group-hover:border-indigo-100 transition-all duration-300">
+					<WiRain className="w-8 h-8 text-indigo-600 mb-3" />
+					<div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Rain</div>
+					<div className="text-sm font-black text-gray-900">{weather.rainProbability}</div>
 				</div>
 			</div>
 
-			<div className="weather-footer">
-				<p>
-					Forecast for{" "}
-					{new Date(weather?.date || "").toLocaleDateString("en-US", {
-						weekday: "long",
-						month: "short",
-						day: "numeric",
-						year: "numeric",
-					})}
-				</p>
+			<div className="flex items-center justify-center gap-3 pt-8 border-t border-gray-50 text-gray-400 font-bold text-xs uppercase tracking-widest">
+				<CalendarIcon className="w-4 h-4 text-indigo-600" />
+				Forecast for {new Date(weather.date).toLocaleDateString("en-US", {
+					weekday: "short",
+					month: "short",
+					day: "numeric",
+				})}
 			</div>
-		</Panel>
+		</div>
 	);
 };
 
 export default WeatherCard;
-
-
-// import React, {useEffect, useState} from "react";
-// import {
-//   WiDaySunny,
-//   WiRain,
-//   WiCloudy,
-//   WiSnow,
-//   WiThunderstorm,
-//   WiStrongWind,
-//   WiThermometer,
-// } from "react-icons/wi";
-
-// interface WeatherData {
-//   location: string;
-//   date: string;
-//   maxTemperature: string;
-//   minTemperature: string;
-//   rainProbability: string;
-//   current: {
-//     temperature: string;
-//     windSpeed: string;
-//     condition: string;
-//   };
-// }
-
-// interface WeatherCardProps {
-//   location: string;
-//   eventDate: string;
-// }
-
-// const WeatherCard: React.FC<WeatherCardProps> = ({ location, eventDate }) => {
-//   const [weather, setWeather] = useState<WeatherData | null>(null);
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState<string | null>(null);
-
-//   useEffect(() => {
-//     const fetchWeather = async () => {
-//       try {
-//         const response = await fetch(
-//           `http://localhost:3080/api/weather/city?city=${location}&date=${eventDate}`
-//         );
-//         const data = await response.json();
-
-//         if (!data.isSuccess) {
-//           throw new Error(
-//             data.responseBody.error || "Failed to fetch weather data"
-//           );
-//         }
-
-//         setWeather(data.responseBody.data);
-//       } catch (err: any) {
-//         setError(err.message);
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-
-//     if (location && eventDate) {
-//       fetchWeather();
-//     }
-//   }, [location, eventDate]);
-
-//   const getWeatherIcon = (condition: string) => {
-//     const lowerCondition = condition.toLowerCase();
-//     if (lowerCondition.includes("rain")) return <WiRain size={32} />;
-//     if (lowerCondition.includes("cloud")) return <WiCloudy size={32} />;
-//     if (lowerCondition.includes("snow")) return <WiSnow size={32} />;
-//     if (lowerCondition.includes("thunder")) return <WiThunderstorm size={32} />;
-//     return <WiDaySunny size={32} />;
-//   };
-
-//   if (loading || error || !weather) {
-//     return (
-//       <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md w-full h-full flex items-center justify-center text-center text-gray-600 dark:text-gray-300">
-//         {loading
-//           ? "Loading weather..."
-//           : "Unable to fetch weather data"}
-//       </div>
-//     );
-//   }
-
-//   return (
-//     <div className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 text-gray-800 dark:text-gray-200 rounded-2xl shadow-lg p-6 w-full hover:shadow-xl transition-all">
-//       <div className="flex items-center space-x-4 mb-6">
-//         <div className="bg-purple-100 dark:bg-purple-700 text-purple-600 dark:text-white rounded-full p-4 shadow-md">
-//           {getWeatherIcon(weather.current.condition)}
-//         </div>
-//         <div>
-//           <h2 className="text-xl font-semibold">{weather.location}</h2>
-//           <p className="text-sm text-gray-500 dark:text-gray-400">
-//             {weather.current.condition}
-//           </p>
-//         </div>
-//       </div>
-
-//       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-//         <div className="flex items-start space-x-3 bg-purple-50 dark:bg-purple-800/40 p-4 rounded-xl hover:bg-purple-100 dark:hover:bg-purple-700 transition">
-//           <WiThermometer className="text-purple-600 dark:text-white" size={24} />
-//           <div>
-//             <p className="text-xs uppercase text-gray-500 dark:text-gray-300 font-semibold">
-//               Temperature
-//             </p>
-//             <p className="text-lg font-bold">{weather.current.temperature}</p>
-//             <p className="text-xs text-gray-500 dark:text-gray-400">
-//               H: {weather.maxTemperature} L: {weather.minTemperature}
-//             </p>
-//           </div>
-//         </div>
-
-//         <div className="flex items-start space-x-3 bg-purple-50 dark:bg-purple-800/40 p-4 rounded-xl hover:bg-purple-100 dark:hover:bg-purple-700 transition">
-//           <WiStrongWind className="text-purple-600 dark:text-white" size={24} />
-//           <div>
-//             <p className="text-xs uppercase text-gray-500 dark:text-gray-300 font-semibold">
-//               Wind Speed
-//             </p>
-//             <p className="text-lg font-bold">{weather.current.windSpeed}</p>
-//           </div>
-//         </div>
-
-//         <div className="flex items-start space-x-3 bg-purple-50 dark:bg-purple-800/40 p-4 rounded-xl hover:bg-purple-100 dark:hover:bg-purple-700 transition">
-//           <WiRain className="text-purple-600 dark:text-white" size={24} />
-//           <div>
-//             <p className="text-xs uppercase text-gray-500 dark:text-gray-300 font-semibold">
-//               Rain Chance
-//             </p>
-//             <p className="text-lg font-bold">{weather.rainProbability}</p>
-//           </div>
-//         </div>
-//       </div>
-
-//       <div className="border-t border-gray-200 dark:border-gray-600 pt-4 text-sm text-center text-gray-500 dark:text-gray-400">
-//         Forecast for{" "}
-//         {new Date(weather.date).toLocaleDateString("en-US", {
-//           weekday: "long",
-//           month: "short",
-//           day: "numeric",
-//           year: "numeric",
-//         })}
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default WeatherCard;

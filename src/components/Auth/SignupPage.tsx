@@ -1,18 +1,12 @@
 import React, {useState} from "react";
-import {useNavigate} from "react-router-dom";
+import {useNavigate, Link} from "react-router-dom";
 import {GOOGLE_AUTH_URL} from "../../config/oauth";
-import {useAppDispatch, useAppSelector} from "../../store/Hooks";
+import {useAppDispatch} from "../../store/Hooks";
 import {signup} from "@/store/auth/ThunkActions";
-import "./Auth.css";
-import {Input, InputGroup, Message, Progress} from "rsuite";
-import {
-	FaUser,
-	FaEnvelope,
-	FaPhone,
-	FaLock,
-	FaEye,
-	FaEyeSlash,
-} from "react-icons/fa";
+import Button from "../ui/Button";
+import Input from "../ui/Input";
+import { UserPlus, Sparkles, Star, ShieldCheck, Mail, Phone, Lock, Eye, EyeOff } from "lucide-react";
+import { toast } from "sonner";
 
 const SignupPage: React.FC = () => {
 	const navigate = useNavigate();
@@ -26,11 +20,8 @@ const SignupPage: React.FC = () => {
 	});
 	const [errors, setErrors] = useState<{[key: string]: string}>({});
 	const [showPassword, setShowPassword] = useState(false);
-	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 	const [loading, setLoading] = useState(false);
-	const [successMessage, setSuccessMessage] = useState("");
 
-	// Password strength calculation
 	const calculatePasswordStrength = (password: string) => {
 		let strength = 0;
 		if (password.length >= 8) strength += 25;
@@ -40,74 +31,23 @@ const SignupPage: React.FC = () => {
 		return strength;
 	};
 
-	const getPasswordStrengthColor = (strength: number) => {
-		if (strength <= 25) return "#ff4d4f";
-		if (strength <= 50) return "#faad14";
-		if (strength <= 75) return "#52c41a";
-		return "#1890ff";
-	};
-
-	// Updated phone validation and formatting
-	const isIndianPhoneNumber = (phone: string) => {
-		const cleanPhone = phone.replace(/\D/g, "");
-		return (
-			cleanPhone.length === 10 ||
-			(cleanPhone.length === 12 && cleanPhone.startsWith("91")) ||
-			(cleanPhone.length === 11 && cleanPhone.startsWith("0"))
-		);
-	};
-
-	const formatPhoneDisplay = (phoneNumber: string) => {
-		// Remove all non-digits
-		let cleanPhone = phoneNumber.replace(/\D/g, "");
-
-		// If number starts with 91, remove it as we'll add +91 later
-		if (cleanPhone.startsWith("91")) {
-			cleanPhone = cleanPhone.slice(2);
-		}
-		// If number starts with 0, remove it
-		if (cleanPhone.startsWith("0")) {
-			cleanPhone = cleanPhone.slice(1);
-		}
-
-		// Take only first 10 digits if longer
-		cleanPhone = cleanPhone.slice(0, 10);
-
-		// If empty, return empty
-		if (!cleanPhone) return "";
-
-		// Format for display: +91 XXXXX XXXXX
-		return `+91 ${cleanPhone.slice(0, 5)} ${cleanPhone.slice(5)}`.trim();
-	};
-
 	const validateForm = () => {
 		const newErrors: {[key: string]: string} = {};
 
-		// Name validation
 		if (formData.name.length < 2) {
 			newErrors.name = "Name must be at least 2 characters long";
 		}
 
-		// Email validation
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 		if (!emailRegex.test(formData.email)) {
 			newErrors.email = "Please enter a valid email address";
 		}
 
-		// Phone validation - strictly for Indian numbers
 		const cleanPhone = formData.phoneNumber.replace(/\D/g, "");
-		// Remove 91 prefix if exists
-		const phoneNumber = cleanPhone.startsWith("91")
-			? cleanPhone.slice(2)
-			: cleanPhone;
-
-		if (phoneNumber.length !== 10) {
-			newErrors.phone = "Please enter a valid 10-digit mobile number";
-		} else if (!/^[6-9]\d{9}$/.test(phoneNumber)) {
-			newErrors.phoneNumber = "Please enter a valid Indian mobile number";
+		if (cleanPhone.length < 10) {
+			newErrors.phoneNumber = "Please enter a valid 10-digit mobile number";
 		}
 
-		// Password validation
 		if (formData.password.length < 8) {
 			newErrors.password = "Password must be at least 8 characters long";
 		}
@@ -120,236 +60,206 @@ const SignupPage: React.FC = () => {
 		return Object.keys(newErrors).length === 0;
 	};
 
-	const handleInputChange = (name: string, value: string) => {
-		if (name === "phoneNumber") {
-			// Remove all non-digits
-			let cleanPhone = value.replace(/\D/g, "");
-
-			// If number starts with 91, remove it
-			if (cleanPhone.startsWith("91")) {
-				cleanPhone = cleanPhone.slice(2);
-			}
-			// If number starts with 0, remove it
-			if (cleanPhone.startsWith("0")) {
-				cleanPhone = cleanPhone.slice(1);
-			}
-
-			// Take only first 10 digits
-			cleanPhone = cleanPhone.slice(0, 10);
-
-			// Store with +91 prefix
-			setFormData((prev) => ({
-				...prev,
-				[name]: cleanPhone ? `+91${cleanPhone}` : "",
-			}));
-		} else {
-			setFormData((prev) => ({
-				...prev,
-				[name]: value,
-			}));
-		}
-
-		// Clear error when user starts typing
+	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const {name, value} = e.target;
+		setFormData((prev) => ({...prev, [name]: value}));
 		if (errors[name]) {
-			setErrors((prev) => ({
-				...prev,
-				[name]: "",
-			}));
+			setErrors((prev) => ({...prev, [name]: ""}));
 		}
 	};
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
+		if (!validateForm()) return;
+
 		setLoading(true);
-		setErrors({});
-		setSuccessMessage("");
-
-		if (!validateForm()) {
-			setLoading(false);
-			return;
-		}
-
 		try {
-			const response = await dispatch(signup(formData))
-
-			setSuccessMessage("Account created successfully! Redirecting...");
-			// localStorage.setItem("token", data.token);
-			setTimeout(() => navigate("/login"), 2000);
+			await dispatch(signup(formData));
+			toast.success("Account created successfully!");
+			setTimeout(() => navigate("/login"), 1500);
 		} catch (err: any) {
-			setErrors({
-				submit: err.message || "An error occurred during signup",
-			});
+			toast.error(err.message || "An error occurred during signup");
 		} finally {
 			setLoading(false);
 		}
 	};
 
-	const handleGoogleSignUp = () => {
-		window.location.href = GOOGLE_AUTH_URL;
-	};
-
 	const passwordStrength = calculatePasswordStrength(formData.password);
+	const strengthColor = passwordStrength <= 25 ? "bg-rose-500" : passwordStrength <= 50 ? "bg-amber-500" : passwordStrength <= 75 ? "bg-emerald-500" : "bg-indigo-500";
 
 	return (
-		<div className="auth-container">
-			<div className="auth-box">
-				<h2>Create Your Account</h2>
-				<p className="auth-subtitle">Join us to start managing your events</p>
-
-				{successMessage && (
-					<Message type="success" className="message-success">
-						{successMessage}
-					</Message>
-				)}
-
-				{errors.submit && (
-					<Message type="error" className="message-error">
-						{errors.submit}
-					</Message>
-				)}
-
-				<form onSubmit={handleSubmit}>
-					<div className="form-group">
-						<InputGroup>
-							<InputGroup.Addon>
-								<FaUser />
-							</InputGroup.Addon>
-							<Input
-								name="name"
-								value={formData.name}
-								onChange={(value) => handleInputChange("name", value)}
-								placeholder="Full Name"
-								disabled={loading}
-							/>
-						</InputGroup>
-						{errors.name && <span className="error-text">{errors.name}</span>}
+		<div className="min-h-screen flex items-center justify-center bg-gray-50 p-4 sm:p-6 lg:p-8">
+			<div className="w-full max-w-5xl bg-white rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:flex-row-reverse min-h-[600px] border border-gray-100">
+				{/* Right: Signup Form */}
+				<div className="flex-1 p-8 sm:p-12 lg:p-16 flex flex-col justify-center">
+					<div className="mb-10">
+						<div className="inline-flex items-center justify-center p-3 bg-indigo-50 rounded-2xl mb-6">
+							<UserPlus className="w-8 h-8 text-indigo-600" />
+						</div>
+						<h2 className="text-4xl font-black text-gray-900 tracking-tight mb-3">
+							Create Account
+						</h2>
+						<p className="text-gray-500 font-medium">
+							Join our community of professional event planners.
+						</p>
 					</div>
 
-					<div className="form-group">
-						<InputGroup>
-							<InputGroup.Addon>
-								<FaEnvelope />
-							</InputGroup.Addon>
+					<form onSubmit={handleSubmit} className="space-y-5">
+						<div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
 							<Input
+								label="Full Name"
+								name="name"
+								placeholder="John Doe"
+								value={formData.name}
+								onChange={handleInputChange}
+								error={errors.name}
+								required
+							/>
+							<Input
+								label="Email Address"
 								name="email"
 								type="email"
+								placeholder="john@example.com"
 								value={formData.email}
-								onChange={(value) => handleInputChange("email", value)}
-								placeholder="Email Address"
-								disabled={loading}
+								onChange={handleInputChange}
+								error={errors.email}
+								required
 							/>
-						</InputGroup>
-						{errors.email && <span className="error-text">{errors.email}</span>}
-					</div>
+						</div>
 
-					<div className="form-group">
-						<InputGroup>
-							<InputGroup.Addon>
-								<FaPhone />
-							</InputGroup.Addon>
-							<Input
-								name="phoneNumber"
-								value={formatPhoneDisplay(formData.phoneNumber)}
-								onChange={(value) => handleInputChange("phoneNumber", value)}
-								placeholder="Mobile Number (10 digits)"
-								disabled={loading}
-							/>
-						</InputGroup>
-						{errors.phoneNumber && <span className="error-text">{errors.phoneNumber}</span>}
-					</div>
+						<Input
+							label="Phone Number"
+							name="phoneNumber"
+							type="tel"
+							placeholder="10-digit number"
+							value={formData.phoneNumber}
+							onChange={handleInputChange}
+							error={errors.phoneNumber}
+							required
+						/>
 
-					<div className="form-group">
-						<InputGroup>
-							<InputGroup.Addon>
-								<FaLock />
-							</InputGroup.Addon>
-							<Input
-								name="password"
-								type={showPassword ? "text" : "password"}
-								value={formData.password}
-								onChange={(value) => handleInputChange("password", value)}
-								placeholder="Password"
-								disabled={loading}
-							/>
-							<InputGroup.Button onClick={() => setShowPassword(!showPassword)}>
-								{showPassword ? <FaEyeSlash /> : <FaEye />}
-							</InputGroup.Button>
-						</InputGroup>
-						{formData.password && (
-							<div className="password-strength">
-								<Progress.Line
-									percent={passwordStrength}
-									strokeColor={getPasswordStrengthColor(passwordStrength)}
-									showInfo={false}
+						<div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+							<div className="space-y-1">
+								<Input
+									label="Password"
+									name="password"
+									type={showPassword ? "text" : "password"}
+									placeholder="••••••••"
+									value={formData.password}
+									onChange={handleInputChange}
+									error={errors.password}
+									required
 								/>
-								<span
-									style={{color: getPasswordStrengthColor(passwordStrength)}}
-								>
-									Password Strength:{" "}
-									{passwordStrength === 100
-										? "Strong"
-										: passwordStrength >= 50
-										? "Medium"
-										: "Weak"}
-								</span>
+								{formData.password && (
+									<div className="px-1 pt-2">
+										<div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+											<div 
+												className={`h-full ${strengthColor} transition-all duration-500`}
+												style={{ width: `${passwordStrength}%` }}
+											></div>
+										</div>
+										<p className="text-[10px] font-bold mt-1 text-gray-400 uppercase tracking-wider text-right">
+											Strength: {passwordStrength === 100 ? "Excellent" : passwordStrength >= 50 ? "Good" : "Weak"}
+										</p>
+									</div>
+								)}
 							</div>
-						)}
-						{errors.password && (
-							<span className="error-text">{errors.password}</span>
-						)}
-					</div>
-
-					<div className="form-group">
-						<InputGroup>
-							<InputGroup.Addon>
-								<FaLock />
-							</InputGroup.Addon>
 							<Input
+								label="Confirm Password"
 								name="confirmPassword"
-								type={showConfirmPassword ? "text" : "password"}
+								type={showPassword ? "text" : "password"}
+								placeholder="••••••••"
 								value={formData.confirmPassword}
-								onChange={(value) =>
-									handleInputChange("confirmPassword", value)
-								}
-								placeholder="Confirm Password"
-								disabled={loading}
+								onChange={handleInputChange}
+								error={errors.confirmPassword}
+								required
 							/>
-							<InputGroup.Button
-								onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-							>
-								{showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
-							</InputGroup.Button>
-						</InputGroup>
-						{errors.confirmPassword && (
-							<span className="error-text">{errors.confirmPassword}</span>
-						)}
+						</div>
+
+						<Button
+							type="submit"
+							className="w-full h-14 text-lg font-bold shadow-xl shadow-indigo-100 hover:shadow-indigo-200 transition-all active:scale-[0.98] mt-4"
+							isLoading={loading}
+						>
+							Create Account
+						</Button>
+					</form>
+
+					<div className="relative my-8">
+						<div className="absolute inset-0 flex items-center">
+							<div className="w-full border-t border-gray-100"></div>
+						</div>
+						<div className="relative flex justify-center text-sm font-bold uppercase tracking-widest">
+							<span className="px-4 bg-white text-gray-400">or sign up with</span>
+						</div>
 					</div>
 
 					<button
-						type="submit"
-						className={`submit-btn ${loading ? "loading" : ""}`}
-						disabled={loading}
+						type="button"
+						onClick={() => window.location.href = GOOGLE_AUTH_URL}
+						className="w-full h-14 flex items-center justify-center gap-4 bg-white border-2 border-gray-100 rounded-2xl font-bold text-gray-700 hover:bg-gray-50 hover:border-gray-200 transition-all active:scale-[0.98]"
 					>
-						{loading ? "Creating Account..." : "Sign Up"}
+						<img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google logo" className="w-6 h-6" />
+						Google Account
 					</button>
-				</form>
 
-				<div className="divider">
-					<span>OR</span>
+					<p className="mt-8 text-center text-gray-500 font-medium">
+						Already have an account?{" "}
+						<Link to="/login" className="text-indigo-600 font-black hover:underline underline-offset-4">
+							Sign In
+						</Link>
+					</p>
 				</div>
 
-				<button
-					className="google-btn"
-					onClick={handleGoogleSignUp}
-					disabled={loading}
-				>
-					<img src="/google-icon.svg" alt="Google" />
-					Continue with Google
-				</button>
+				{/* Left: Brand Section */}
+				<div className="hidden md:flex flex-1 bg-indigo-600 p-12 lg:p-16 flex-col justify-between relative overflow-hidden">
+					<div className="absolute top-0 left-0 w-64 h-64 bg-indigo-500 rounded-full -ml-32 -mt-32 opacity-20"></div>
+					<div className="absolute bottom-0 right-0 w-96 h-96 bg-indigo-700 rounded-full -mr-48 -mb-48 opacity-20"></div>
+					
+					<div className="relative z-10">
+						<div className="flex items-center gap-3 mb-12">
+							<div className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center">
+								<Sparkles className="w-6 h-6 text-white" />
+							</div>
+							<span className="text-white font-black text-xl tracking-tighter">Saini Events</span>
+						</div>
 
-				<p className="auth-link">
-					Already have an account? <a href="/login">Login</a>
-				</p>
+						<h1 className="text-5xl font-black text-white leading-tight mb-8">
+							Empower Your <br />
+							<span className="text-indigo-200">Creative Vision.</span>
+						</h1>
+						
+						<div className="space-y-6">
+							<div className="flex items-center gap-4 group">
+								<div className="p-2 bg-indigo-500 rounded-lg text-indigo-100 group-hover:bg-white group-hover:text-indigo-600 transition-colors">
+									<ShieldCheck className="w-5 h-5" />
+								</div>
+								<p className="text-indigo-100 text-sm font-bold opacity-90">Enterprise-grade Security</p>
+							</div>
+							<div className="flex items-center gap-4 group">
+								<div className="p-2 bg-indigo-500 rounded-lg text-indigo-100 group-hover:bg-white group-hover:text-indigo-600 transition-colors">
+									<Star className="w-5 h-5" />
+								</div>
+								<p className="text-indigo-100 text-sm font-bold opacity-90">Premium Management Tools</p>
+							</div>
+						</div>
+					</div>
+
+					<div className="relative z-10">
+						<div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8">
+							<p className="text-white font-black text-xl mb-4 italic leading-relaxed">
+								&quot;The most intuitive platform for event management I&apos;ve ever used.&quot;
+							</p>
+							<div className="flex items-center gap-3">
+								<img src="https://i.pravatar.cc/100?img=32" alt="Testimonial" className="w-10 h-10 rounded-full border-2 border-indigo-400" />
+								<div>
+									<p className="text-white font-bold text-sm">Sarah Jenkins</p>
+									<p className="text-indigo-200 text-xs font-medium">CEO, DreamDecor</p>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 	);

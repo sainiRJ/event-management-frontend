@@ -23,9 +23,9 @@ export interface iBooking {
 	budget: string;
 	totalCost: string;
 	advancePayment: string;
-	bookingStatus?: string;
 	paymentStatusId: string;
 	bookingStatusId: string;
+	bookingStatus: string;
 	bookedAt: string;
 	serviceName: string;
 	paymentStatus: string;
@@ -45,7 +45,6 @@ export interface iBookingRequest {
 	location: string;
 	bookingRquestAt: string;
 	status: string;
-	serviceName: string;
 	serviceId: string;
 	statusId: string;
 	statusName: string;

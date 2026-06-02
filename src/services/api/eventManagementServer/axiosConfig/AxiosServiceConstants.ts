@@ -122,7 +122,7 @@ export const apiEndpoints = Object.freeze({
 			return "service/create";
 		},
 		updateService: (serviceId: string) => {
-			return `service//update/${serviceId}`;
+			return `service/update/${serviceId}`;
 		},
 	},
 	status: {
