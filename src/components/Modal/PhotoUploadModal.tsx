@@ -15,8 +15,8 @@ interface PhotoUploadModalProps {
 
 const PhotoUploadModal: React.FC<PhotoUploadModalProps> = ({open, onClose}) => {
 	const [selectedService, setSelectedService] = useState<string>("");
-	const [file, setFile] = useState<File | null>(null);
-	const [preview, setPreview] = useState<string | null>(null);
+	const [files, setFiles] = useState<File[]>([]);
+	const [previews, setPreviews] = useState<string[]>([]);
 	const [isUploading, setIsUploading] = useState(false);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -29,24 +29,36 @@ const PhotoUploadModal: React.FC<PhotoUploadModalProps> = ({open, onClose}) => {
 	}));
 
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const selectedFile = e.target.files?.[0];
-		if (selectedFile) {
-			if (selectedFile.size > 5 * 1024 * 1024) {
-				toast.error("File size must be less than 5MB");
+		const selectedFiles = Array.from(e.target.files || []);
+		const validFiles: File[] = [];
+		const newPreviews: string[] = [];
+
+		selectedFiles.forEach((file) => {
+			if (file.size > 5 * 1024 * 1024) {
+				toast.error(`${file.name} is too large (max 5MB)`);
 				return;
 			}
-			setFile(selectedFile);
+			validFiles.push(file);
 			const reader = new FileReader();
 			reader.onloadend = () => {
-				setPreview(reader.result as string);
+				setPreviews((prev) => [...prev, reader.result as string]);
 			};
-			reader.readAsDataURL(selectedFile);
-		}
+			reader.readAsDataURL(file);
+		});
+
+		setFiles((prev) => [...prev, ...validFiles]);
 	};
 
-	const removeFile = () => {
-		setFile(null);
-		setPreview(null);
+	const removeFile = (index: number) => {
+		setFiles((prev) => prev.filter((_, i) => i !== index));
+		setPreviews((prev) => prev.filter((_, i) => i !== index));
+		if (fileInputRef.current) fileInputRef.current.value = "";
+	};
+
+	const resetForm = () => {
+		setFiles([]);
+		setPreviews([]);
+		setSelectedService("");
 		if (fileInputRef.current) fileInputRef.current.value = "";
 	};
 
@@ -56,15 +68,17 @@ const PhotoUploadModal: React.FC<PhotoUploadModalProps> = ({open, onClose}) => {
 			return;
 		}
 
-		if (!file) {
-			toast.error("Please select a photo to upload");
+		if (files.length === 0) {
+			toast.error("Please select at least one photo to upload");
 			return;
 		}
 
 		setIsUploading(true);
 		const formData = new FormData();
 		formData.append("serviceId", selectedService);
-		formData.append("photo", file);
+		files.forEach((file) => {
+			formData.append("photos", file);
+		});
 
 		try {
 			const response = await fetch(
@@ -76,15 +90,14 @@ const PhotoUploadModal: React.FC<PhotoUploadModalProps> = ({open, onClose}) => {
 			);
 
 			if (response.ok) {
-				toast.success("Photo uploaded successfully");
-				removeFile();
-				setSelectedService("");
+				toast.success("Photos uploaded successfully");
+				resetForm();
 				onClose();
 			} else {
 				throw new Error("Upload failed");
 			}
 		} catch (error) {
-			toast.error("Failed to upload photo. Please try again.");
+			toast.error("Failed to upload photos. Please try again.");
 		} finally {
 			setIsUploading(false);
 		}
@@ -94,7 +107,7 @@ const PhotoUploadModal: React.FC<PhotoUploadModalProps> = ({open, onClose}) => {
 		<Modal
 			isOpen={open}
 			onClose={onClose}
-			title="Upload Service Photo"
+			title="Upload Service Photos"
 			footer={
 				<>
 					<Button variant="ghost" onClick={onClose} disabled={isUploading}>
@@ -103,9 +116,9 @@ const PhotoUploadModal: React.FC<PhotoUploadModalProps> = ({open, onClose}) => {
 					<Button
 						onClick={handleUpload}
 						isLoading={isUploading}
-						disabled={!file || !selectedService}
+						disabled={files.length === 0 || !selectedService}
 					>
-						Start Upload
+						Start Upload ({files.length})
 					</Button>
 				</>
 			}
@@ -119,12 +132,22 @@ const PhotoUploadModal: React.FC<PhotoUploadModalProps> = ({open, onClose}) => {
 					placeholder="Which service is this for?"
 				/>
 
-				<div className="space-y-2">
-					<label className="block text-sm font-medium text-gray-700">
-						Photo Attachment
-					</label>
+				<div className="space-y-4">
+					<div className="flex items-center justify-between">
+						<label className="block text-sm font-medium text-gray-700">
+							Photo Attachments
+						</label>
+						{files.length > 0 && (
+							<button
+								onClick={() => fileInputRef.current?.click()}
+								className="text-xs font-bold text-indigo-600 hover:text-indigo-700 transition-colors"
+							>
+								Add More
+							</button>
+						)}
+					</div>
 
-					{!preview ? (
+					{previews.length === 0 ? (
 						<div
 							onClick={() => fileInputRef.current?.click()}
 							className="border-2 border-dashed border-gray-200 rounded-[2rem] p-12 flex flex-col items-center justify-center bg-gray-50/50 hover:bg-indigo-50/30 hover:border-indigo-200 transition-all cursor-pointer group"
@@ -133,42 +156,58 @@ const PhotoUploadModal: React.FC<PhotoUploadModalProps> = ({open, onClose}) => {
 								<Upload className="w-8 h-8" />
 							</div>
 							<p className="text-sm font-bold text-gray-900 mb-1">
-								Click to select photo
+								Click to select photos
 							</p>
 							<p className="text-xs text-gray-400 font-medium">
-								PNG, JPG or WEBP (Max 5MB)
+								PNG, JPG or WEBP (Max 5MB each)
 							</p>
 							<input
 								ref={fileInputRef}
 								type="file"
 								className="hidden"
 								accept="image/*"
+								multiple
 								onChange={handleFileChange}
 							/>
 						</div>
 					) : (
-						<div className="relative group rounded-[2rem] overflow-hidden border border-gray-100 shadow-xl">
-							<img
-								src={preview}
-								alt="Preview"
-								className="w-full h-64 object-cover"
-							/>
-							<div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-								<button
-									onClick={removeFile}
-									className="p-3 bg-rose-600 text-white rounded-2xl shadow-lg hover:bg-rose-700 active:scale-95 transition-all"
-								>
-									<X className="w-6 h-6" />
-								</button>
-							</div>
-							<div className="absolute bottom-4 left-4 right-4 p-3 bg-white/90 backdrop-blur-md rounded-xl flex items-center gap-3">
-								<ImageIcon className="w-4 h-4 text-indigo-600" />
-								<span className="text-xs font-bold text-gray-900 truncate">
-									{file?.name}
-								</span>
-								<span className="text-[10px] font-black text-gray-400 ml-auto">
-									{(file!.size / 1024 / 1024).toFixed(2)} MB
-								</span>
+						<div className="grid grid-cols-2 gap-4">
+							{previews.map((preview, index) => (
+								<div key={index} className="relative group rounded-2xl overflow-hidden border border-gray-100 shadow-sm h-40">
+									<img
+										src={preview}
+										alt={`Preview ${index}`}
+										className="w-full h-full object-cover"
+									/>
+									<div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+										<button
+											onClick={() => removeFile(index)}
+											className="p-2 bg-rose-600 text-white rounded-xl shadow-lg hover:bg-rose-700 active:scale-95 transition-all"
+										>
+											<X className="w-4 h-4" />
+										</button>
+									</div>
+									<div className="absolute bottom-2 left-2 right-2 p-2 bg-white/90 backdrop-blur-md rounded-lg flex items-center gap-2">
+										<span className="text-[10px] font-bold text-gray-900 truncate flex-1">
+											{files[index]?.name}
+										</span>
+									</div>
+								</div>
+							))}
+							<div
+								onClick={() => fileInputRef.current?.click()}
+								className="border-2 border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center bg-gray-50/50 hover:bg-indigo-50/30 hover:border-indigo-200 transition-all cursor-pointer group h-40"
+							>
+								<Upload className="w-6 h-6 text-gray-400 group-hover:text-indigo-600 transition-colors" />
+								<span className="text-[10px] font-bold text-gray-500 mt-2">Add More</span>
+								<input
+									ref={fileInputRef}
+									type="file"
+									className="hidden"
+									accept="image/*"
+									multiple
+									onChange={handleFileChange}
+								/>
 							</div>
 						</div>
 					)}
