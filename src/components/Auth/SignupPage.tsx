@@ -5,8 +5,18 @@ import {useAppDispatch} from "../../store/Hooks";
 import {signup} from "@/store/auth/ThunkActions";
 import Button from "../ui/Button";
 import Input from "../ui/Input";
-import { UserPlus, Sparkles, Star, ShieldCheck, Mail, Phone, Lock, Eye, EyeOff } from "lucide-react";
-import { toast } from "sonner";
+import {
+	UserPlus,
+	Sparkles,
+	Star,
+	ShieldCheck,
+	Mail,
+	Phone,
+	Lock,
+	Eye,
+	EyeOff,
+} from "lucide-react";
+import {toast} from "sonner";
 
 const SignupPage: React.FC = () => {
 	const navigate = useNavigate();
@@ -85,7 +95,14 @@ const SignupPage: React.FC = () => {
 	};
 
 	const passwordStrength = calculatePasswordStrength(formData.password);
-	const strengthColor = passwordStrength <= 25 ? "bg-rose-500" : passwordStrength <= 50 ? "bg-amber-500" : passwordStrength <= 75 ? "bg-emerald-500" : "bg-indigo-500";
+	const strengthColor =
+		passwordStrength <= 25
+			? "bg-rose-500"
+			: passwordStrength <= 50
+			? "bg-amber-500"
+			: passwordStrength <= 75
+			? "bg-emerald-500"
+			: "bg-indigo-500";
 
 	return (
 		<div className="min-h-screen flex items-center justify-center bg-gray-50 p-4 sm:p-6 lg:p-8">
@@ -153,13 +170,18 @@ const SignupPage: React.FC = () => {
 								{formData.password && (
 									<div className="px-1 pt-2">
 										<div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
-											<div 
+											<div
 												className={`h-full ${strengthColor} transition-all duration-500`}
-												style={{ width: `${passwordStrength}%` }}
+												style={{width: `${passwordStrength}%`}}
 											></div>
 										</div>
 										<p className="text-[10px] font-bold mt-1 text-gray-400 uppercase tracking-wider text-right">
-											Strength: {passwordStrength === 100 ? "Excellent" : passwordStrength >= 50 ? "Good" : "Weak"}
+											Strength:{" "}
+											{passwordStrength === 100
+												? "Excellent"
+												: passwordStrength >= 50
+												? "Good"
+												: "Weak"}
 										</p>
 									</div>
 								)}
@@ -190,22 +212,31 @@ const SignupPage: React.FC = () => {
 							<div className="w-full border-t border-gray-100"></div>
 						</div>
 						<div className="relative flex justify-center text-sm font-bold uppercase tracking-widest">
-							<span className="px-4 bg-white text-gray-400">or sign up with</span>
+							<span className="px-4 bg-white text-gray-400">
+								or sign up with
+							</span>
 						</div>
 					</div>
 
 					<button
 						type="button"
-						onClick={() => window.location.href = GOOGLE_AUTH_URL}
+						onClick={() => (window.location.href = GOOGLE_AUTH_URL)}
 						className="w-full h-14 flex items-center justify-center gap-4 bg-white border-2 border-gray-100 rounded-2xl font-bold text-gray-700 hover:bg-gray-50 hover:border-gray-200 transition-all active:scale-[0.98]"
 					>
-						<img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google logo" className="w-6 h-6" />
+						<img
+							src="https://www.svgrepo.com/show/475656/google-color.svg"
+							alt="Google logo"
+							className="w-6 h-6"
+						/>
 						Google Account
 					</button>
 
 					<p className="mt-8 text-center text-gray-500 font-medium">
 						Already have an account?{" "}
-						<Link to="/login" className="text-indigo-600 font-black hover:underline underline-offset-4">
+						<Link
+							to="/login"
+							className="text-indigo-600 font-black hover:underline underline-offset-4"
+						>
 							Sign In
 						</Link>
 					</p>
@@ -215,32 +246,38 @@ const SignupPage: React.FC = () => {
 				<div className="hidden md:flex flex-1 bg-indigo-600 p-12 lg:p-16 flex-col justify-between relative overflow-hidden">
 					<div className="absolute top-0 left-0 w-64 h-64 bg-indigo-500 rounded-full -ml-32 -mt-32 opacity-20"></div>
 					<div className="absolute bottom-0 right-0 w-96 h-96 bg-indigo-700 rounded-full -mr-48 -mb-48 opacity-20"></div>
-					
+
 					<div className="relative z-10">
 						<div className="flex items-center gap-3 mb-12">
 							<div className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center">
 								<Sparkles className="w-6 h-6 text-white" />
 							</div>
-							<span className="text-white font-black text-xl tracking-tighter">Saini Events</span>
+							<span className="text-white font-black text-xl tracking-tighter">
+								Saini Events
+							</span>
 						</div>
 
 						<h1 className="text-5xl font-black text-white leading-tight mb-8">
 							Empower Your <br />
 							<span className="text-indigo-200">Creative Vision.</span>
 						</h1>
-						
+
 						<div className="space-y-6">
 							<div className="flex items-center gap-4 group">
 								<div className="p-2 bg-indigo-500 rounded-lg text-indigo-100 group-hover:bg-white group-hover:text-indigo-600 transition-colors">
 									<ShieldCheck className="w-5 h-5" />
 								</div>
-								<p className="text-indigo-100 text-sm font-bold opacity-90">Enterprise-grade Security</p>
+								<p className="text-indigo-100 text-sm font-bold opacity-90">
+									Enterprise-grade Security
+								</p>
 							</div>
 							<div className="flex items-center gap-4 group">
 								<div className="p-2 bg-indigo-500 rounded-lg text-indigo-100 group-hover:bg-white group-hover:text-indigo-600 transition-colors">
 									<Star className="w-5 h-5" />
 								</div>
-								<p className="text-indigo-100 text-sm font-bold opacity-90">Premium Management Tools</p>
+								<p className="text-indigo-100 text-sm font-bold opacity-90">
+									Premium Management Tools
+								</p>
 							</div>
 						</div>
 					</div>
@@ -248,13 +285,20 @@ const SignupPage: React.FC = () => {
 					<div className="relative z-10">
 						<div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8">
 							<p className="text-white font-black text-xl mb-4 italic leading-relaxed">
-								&quot;The most intuitive platform for event management I&apos;ve ever used.&quot;
+								&quot;The most intuitive platform for event management I&apos;ve
+								ever used.&quot;
 							</p>
 							<div className="flex items-center gap-3">
-								<img src="https://i.pravatar.cc/100?img=32" alt="Testimonial" className="w-10 h-10 rounded-full border-2 border-indigo-400" />
+								<img
+									src="https://i.pravatar.cc/100?img=32"
+									alt="Testimonial"
+									className="w-10 h-10 rounded-full border-2 border-indigo-400"
+								/>
 								<div>
 									<p className="text-white font-bold text-sm">Sarah Jenkins</p>
-									<p className="text-indigo-200 text-xs font-medium">CEO, DreamDecor</p>
+									<p className="text-indigo-200 text-xs font-medium">
+										CEO, DreamDecor
+									</p>
 								</div>
 							</div>
 						</div>

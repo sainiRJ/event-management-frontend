@@ -1,8 +1,3 @@
-import {
-	appFeatureFlagStatusType,
-	appFeatureTypes,
-} from "@/customTypes/GenericAppTypes";
-
 /**
  * Returns whether the app is currently running on the "development"
  * environment or not.
@@ -12,7 +7,6 @@ import {
 function isDev(): boolean {
 	return process.env.NODE_ENV === "development";
 }
-
 
 const AppUtil = {
 	isDev,

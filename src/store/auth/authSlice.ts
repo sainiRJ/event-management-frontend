@@ -1,7 +1,7 @@
 import {createSlice} from "@reduxjs/toolkit";
 import {apiResponseStatuses} from "@/customTypes/NetworkTypes";
 import {handleGoogleCallback, login, signup} from "./ThunkActions";
-import {iAuthState, REDUCER_NAME, iAuthResponse} from "./Types";
+import {iAuthState, REDUCER_NAME} from "./Types";
 import Cookies from "js-cookie";
 
 const initialState: iAuthState = {
@@ -20,7 +20,7 @@ export const authSlice = createSlice({
 		resetAuthState: () => {
 			return initialState;
 		},
-		logout: (state) => {
+		logout: () => {
 			localStorage.removeItem("access_token");
 			Cookies.remove("refresh_token");
 			return initialState;
@@ -41,7 +41,7 @@ export const authSlice = createSlice({
 					state.responseStatus = apiResponseStatuses.SUCCESS;
 				}
 			})
-			.addCase(login.rejected, (state, action) => {
+			.addCase(login.rejected, (state) => {
 				state.message = "Failed to login";
 				state.isLoading = false;
 				state.responseStatus = apiResponseStatuses.ERROR;
@@ -73,7 +73,7 @@ export const authSlice = createSlice({
 					state.responseStatus = apiResponseStatuses.SUCCESS;
 				}
 			})
-			.addCase(handleGoogleCallback.rejected, (state, action) => {
+			.addCase(handleGoogleCallback.rejected, (state) => {
 				state.message = "Failed to authenticate";
 				state.isLoading = false;
 				state.responseStatus = apiResponseStatuses.ERROR;

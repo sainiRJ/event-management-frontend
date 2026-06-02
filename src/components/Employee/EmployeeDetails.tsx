@@ -23,16 +23,19 @@ import {
 	Search,
 	Filter,
 	X,
-	Wallet
+	Wallet,
 } from "lucide-react";
 import {fetchStatus} from "../../store/status/ThunkActions";
-import {iAssignedService, iEmployeePaymentUpdate} from "../../customTypes/appDataTypes/employeeTypes";
+import {
+	iAssignedService,
+	iEmployeePaymentUpdate,
+} from "../../customTypes/appDataTypes/employeeTypes";
 import Button from "../ui/Button";
 import Input from "../ui/Input";
 import Modal from "../ui/Modal";
 import Select from "../ui/Select";
-import { toast } from "sonner";
-import { formatCurrency } from "../../utils/currencyUtils";
+import {toast} from "sonner";
+import {formatCurrency} from "../../utils/currencyUtils";
 
 const EmployeeDetails: React.FC = () => {
 	const {employeeId} = useParams<{employeeId: string}>();
@@ -78,12 +81,20 @@ const EmployeeDetails: React.FC = () => {
 
 	const getStatusBadge = (status: string) => {
 		let color = "bg-gray-100 text-gray-700";
-		if (status?.toLowerCase() === "active" || status?.toLowerCase() === "working") color = "bg-emerald-100 text-emerald-700";
-		if (status?.toLowerCase() === "inactive") color = "bg-amber-100 text-yellow-700";
-		if (status?.toLowerCase() === "terminated") color = "bg-rose-100 text-red-700";
-		
+		if (
+			status?.toLowerCase() === "active" ||
+			status?.toLowerCase() === "working"
+		)
+			color = "bg-emerald-100 text-emerald-700";
+		if (status?.toLowerCase() === "inactive")
+			color = "bg-amber-100 text-yellow-700";
+		if (status?.toLowerCase() === "terminated")
+			color = "bg-rose-100 text-red-700";
+
 		return (
-			<span className={`px-3 py-1 rounded-full text-xs font-bold ${color} border border-white shadow-sm`}>
+			<span
+				className={`px-3 py-1 rounded-full text-xs font-bold ${color} border border-white shadow-sm`}
+			>
 				{status || "Unknown"}
 			</span>
 		);
@@ -93,7 +104,9 @@ const EmployeeDetails: React.FC = () => {
 		return (
 			<div className="flex flex-col items-center justify-center py-20">
 				<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-				<p className="mt-4 text-gray-500 font-medium">Loading employee records...</p>
+				<p className="mt-4 text-gray-500 font-medium">
+					Loading employee records...
+				</p>
 			</div>
 		);
 	}
@@ -103,8 +116,12 @@ const EmployeeDetails: React.FC = () => {
 			<div className="flex flex-col items-center justify-center py-20 text-center">
 				<AlertCircle className="w-16 h-16 text-gray-300 mb-4" />
 				<h3 className="text-xl font-bold text-gray-900">Employee Not Found</h3>
-				<p className="text-gray-500 mt-1 mb-6">We couldn&apos;t find the employee you&apos;re looking for.</p>
-				<Button onClick={() => navigate("/employees")}>Back to Directory</Button>
+				<p className="text-gray-500 mt-1 mb-6">
+					We couldn&apos;t find the employee you&apos;re looking for.
+				</p>
+				<Button onClick={() => navigate("/employees")}>
+					Back to Directory
+				</Button>
 			</div>
 		);
 	}
@@ -126,7 +143,9 @@ const EmployeeDetails: React.FC = () => {
 						</div>
 						<div>
 							<div className="flex items-center gap-3 mb-1">
-								<h1 className="text-3xl font-black text-gray-900 tracking-tight">{employee.name}</h1>
+								<h1 className="text-3xl font-black text-gray-900 tracking-tight">
+									{employee.name}
+								</h1>
 								{getStatusBadge((employee as any).status)}
 							</div>
 							<p className="text-gray-500 font-bold flex items-center gap-2">
@@ -136,9 +155,11 @@ const EmployeeDetails: React.FC = () => {
 						</div>
 					</div>
 				</div>
-				
+
 				<div className="flex items-center gap-3">
-					<Button variant="outline" icon={<Edit2 className="w-4 h-4" />}>Edit Profile</Button>
+					<Button variant="outline" icon={<Edit2 className="w-4 h-4" />}>
+						Edit Profile
+					</Button>
 				</div>
 			</div>
 
@@ -152,12 +173,16 @@ const EmployeeDetails: React.FC = () => {
 							key={tab.id}
 							onClick={() => setActiveTab(tab.id)}
 							className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all ${
-								isActive 
-									? "bg-white text-indigo-600 shadow-sm ring-1 ring-black/5" 
+								isActive
+									? "bg-white text-indigo-600 shadow-sm ring-1 ring-black/5"
 									: "text-gray-500 hover:text-gray-900 hover:bg-white/50"
 							}`}
 						>
-							<Icon className={`w-4 h-4 ${isActive ? 'text-indigo-600' : 'text-gray-400'}`} />
+							<Icon
+								className={`w-4 h-4 ${
+									isActive ? "text-indigo-600" : "text-gray-400"
+								}`}
+							/>
 							{tab.label}
 						</button>
 					);
@@ -166,7 +191,9 @@ const EmployeeDetails: React.FC = () => {
 
 			{/* Tab Content */}
 			<div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 min-h-[400px]">
-				{activeTab === "profile" && <EmployeeProfileTab employee={employee} formatDate={formatDate} />}
+				{activeTab === "profile" && (
+					<EmployeeProfileTab employee={employee} formatDate={formatDate} />
+				)}
 				{activeTab === "service-history" && (
 					<EmployeeServiceHistoryTab serviceHistory={serviceHistory} />
 				)}
@@ -178,15 +205,30 @@ const EmployeeDetails: React.FC = () => {
 	);
 };
 
-const EmployeeProfileTab: React.FC<{employee: iCreateEmployeeDTO, formatDate: (d: any) => string}> = ({
-	employee,
-	formatDate
-}) => {
+const EmployeeProfileTab: React.FC<{
+	employee: iCreateEmployeeDTO;
+	formatDate: (d: any) => string;
+}> = ({employee, formatDate}) => {
 	const infoItems = [
-		{ label: "Email Address", value: employee.email, icon: Mail, type: "email" },
-		{ label: "Phone Number", value: employee.phoneNumber, icon: Phone, type: "tel" },
-		{ label: "Designation", value: employee.designation, icon: Briefcase, type: "text" },
-		{ label: "Joined Date", value: formatDate(employee.joinedDate), icon: Calendar, type: "text" },
+		{label: "Email Address", value: employee.email, icon: Mail, type: "email"},
+		{
+			label: "Phone Number",
+			value: employee.phoneNumber,
+			icon: Phone,
+			type: "tel",
+		},
+		{
+			label: "Designation",
+			value: employee.designation,
+			icon: Briefcase,
+			type: "text",
+		},
+		{
+			label: "Joined Date",
+			value: formatDate(employee.joinedDate),
+			icon: Calendar,
+			type: "text",
+		},
 	];
 
 	return (
@@ -196,15 +238,22 @@ const EmployeeProfileTab: React.FC<{employee: iCreateEmployeeDTO, formatDate: (d
 					<div className="w-1 h-6 bg-indigo-600 rounded-full"></div>
 					Basic Information
 				</h3>
-				
+
 				<div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
 					{infoItems.map((item, idx) => (
-						<div key={idx} className="group p-6 bg-gray-50/50 rounded-3xl border border-gray-50 hover:bg-white hover:border-indigo-100 hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-300">
+						<div
+							key={idx}
+							className="group p-6 bg-gray-50/50 rounded-3xl border border-gray-50 hover:bg-white hover:border-indigo-100 hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-300"
+						>
 							<div className="p-2.5 bg-white rounded-xl text-indigo-600 w-fit mb-4 shadow-sm group-hover:scale-110 transition-transform">
 								<item.icon className="w-5 h-5" />
 							</div>
-							<p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">{item.label}</p>
-							<p className="text-sm font-bold text-gray-900 truncate">{item.value || "Not provided"}</p>
+							<p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+								{item.label}
+							</p>
+							<p className="text-sm font-bold text-gray-900 truncate">
+								{item.value || "Not provided"}
+							</p>
 						</div>
 					))}
 				</div>
@@ -215,32 +264,38 @@ const EmployeeProfileTab: React.FC<{employee: iCreateEmployeeDTO, formatDate: (d
 					<div className="w-1 h-6 bg-emerald-600 rounded-full"></div>
 					Activity Summary
 				</h3>
-				
+
 				<div className="bg-gradient-to-br from-indigo-600 to-violet-700 rounded-[2.5rem] p-8 text-white relative overflow-hidden shadow-2xl shadow-indigo-200">
 					{/* Background Decorations */}
 					<div className="absolute -top-12 -right-12 w-48 h-48 bg-white/10 rounded-full blur-3xl"></div>
 					<div className="absolute -bottom-12 -left-12 w-48 h-48 bg-black/10 rounded-full blur-3xl"></div>
-					
+
 					<div className="relative z-10 space-y-6">
 						<div>
-							<p className="text-indigo-100 text-xs font-bold uppercase tracking-[0.2em] mb-2 opacity-80">Performance Score</p>
+							<p className="text-indigo-100 text-xs font-bold uppercase tracking-[0.2em] mb-2 opacity-80">
+								Performance Score
+							</p>
 							<div className="flex items-end gap-3">
 								<span className="text-6xl font-black leading-none">94</span>
 								<span className="text-indigo-200 font-bold mb-2">/ 100</span>
 							</div>
 						</div>
-						
+
 						<div className="h-2 w-full bg-white/10 rounded-full overflow-hidden">
 							<div className="h-full bg-white rounded-full w-[94%]"></div>
 						</div>
-						
+
 						<div className="grid grid-cols-2 gap-4 pt-4">
 							<div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10">
-								<p className="text-[10px] font-bold text-indigo-100 uppercase mb-1">Reliability</p>
+								<p className="text-[10px] font-bold text-indigo-100 uppercase mb-1">
+									Reliability
+								</p>
 								<p className="text-lg font-black text-white">Excellent</p>
 							</div>
 							<div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10">
-								<p className="text-[10px] font-bold text-indigo-100 uppercase mb-1">Satisfaction</p>
+								<p className="text-[10px] font-bold text-indigo-100 uppercase mb-1">
+									Satisfaction
+								</p>
 								<p className="text-lg font-black text-white">4.8 / 5</p>
 							</div>
 						</div>
@@ -295,34 +350,62 @@ const EmployeeServiceHistoryTab: React.FC<{serviceHistory: any}> = ({
 		return (
 			<div className="flex flex-col items-center justify-center py-20 text-center">
 				<Clock className="w-12 h-12 text-gray-300 mb-4" />
-				<p className="text-gray-500 font-medium">No service history records found.</p>
+				<p className="text-gray-500 font-medium">
+					No service history records found.
+				</p>
 			</div>
 		);
 	}
 
 	const services = serviceHistory.assignedServices || [];
 	const filteredServices = services.filter((service: any) => {
-		const matchesService = !filters.serviceName || service.serviceName === filters.serviceName;
-		const matchesPayment = filters.isPaid === null || service.isPaid === filters.isPaid;
+		const matchesService =
+			!filters.serviceName || service.serviceName === filters.serviceName;
+		const matchesPayment =
+			filters.isPaid === null || service.isPaid === filters.isPaid;
 		return matchesService && matchesPayment;
 	});
 
 	const stats = [
-		{ label: "Total Completed", value: services.length, color: "text-indigo-600", bgColor: "bg-indigo-50" },
-		{ label: "Paid Services", value: services.filter((s: any) => s.isPaid).length, color: "text-emerald-600", bgColor: "bg-emerald-50" },
-		{ label: "Unpaid Services", value: services.filter((s: any) => !s.isPaid).length, color: "text-rose-600", bgColor: "bg-rose-50" },
+		{
+			label: "Total Completed",
+			value: services.length,
+			color: "text-indigo-600",
+			bgColor: "bg-indigo-50",
+		},
+		{
+			label: "Paid Services",
+			value: services.filter((s: any) => s.isPaid).length,
+			color: "text-emerald-600",
+			bgColor: "bg-emerald-50",
+		},
+		{
+			label: "Unpaid Services",
+			value: services.filter((s: any) => !s.isPaid).length,
+			color: "text-rose-600",
+			bgColor: "bg-rose-50",
+		},
 	];
 
 	return (
 		<div className="space-y-8 animate-in slide-in-from-bottom-4 duration-500">
 			<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 				{stats.map((stat, idx) => (
-					<div key={idx} className={`p-6 rounded-3xl border border-gray-50 ${stat.bgColor} flex items-center justify-between`}>
+					<div
+						key={idx}
+						className={`p-6 rounded-3xl border border-gray-50 ${stat.bgColor} flex items-center justify-between`}
+					>
 						<div>
-							<p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{stat.label}</p>
-							<p className={`text-2xl font-black ${stat.color}`}>{stat.value}</p>
+							<p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">
+								{stat.label}
+							</p>
+							<p className={`text-2xl font-black ${stat.color}`}>
+								{stat.value}
+							</p>
 						</div>
-						<div className={`p-3 rounded-2xl bg-white/80 shadow-sm ${stat.color}`}>
+						<div
+							className={`p-3 rounded-2xl bg-white/80 shadow-sm ${stat.color}`}
+						>
 							<CheckCircle2 className="w-6 h-6" />
 						</div>
 					</div>
@@ -339,21 +422,27 @@ const EmployeeServiceHistoryTab: React.FC<{serviceHistory: any}> = ({
 					/>
 				</div>
 				<div className="flex items-center gap-2">
-					<Button 
-						variant={filters.isPaid === null ? "primary" : "ghost"} 
+					<Button
+						variant={filters.isPaid === null ? "primary" : "ghost"}
 						size="sm"
 						onClick={() => setFilters({...filters, isPaid: null})}
-					>All</Button>
-					<Button 
-						variant={filters.isPaid === true ? "primary" : "ghost"} 
+					>
+						All
+					</Button>
+					<Button
+						variant={filters.isPaid === true ? "primary" : "ghost"}
 						size="sm"
 						onClick={() => setFilters({...filters, isPaid: true})}
-					>Paid</Button>
-					<Button 
-						variant={filters.isPaid === false ? "primary" : "ghost"} 
+					>
+						Paid
+					</Button>
+					<Button
+						variant={filters.isPaid === false ? "primary" : "ghost"}
 						size="sm"
 						onClick={() => setFilters({...filters, isPaid: false})}
-					>Unpaid</Button>
+					>
+						Unpaid
+					</Button>
 				</div>
 			</div>
 
@@ -361,40 +450,71 @@ const EmployeeServiceHistoryTab: React.FC<{serviceHistory: any}> = ({
 				<table className="min-w-full">
 					<thead className="bg-gray-50/50">
 						<tr>
-							<th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">Service Details</th>
-							<th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">Customer & Date</th>
-							<th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">Earnings</th>
-							<th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">Status</th>
-							<th className="px-6 py-4 text-right text-[11px] font-bold text-gray-400 uppercase tracking-widest">Action</th>
+							<th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+								Service Details
+							</th>
+							<th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+								Customer & Date
+							</th>
+							<th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+								Earnings
+							</th>
+							<th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+								Status
+							</th>
+							<th className="px-6 py-4 text-right text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+								Action
+							</th>
 						</tr>
 					</thead>
 					<tbody className="divide-y divide-gray-50">
 						{filteredServices.map((service: any) => (
-							<tr key={service.assignedEmployeeId} className="group hover:bg-gray-50/50 transition-colors">
+							<tr
+								key={service.assignedEmployeeId}
+								className="group hover:bg-gray-50/50 transition-colors"
+							>
 								<td className="px-6 py-4">
-									<div className="font-bold text-gray-900">{service.serviceName}</div>
-									<div className="text-xs text-gray-500 font-medium">{service.location}</div>
+									<div className="font-bold text-gray-900">
+										{service.serviceName}
+									</div>
+									<div className="text-xs text-gray-500 font-medium">
+										{service.location}
+									</div>
 								</td>
 								<td className="px-6 py-4">
-									<div className="text-sm font-bold text-gray-700">{service.customerName}</div>
-									<div className="text-xs text-gray-400 font-bold">{new Date(service.eventDate).toLocaleDateString()}</div>
+									<div className="text-sm font-bold text-gray-700">
+										{service.customerName}
+									</div>
+									<div className="text-xs text-gray-400 font-bold">
+										{new Date(service.eventDate).toLocaleDateString()}
+									</div>
 								</td>
 								<td className="px-6 py-4">
-									<div className="text-sm font-black text-indigo-600">{formatCurrency(service.amount)}</div>
+									<div className="text-sm font-black text-indigo-600">
+										{formatCurrency(service.amount)}
+									</div>
 								</td>
 								<td className="px-6 py-4">
-									<span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${service.isPaid ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
-										{service.isPaid ? 'Paid' : 'Unpaid'}
+									<span
+										className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
+											service.isPaid
+												? "bg-emerald-50 text-emerald-600"
+												: "bg-rose-50 text-rose-600"
+										}`}
+									>
+										{service.isPaid ? "Paid" : "Unpaid"}
 									</span>
 								</td>
 								<td className="px-6 py-4 text-right">
 									{!service.isPaid && (
-										<Button 
-											variant="ghost" 
-											size="sm" 
+										<Button
+											variant="ghost"
+											size="sm"
 											icon={<DollarSign className="w-3.5 h-3.5" />}
 											onClick={() => handleEdit(service)}
-										>Pay Now</Button>
+										>
+											Pay Now
+										</Button>
 									)}
 								</td>
 							</tr>
@@ -409,7 +529,9 @@ const EmployeeServiceHistoryTab: React.FC<{serviceHistory: any}> = ({
 				title="Process Payment"
 				footer={
 					<>
-						<Button variant="ghost" onClick={() => setShowEditModal(false)}>Cancel</Button>
+						<Button variant="ghost" onClick={() => setShowEditModal(false)}>
+							Cancel
+						</Button>
 						<Button onClick={handleSubmit}>Confirm Payment</Button>
 					</>
 				}
@@ -419,13 +541,20 @@ const EmployeeServiceHistoryTab: React.FC<{serviceHistory: any}> = ({
 						label="Amount"
 						type="number"
 						value={formData.amount}
-						onChange={(e) => setFormData({...formData, amount: Number(e.target.value)})}
+						onChange={(e) =>
+							setFormData({...formData, amount: Number(e.target.value)})
+						}
 					/>
 					<Input
 						label="Date"
 						type="date"
-						value={formData.paidAt?.split('T')[0]}
-						onChange={(e) => setFormData({...formData, paidAt: new Date(e.target.value).toISOString()})}
+						value={formData.paidAt?.split("T")[0]}
+						onChange={(e) =>
+							setFormData({
+								...formData,
+								paidAt: new Date(e.target.value).toISOString(),
+							})
+						}
 					/>
 				</div>
 			</Modal>
@@ -440,18 +569,25 @@ const EmployeePaymentHistoryTab: React.FC<{serviceHistory: any}> = ({
 		return (
 			<div className="flex flex-col items-center justify-center py-20 text-center">
 				<CreditCard className="w-12 h-12 text-gray-300 mb-4" />
-				<p className="text-gray-500 font-medium">No payment history records found.</p>
+				<p className="text-gray-500 font-medium">
+					No payment history records found.
+				</p>
 			</div>
 		);
 	}
 
-	const totalPaid = serviceHistory.paymentHistory.reduce((sum: number, p: any) => sum + parseFloat(p.amount), 0);
+	const totalPaid = serviceHistory.paymentHistory.reduce(
+		(sum: number, p: any) => sum + parseFloat(p.amount),
+		0,
+	);
 
 	return (
 		<div className="space-y-8 animate-in slide-in-from-bottom-4 duration-500">
 			<div className="bg-indigo-600 rounded-[2rem] p-8 text-white flex items-center justify-between shadow-xl shadow-indigo-200">
 				<div>
-					<p className="text-indigo-100 text-xs font-bold uppercase tracking-[0.2em] mb-1">Lifetime Total Paid</p>
+					<p className="text-indigo-100 text-xs font-bold uppercase tracking-[0.2em] mb-1">
+						Lifetime Total Paid
+					</p>
 					<p className="text-4xl font-black">{formatCurrency(totalPaid)}</p>
 				</div>
 				<div className="p-4 bg-white/10 backdrop-blur-md rounded-3xl border border-white/10">
@@ -463,23 +599,40 @@ const EmployeePaymentHistoryTab: React.FC<{serviceHistory: any}> = ({
 				<table className="min-w-full">
 					<thead className="bg-gray-50/50">
 						<tr>
-							<th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">Transaction ID</th>
-							<th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">Amount</th>
-							<th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">Date</th>
-							<th className="px-6 py-4 text-right text-[11px] font-bold text-gray-400 uppercase tracking-widest">Status</th>
+							<th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+								Transaction ID
+							</th>
+							<th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+								Amount
+							</th>
+							<th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+								Date
+							</th>
+							<th className="px-6 py-4 text-right text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+								Status
+							</th>
 						</tr>
 					</thead>
 					<tbody className="divide-y divide-gray-50">
 						{serviceHistory.paymentHistory.map((payment: any) => (
-							<tr key={payment.id} className="hover:bg-gray-50/50 transition-colors">
+							<tr
+								key={payment.id}
+								className="hover:bg-gray-50/50 transition-colors"
+							>
 								<td className="px-6 py-4">
-									<div className="text-xs font-bold text-gray-400 font-mono">#{payment.id.slice(-8).toUpperCase()}</div>
+									<div className="text-xs font-bold text-gray-400 font-mono">
+										#{payment.id.slice(-8).toUpperCase()}
+									</div>
 								</td>
 								<td className="px-6 py-4">
-									<div className="text-sm font-black text-gray-900">{formatCurrency(parseFloat(payment.amount))}</div>
+									<div className="text-sm font-black text-gray-900">
+										{formatCurrency(parseFloat(payment.amount))}
+									</div>
 								</td>
 								<td className="px-6 py-4">
-									<div className="text-sm font-bold text-gray-600">{new Date(payment.paidAt).toLocaleDateString()}</div>
+									<div className="text-sm font-bold text-gray-600">
+										{new Date(payment.paidAt).toLocaleDateString()}
+									</div>
 								</td>
 								<td className="px-6 py-4 text-right">
 									<span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-600">

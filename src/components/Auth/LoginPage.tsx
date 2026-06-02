@@ -8,7 +8,7 @@ import {useAppDispatch} from "../../store/Hooks";
 import {showToast} from "../../utils/showToatify";
 import Button from "../ui/Button";
 import Input from "../ui/Input";
-import { LogIn, Sparkles, Star } from "lucide-react";
+import {LogIn, Sparkles, Star} from "lucide-react";
 
 const Login: React.FC = () => {
 	const navigate = useNavigate();
@@ -80,11 +80,19 @@ const Login: React.FC = () => {
 							required
 							className="h-12"
 						/>
-						
+
 						<div className="space-y-1">
 							<div className="flex justify-between items-center">
-								<label className="block text-sm font-bold text-gray-700">Password</label>
-								<Link to="/forgot-password" title="Forgot password link" className="text-xs font-bold text-indigo-600 hover:text-indigo-700">Forgot Password?</Link>
+								<label className="block text-sm font-bold text-gray-700">
+									Password
+								</label>
+								<Link
+									to="/forgot-password"
+									title="Forgot password link"
+									className="text-xs font-bold text-indigo-600 hover:text-indigo-700"
+								>
+									Forgot Password?
+								</Link>
 							</div>
 							<Input
 								name="password"
@@ -111,7 +119,9 @@ const Login: React.FC = () => {
 							<div className="w-full border-t border-gray-100"></div>
 						</div>
 						<div className="relative flex justify-center text-sm font-bold uppercase tracking-widest">
-							<span className="px-4 bg-white text-gray-400">or continue with</span>
+							<span className="px-4 bg-white text-gray-400">
+								or continue with
+							</span>
 						</div>
 					</div>
 
@@ -120,13 +130,20 @@ const Login: React.FC = () => {
 						onClick={handleGoogleLogin}
 						className="w-full h-14 flex items-center justify-center gap-4 bg-white border-2 border-gray-100 rounded-2xl font-bold text-gray-700 hover:bg-gray-50 hover:border-gray-200 transition-all active:scale-[0.98]"
 					>
-						<img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google logo" className="w-6 h-6" />
+						<img
+							src="https://www.svgrepo.com/show/475656/google-color.svg"
+							alt="Google logo"
+							className="w-6 h-6"
+						/>
 						Google Account
 					</button>
 
 					<p className="mt-10 text-center text-gray-500 font-medium">
 						Don&apos;t have an account?{" "}
-						<Link to="/signup" className="text-indigo-600 font-black hover:underline underline-offset-4">
+						<Link
+							to="/signup"
+							className="text-indigo-600 font-black hover:underline underline-offset-4"
+						>
 							Create Account
 						</Link>
 					</p>
@@ -137,29 +154,34 @@ const Login: React.FC = () => {
 					{/* Decorative background elements */}
 					<div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500 rounded-full -mr-32 -mt-32 opacity-20"></div>
 					<div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-700 rounded-full -ml-48 -mb-48 opacity-20"></div>
-					
+
 					<div className="relative z-10">
 						<div className="flex items-center gap-3 mb-12">
 							<div className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center">
 								<Sparkles className="w-6 h-6 text-white" />
 							</div>
-							<span className="text-white font-black text-xl tracking-tighter">Saini Events</span>
+							<span className="text-white font-black text-xl tracking-tighter">
+								Saini Events
+							</span>
 						</div>
 
 						<h1 className="text-5xl font-black text-white leading-tight mb-8">
 							Crafting Memories, <br />
 							<span className="text-indigo-200">One Event at a Time.</span>
 						</h1>
-						
+
 						<div className="space-y-6">
 							<div className="flex items-start gap-4">
 								<div className="p-2 bg-indigo-500 rounded-lg text-indigo-100">
 									<Star className="w-5 h-5" />
 								</div>
 								<div>
-									<h4 className="text-white font-bold mb-1">Elite Decoration</h4>
+									<h4 className="text-white font-bold mb-1">
+										Elite Decoration
+									</h4>
 									<p className="text-indigo-100 text-sm font-medium opacity-80 leading-relaxed">
-										Professional-grade management tools for your creative decoration business.
+										Professional-grade management tools for your creative
+										decoration business.
 									</p>
 								</div>
 							</div>
@@ -170,15 +192,24 @@ const Login: React.FC = () => {
 						<div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-6">
 							<div className="flex -space-x-3 mb-4">
 								{[1, 2, 3, 4].map((i) => (
-									<div key={i} className="w-10 h-10 rounded-full border-2 border-indigo-600 bg-indigo-400 overflow-hidden shadow-lg">
-										<img src={`https://i.pravatar.cc/100?img=${i+10}`} alt="User avatar" />
+									<div
+										key={i}
+										className="w-10 h-10 rounded-full border-2 border-indigo-600 bg-indigo-400 overflow-hidden shadow-lg"
+									>
+										<img
+											src={`https://i.pravatar.cc/100?img=${i + 10}`}
+											alt="User avatar"
+										/>
 									</div>
 								))}
 								<div className="w-10 h-10 rounded-full border-2 border-indigo-600 bg-white/20 backdrop-blur-md flex items-center justify-center text-xs font-bold text-white shadow-lg">
 									+50
 								</div>
 							</div>
-							<p className="text-white font-bold text-sm">Join 50+ event planners managing their business with Saini Events.</p>
+							<p className="text-white font-bold text-sm">
+								Join 50+ event planners managing their business with Saini
+								Events.
+							</p>
 						</div>
 					</div>
 				</div>

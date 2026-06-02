@@ -14,16 +14,34 @@ interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
 }
 
 const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
-	({ label, error, options, placeholder = "Select an option", className = "", id, icon, ...props }, ref) => {
-		const baseStyles = "block w-full rounded-2xl border-gray-100 bg-white px-4 py-3 text-sm font-medium text-gray-900 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-50/50 transition-all duration-200 shadow-sm border appearance-none cursor-pointer";
-		const errorStyles = error ? "border-rose-300 text-rose-900 focus:border-rose-500 focus:ring-rose-50/50" : "";
+	(
+		{
+			label,
+			error,
+			options,
+			placeholder = "Select an option",
+			className = "",
+			id,
+			icon,
+			...props
+		},
+		ref,
+	) => {
+		const baseStyles =
+			"block w-full rounded-2xl border-gray-100 bg-white px-4 py-3 text-sm font-medium text-gray-900 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-50/50 transition-all duration-200 shadow-sm border appearance-none cursor-pointer";
+		const errorStyles = error
+			? "border-rose-300 text-rose-900 focus:border-rose-500 focus:ring-rose-50/50"
+			: "";
 
 		const selectId = id || props.name;
 
 		return (
 			<div className="w-full group">
 				{label && (
-					<label htmlFor={selectId} className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">
+					<label
+						htmlFor={selectId}
+						className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1"
+					>
 						{label}
 					</label>
 				)}
@@ -36,10 +54,14 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
 					<select
 						id={selectId}
 						ref={ref}
-						className={`${baseStyles} ${errorStyles} ${icon ? "pl-11" : ""} ${className}`}
+						className={`${baseStyles} ${errorStyles} ${
+							icon ? "pl-11" : ""
+						} ${className}`}
 						{...props}
 					>
-						<option value="" disabled>{placeholder}</option>
+						<option value="" disabled>
+							{placeholder}
+						</option>
 						{options.map((option) => (
 							<option key={option.value} value={option.value}>
 								{option.label}
@@ -47,8 +69,18 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
 						))}
 					</select>
 					<div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-						<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+						<svg
+							className="w-4 h-4"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+						>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth="2"
+								d="M19 9l-7 7-7-7"
+							/>
 						</svg>
 					</div>
 				</div>
@@ -60,7 +92,7 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
 				)}
 			</div>
 		);
-	}
+	},
 );
 
 Select.displayName = "Select";

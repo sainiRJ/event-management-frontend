@@ -10,12 +10,12 @@ import {
 	updateEmployeePayment,
 	getAssignedServices,
 } from "../../store/employee/ThunkActions";
-import { formatCurrency } from "../../utils/currencyUtils";
+import {formatCurrency} from "../../utils/currencyUtils";
 import Button from "../ui/Button";
 import Input from "../ui/Input";
 import Modal from "../ui/Modal";
-import { toast } from "sonner";
-import { Loader2, DollarSign, ChevronRight } from "lucide-react";
+import {toast} from "sonner";
+import {Loader2, DollarSign, ChevronRight} from "lucide-react";
 
 interface EmployeeStatsTableProps {
 	stats: Record<string, iEmployeeStat>;
@@ -27,7 +27,8 @@ const EmployeeStatsTable: React.FC<EmployeeStatsTableProps> = ({
 	onRefresh,
 }) => {
 	const [showEditModal, setShowEditModal] = useState(false);
-	const [selectedEmployee, setSelectedEmployee] = useState<iEmployeeStat | null>(null);
+	const [selectedEmployee, setSelectedEmployee] =
+		useState<iEmployeeStat | null>(null);
 	const [formData, setFormData] = useState<iEmployeePaymentUpdate>({
 		employeeId: "",
 		amount: 0,
@@ -38,7 +39,9 @@ const EmployeeStatsTable: React.FC<EmployeeStatsTableProps> = ({
 
 	const dispatch = useAppDispatch();
 	const {loading} = useAppSelector((state: RootState) => state.employeeReducer);
-	const assignedServices = useAppSelector((state: RootState) => state.employeeReducer.assignedServices);
+	const assignedServices = useAppSelector(
+		(state: RootState) => state.employeeReducer.assignedServices,
+	);
 	const hasFetchedServices = useRef(false);
 
 	useEffect(() => {
@@ -92,8 +95,10 @@ const EmployeeStatsTable: React.FC<EmployeeStatsTableProps> = ({
 
 	const serviceNames = Array.from(
 		new Set(
-			Object.values(stats).flatMap((emp) => emp.serviceStats.map((s) => s.serviceName))
-		)
+			Object.values(stats).flatMap((emp) =>
+				emp.serviceStats.map((s) => s.serviceName),
+			),
+		),
 	);
 
 	if (loading && !Object.keys(stats).length) {
@@ -108,7 +113,9 @@ const EmployeeStatsTable: React.FC<EmployeeStatsTableProps> = ({
 	if (!stats || Object.keys(stats).length === 0) {
 		return (
 			<div className="text-center py-12 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
-				<p className="text-gray-500">No employee statistics available for this period.</p>
+				<p className="text-gray-500">
+					No employee statistics available for this period.
+				</p>
 			</div>
 		);
 	}
@@ -118,35 +125,67 @@ const EmployeeStatsTable: React.FC<EmployeeStatsTableProps> = ({
 			<table className="min-w-full">
 				<thead>
 					<tr className="border-b border-gray-100">
-						<th className="px-4 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Employee</th>
+						<th className="px-4 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">
+							Employee
+						</th>
 						{serviceNames.map((name) => (
-							<th key={name} className="px-4 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">{name}</th>
+							<th
+								key={name}
+								className="px-4 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider"
+							>
+								{name}
+							</th>
 						))}
-						<th className="px-4 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Total</th>
-						<th className="px-4 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Earnings</th>
-						<th className="px-4 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Paid</th>
-						<th className="px-4 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Remaining</th>
-						<th className="px-4 py-4 text-right text-xs font-bold text-gray-400 uppercase tracking-wider">Action</th>
+						<th className="px-4 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">
+							Total
+						</th>
+						<th className="px-4 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">
+							Earnings
+						</th>
+						<th className="px-4 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">
+							Paid
+						</th>
+						<th className="px-4 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">
+							Remaining
+						</th>
+						<th className="px-4 py-4 text-right text-xs font-bold text-gray-400 uppercase tracking-wider">
+							Action
+						</th>
 					</tr>
 				</thead>
 				<tbody className="divide-y divide-gray-50">
 					{Object.values(stats).map((employee) => (
-						<tr key={employee.employeeId} className="group hover:bg-gray-50/50 transition-colors">
+						<tr
+							key={employee.employeeId}
+							className="group hover:bg-gray-50/50 transition-colors"
+						>
 							<td className="px-4 py-4 whitespace-nowrap">
-								<div className="font-semibold text-gray-900">{employee.name}</div>
+								<div className="font-semibold text-gray-900">
+									{employee.name}
+								</div>
 							</td>
 							{serviceNames.map((name) => {
-								const stat = employee.serviceStats.find((s) => s.serviceName === name);
+								const stat = employee.serviceStats.find(
+									(s) => s.serviceName === name,
+								);
 								return (
 									<td key={name} className="px-4 py-4 whitespace-nowrap">
-										<span className={`inline-flex items-center justify-center w-8 h-8 rounded-lg text-xs font-bold ${stat && stat.count > 0 ? 'bg-indigo-50 text-indigo-600' : 'bg-gray-50 text-gray-300'}`}>
+										<span
+											className={`inline-flex items-center justify-center w-8 h-8 rounded-lg text-xs font-bold ${
+												stat && stat.count > 0
+													? "bg-indigo-50 text-indigo-600"
+													: "bg-gray-50 text-gray-300"
+											}`}
+										>
 											{stat ? stat.count : 0}
 										</span>
 									</td>
 								);
 							})}
 							<td className="px-4 py-4 whitespace-nowrap">
-								<span className="font-bold text-gray-700">{employee.totalServices}</span>
+								<span className="font-bold text-gray-700">
+									{employee.totalServices}
+								</span>
 							</td>
 							<td className="px-4 py-4 whitespace-nowrap font-medium text-gray-900">
 								{formatCurrency(employee.totalAmount)}
@@ -155,7 +194,13 @@ const EmployeeStatsTable: React.FC<EmployeeStatsTableProps> = ({
 								{formatCurrency(employee.totalPaid)}
 							</td>
 							<td className="px-4 py-4 whitespace-nowrap">
-								<span className={`font-bold ${employee.totalRemaining > 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
+								<span
+									className={`font-bold ${
+										employee.totalRemaining > 0
+											? "text-rose-600"
+											: "text-emerald-600"
+									}`}
+								>
 									{formatCurrency(employee.totalRemaining)}
 								</span>
 							</td>
@@ -180,18 +225,26 @@ const EmployeeStatsTable: React.FC<EmployeeStatsTableProps> = ({
 				title="Update Employee Payment"
 				footer={
 					<>
-						<Button variant="ghost" onClick={() => setShowEditModal(false)}>Cancel</Button>
+						<Button variant="ghost" onClick={() => setShowEditModal(false)}>
+							Cancel
+						</Button>
 						<Button onClick={handleSubmit}>Update Payment</Button>
 					</>
 				}
 			>
 				<div className="space-y-4">
 					<div className="bg-indigo-50 rounded-xl p-4 mb-4">
-						<div className="text-sm text-indigo-600 font-medium mb-1">Paying To</div>
-						<div className="text-lg font-bold text-indigo-900">{selectedEmployee?.name}</div>
+						<div className="text-sm text-indigo-600 font-medium mb-1">
+							Paying To
+						</div>
+						<div className="text-lg font-bold text-indigo-900">
+							{selectedEmployee?.name}
+						</div>
 						<div className="flex justify-between mt-2 text-sm">
 							<span className="text-indigo-600/70">Remaining Balance:</span>
-							<span className="font-bold text-indigo-900">{formatCurrency(selectedEmployee?.totalRemaining || 0)}</span>
+							<span className="font-bold text-indigo-900">
+								{formatCurrency(selectedEmployee?.totalRemaining || 0)}
+							</span>
 						</div>
 					</div>
 
@@ -199,15 +252,26 @@ const EmployeeStatsTable: React.FC<EmployeeStatsTableProps> = ({
 						label="Amount to Pay"
 						type="number"
 						value={formData.amount || ""}
-						onChange={(e) => setFormData(prev => ({ ...prev, amount: Number(e.target.value) }))}
+						onChange={(e) =>
+							setFormData((prev) => ({...prev, amount: Number(e.target.value)}))
+						}
 						placeholder="Enter amount"
 					/>
 
 					<Input
 						label="Payment Date"
 						type="date"
-						value={formData.paidAt ? new Date(formData.paidAt).toISOString().split("T")[0] : ""}
-						onChange={(e) => setFormData(prev => ({ ...prev, paidAt: new Date(e.target.value).toISOString() }))}
+						value={
+							formData.paidAt
+								? new Date(formData.paidAt).toISOString().split("T")[0]
+								: ""
+						}
+						onChange={(e) =>
+							setFormData((prev) => ({
+								...prev,
+								paidAt: new Date(e.target.value).toISOString(),
+							}))
+						}
 					/>
 
 					<div>
@@ -217,22 +281,33 @@ const EmployeeStatsTable: React.FC<EmployeeStatsTableProps> = ({
 						<div className="max-h-48 overflow-y-auto border border-gray-100 rounded-xl bg-gray-50/50">
 							{getSelectedEmployeeServices().length > 0 ? (
 								getSelectedEmployeeServices().map((service) => {
-									const isSelected = formData.assignedEmployeeIds?.includes(service.assignedEmployeeId);
+									const isSelected = formData.assignedEmployeeIds?.includes(
+										service.assignedEmployeeId,
+									);
 									return (
 										<div
 											key={service.assignedEmployeeId}
 											onClick={() => {
 												const currentIds = formData.assignedEmployeeIds || [];
 												const newIds = isSelected
-													? currentIds.filter((id) => id !== service.assignedEmployeeId)
+													? currentIds.filter(
+															(id) => id !== service.assignedEmployeeId,
+													  )
 													: [...currentIds, service.assignedEmployeeId];
-												setFormData(prev => ({ ...prev, assignedEmployeeIds: newIds }));
+												setFormData((prev) => ({
+													...prev,
+													assignedEmployeeIds: newIds,
+												}));
 											}}
 											className={`px-4 py-3 cursor-pointer flex items-center justify-between transition-colors border-b border-white last:border-0 ${
-												isSelected ? "bg-indigo-100/50 text-indigo-700" : "text-gray-600 hover:bg-white"
+												isSelected
+													? "bg-indigo-100/50 text-indigo-700"
+													: "text-gray-600 hover:bg-white"
 											}`}
 										>
-											<span className="text-sm font-medium">{formatServiceLabel(service)}</span>
+											<span className="text-sm font-medium">
+												{formatServiceLabel(service)}
+											</span>
 											{isSelected && <ChevronRight className="w-4 h-4" />}
 										</div>
 									);
@@ -249,10 +324,14 @@ const EmployeeStatsTable: React.FC<EmployeeStatsTableProps> = ({
 						<input
 							type="checkbox"
 							checked={formData.autoPaid}
-							onChange={(e) => setFormData(prev => ({ ...prev, autoPaid: e.target.checked }))}
+							onChange={(e) =>
+								setFormData((prev) => ({...prev, autoPaid: e.target.checked}))
+							}
 							className="w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500"
 						/>
-						<span className="text-sm font-medium text-gray-700">Auto-calculate from services</span>
+						<span className="text-sm font-medium text-gray-700">
+							Auto-calculate from services
+						</span>
 					</label>
 				</div>
 			</Modal>

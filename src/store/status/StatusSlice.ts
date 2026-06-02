@@ -1,12 +1,6 @@
-import {createSlice, PayloadAction} from "@reduxjs/toolkit";
-import Decimal from "decimal.js";
+import {createSlice} from "@reduxjs/toolkit";
 
 import {apiResponseStatuses} from "@/customTypes/NetworkTypes";
-import {
-	NullableNumber,
-	NullableString,
-	StringArray,
-} from "@/customTypes/CommonTypes";
 import {fetchStatus} from "./ThunkActions";
 import {iStatusState, REDUCER_NAME} from "./Types";
 
@@ -40,7 +34,7 @@ export const statusSlice = createSlice({
 					state.responseStatus = apiResponseStatuses.SUCCESS;
 				}
 			})
-			.addCase(fetchStatus.rejected, (state, action) => {
+			.addCase(fetchStatus.rejected, (state) => {
 				state.message = "Failed to fetch order data";
 				state.isLoading = false;
 				state.responseStatus = apiResponseStatuses.ERROR;

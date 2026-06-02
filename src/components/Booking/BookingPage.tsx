@@ -14,8 +14,6 @@ import DetailsModal from "../common/DetailsModal";
 import Joi from "joi";
 import {Plus, RefreshCw, Search, Filter} from "lucide-react";
 import Button from "../ui/Button";
-import Input from "../ui/Input";
-import Select from "../ui/Select";
 import Modal from "../ui/Modal";
 
 const initialFormValue: iCreateBookingDTO = {
@@ -35,9 +33,14 @@ const initialFormValue: iCreateBookingDTO = {
 	assignedEmployeeIds: [],
 };
 
+interface BookingFormErrors {
+	[key: string]: string;
+}
+
 // Utility to clean payload
 function cleanBookingPayload(
-	payload: Record<string, any>,
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	payload: iCreateBookingDTO | Record<string, any>,
 	excludeFields: string[] = [],
 ): iCreateBookingDTO {
 	const cleaned: Partial<iCreateBookingDTO> = {};
@@ -49,13 +52,16 @@ function cleanBookingPayload(
 			!excludeFields.includes(key)
 		) {
 			if (key === "assignedEmployees" || key === "assignedEmployeeIds") {
-				const employeeIds = Array.isArray(value)
-					? value
-							.map((emp) => emp?.id || emp)
-							.filter((id) => id !== null && id !== undefined && id !== "")
-					: [];
+				let employeeIds: string[] = [];
+				if (Array.isArray(value)) {
+					// eslint-disable-next-line @typescript-eslint/no-explicit-any
+					employeeIds = (value as any[])
+						.map((emp) => (typeof emp === "object" ? emp.id : emp))
+						.filter((id) => id !== null && id !== undefined && id !== "");
+				}
 				cleaned["assignedEmployeeIds"] = employeeIds;
 			} else if (key in initialFormValue) {
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
 				(cleaned as any)[key] = value;
 			}
 		}
@@ -78,8 +84,8 @@ const BookingPage = () => {
 	const [showEditModal, setShowEditModal] = useState(false);
 	const [editingBooking, setEditingBooking] =
 		useState<iCreateBookingDTO | null>(null);
-	const [addFormErrors, setAddFormErrors] = useState<any>({});
-	const [editFormErrors, setEditFormErrors] = useState<any>({});
+	const [addFormErrors, setAddFormErrors] = useState<BookingFormErrors>({});
+	const [editFormErrors, setEditFormErrors] = useState<BookingFormErrors>({});
 	const [isRefreshing, setIsRefreshing] = useState(false);
 
 	const {statusList} = useAppSelector(
@@ -111,9 +117,9 @@ const BookingPage = () => {
 		});
 
 		if (error) {
-			const errors: any = {};
+			const errors: BookingFormErrors = {};
 			error.details.forEach((detail: Joi.ValidationErrorItem) => {
-				errors[detail.path[0]] = detail.message;
+				errors[detail.path[0] as string] = detail.message;
 			});
 			setAddFormErrors(errors);
 			return;
@@ -171,9 +177,9 @@ const BookingPage = () => {
 		});
 
 		if (error) {
-			const errors: any = {};
+			const errors: BookingFormErrors = {};
 			error.details.forEach((detail: Joi.ValidationErrorItem) => {
-				errors[detail.path[0]] = detail.message;
+				errors[detail.path[0] as string] = detail.message;
 			});
 			setEditFormErrors(errors);
 			return;
@@ -190,30 +196,38 @@ const BookingPage = () => {
 		}
 	};
 
-	const bookingDetailsFields = [
-		{name: "customerName", label: "Customer Name", type: "text" as const},
-		{name: "phoneNumber", label: "Phone Number", type: "text" as const},
-		{name: "eventName", label: "Event Name", type: "text" as const},
-		{name: "eventDate", label: "Event Date", type: "date" as const},
-		{name: "venueAddress", label: "Venue", type: "text" as const},
-		{name: "budget", label: "Budget", type: "text" as const},
-		{name: "advancePayment", label: "Advance Payment", type: "text" as const},
+	const bookingDetailsFields: {
+		name: keyof iBooking;
+		label: string;
+		type: "text" | "date" | "select" | "textarea";
+		options?: {label: string; value: string}[];
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		render?: (value: any) => React.ReactNode;
+	}[] = [
+		{name: "customerName", label: "Customer Name", type: "text"},
+		{name: "phoneNumber", label: "Phone Number", type: "text"},
+		{name: "eventName", label: "Event Name", type: "text"},
+		{name: "eventDate", label: "Event Date", type: "date"},
+		{name: "venueAddress", label: "Venue", type: "text"},
+		{name: "budget", label: "Budget", type: "text"},
+		{name: "advancePayment", label: "Advance Payment", type: "text"},
 		{
 			name: "bookingStatus",
 			label: "Booking Status",
-			type: "select" as const,
+			type: "select",
 			options: bookingStatuses,
 		},
 		{
 			name: "assignedEmployees",
 			label: "Assigned Employees",
-			type: "text" as const,
+			type: "text",
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			render: (value: any) => {
 				if (!value?.length) return "-";
-				return value.map((emp: any) => emp.name).join(", ");
+				return (value as {name: string}[]).map((emp) => emp.name).join(", ");
 			},
 		},
-		{name: "notes", label: "Notes", type: "textarea" as const},
+		{name: "notes", label: "Notes", type: "textarea"},
 	];
 
 	return (

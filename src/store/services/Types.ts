@@ -1,12 +1,5 @@
-import {
-	NullableNumber,
-	NullableString,
-	StringArray,
-} from "@/customTypes/CommonTypes";
-import {
-	apiResponseStatuses,
-	iAPIRequestStatus,
-} from "@/customTypes/NetworkTypes";
+import {NullableNumber, NullableString} from "@/customTypes/CommonTypes";
+import {apiResponseStatuses} from "@/customTypes/NetworkTypes";
 
 export const REDUCER_NAME = "serviceSlice";
 

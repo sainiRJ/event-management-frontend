@@ -6,7 +6,6 @@ import {
 	iCreateEmployeeDTO,
 	iEmployeeStatsResponse,
 	iEmployeePaymentUpdate,
-	iAssignedServicesResponse,
 	iEmployeeAssignedServices,
 	iEmployeeServiceHistory,
 } from "../../../customTypes/appDataTypes/employeeTypes";
@@ -79,13 +78,18 @@ function EmployeeService(apiServer: AxiosInstance) {
 		);
 		let result = null;
 
+		const employeeId = employeeData.id;
+		if (!employeeId) {
+			throw new Error("Employee ID is required for updates");
+		}
+
 		try {
 			console.log(
 				"Making PATCH request to:",
-				apiEndpoints.employee.updateEmployee(employeeData.id!),
+				apiEndpoints.employee.updateEmployee(employeeId),
 			);
 			const response = await apiServer.patch(
-				apiEndpoints.employee.updateEmployee(employeeData.id!),
+				apiEndpoints.employee.updateEmployee(employeeId),
 				employeeData,
 			);
 			console.log("Update employee API response:", response);
@@ -292,14 +296,13 @@ function EmployeeService(apiServer: AxiosInstance) {
 				null,
 				null,
 			);
-		} catch (error) {
+		} catch (error: any) {
 			console.error("Error fetching employee service history:", error);
-			const errorResponse = error as any;
 			return NetworkUtil.buildResult<iEmployeeServiceHistory>(
 				null,
-				errorResponse?.response?.status || 500,
-				errorResponse?.response?.data || errorResponse,
-				errorResponse,
+				error?.response?.status || 500,
+				error?.response?.data || error,
+				error,
 			);
 		}
 	};

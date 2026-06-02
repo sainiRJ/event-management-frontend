@@ -53,13 +53,17 @@ const BookingForm: React.FC<BookingFormProps> = ({
 			value: emp.id || "",
 		}));
 
-	const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-		const { name, value } = e.target;
-		setFormValue({ ...formValue, [name]: value });
+	const handleChange = (
+		e: React.ChangeEvent<
+			HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+		>,
+	) => {
+		const {name, value} = e.target;
+		setFormValue({...formValue, [name]: value});
 	};
 
 	const handleMultiSelectChange = (name: string, value: string[]) => {
-		setFormValue({ ...formValue, [name]: value });
+		setFormValue({...formValue, [name]: value});
 	};
 
 	return (
@@ -73,7 +77,7 @@ const BookingForm: React.FC<BookingFormProps> = ({
 					error={errors.customerName}
 					placeholder="Enter customer name"
 				/>
-				
+
 				<Input
 					name="phoneNumber"
 					label="Phone Number"
@@ -163,7 +167,9 @@ const BookingForm: React.FC<BookingFormProps> = ({
 						label="Assigned Employees (Optional)"
 						options={activeEmployees}
 						value={formValue.assignedEmployeeIds || []}
-						onChange={(val) => handleMultiSelectChange("assignedEmployeeIds", val)}
+						onChange={(val) =>
+							handleMultiSelectChange("assignedEmployeeIds", val)
+						}
 						error={errors.assignedEmployeeIds}
 						placeholder="Select employees to assign"
 					/>

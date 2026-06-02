@@ -3,7 +3,6 @@ import {AxiosInstance} from "axios";
 import {APIResponse} from "@/customTypes/NetworkTypes";
 
 import NetworkUtil from "@/utils/NetworkUtil";
-import {NullableString} from "@/customTypes/CommonTypes";
 import {apiEndpoints} from "./axiosConfig/AxiosServiceConstants";
 import {
 	iLoginDTO,
