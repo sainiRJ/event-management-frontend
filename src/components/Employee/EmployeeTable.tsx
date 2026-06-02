@@ -11,11 +11,9 @@ import {
 import {fetchServices} from "@/store/services/ThunkActions";
 import {fetchStatus} from "@/store/status/ThunkActions";
 import {RootState} from "@/store";
-import { Plus, RefreshCw, Search, Filter, Edit2, Trash2 } from "lucide-react";
+import {Plus, RefreshCw, Search, Filter, Edit2, Trash2} from "lucide-react";
 import CustomTable from "../common/CustomTable";
-import {
-	iCreateEmployeeDTO,
-} from "../../customTypes/appDataTypes/employeeTypes";
+import {iCreateEmployeeDTO} from "../../customTypes/appDataTypes/employeeTypes";
 import {employeeValidationSchema} from "../../validations/EmployeeValidationSchema";
 import Joi from "joi";
 import EmployeeStatsTable from "./EmployeeStatsTable";
@@ -23,7 +21,7 @@ import Button from "../ui/Button";
 import Input from "../ui/Input";
 import Select from "../ui/Select";
 import Modal from "../ui/Modal";
-import { toast } from "sonner";
+import {toast} from "sonner";
 
 const formatDate = (dateString: string) => {
 	if (!dateString) return "-";
@@ -37,12 +35,17 @@ const formatDate = (dateString: string) => {
 
 const StatusBadge = ({status}: {status: string}) => {
 	let color = "bg-gray-100 text-gray-700";
-	if (status?.toLowerCase() === "active" || status?.toLowerCase() === "working") color = "bg-emerald-100 text-emerald-700";
-	if (status?.toLowerCase() === "inactive") color = "bg-amber-100 text-yellow-700";
-	if (status?.toLowerCase() === "terminated") color = "bg-rose-100 text-red-700";
-	
+	if (status?.toLowerCase() === "active" || status?.toLowerCase() === "working")
+		color = "bg-emerald-100 text-emerald-700";
+	if (status?.toLowerCase() === "inactive")
+		color = "bg-amber-100 text-yellow-700";
+	if (status?.toLowerCase() === "terminated")
+		color = "bg-rose-100 text-red-700";
+
 	return (
-		<span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${color} border border-white shadow-sm`}>
+		<span
+			className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${color} border border-white shadow-sm`}
+		>
 			{status}
 		</span>
 	);
@@ -55,16 +58,27 @@ const EmployeeTable = () => {
 	const [selectedStatus, setSelectedStatus] = useState<string>("");
 	const [selectedDesignation, setSelectedDesignation] = useState<string>("");
 	const [showEditModal, setShowEditModal] = useState(false);
-	const [editingEmployee, setEditingEmployee] = useState<iCreateEmployeeDTO | null>(null);
+	const [editingEmployee, setEditingEmployee] =
+		useState<iCreateEmployeeDTO | null>(null);
 	const [showAddModal, setShowAddModal] = useState(false);
-	const [editFormErrors, setEditFormErrors] = useState<Record<string, string>>({});
-	const [addFormErrors, setAddFormErrors] = useState<Record<string, string>>({});
+	const [editFormErrors, setEditFormErrors] = useState<Record<string, string>>(
+		{},
+	);
+	const [addFormErrors, setAddFormErrors] = useState<Record<string, string>>(
+		{},
+	);
 	const [isRefreshing, setIsRefreshing] = useState(false);
 
-	const {employeeList} = useAppSelector((state: RootState) => state.employeeReducer);
-	const employeeStats = useAppSelector((state: RootState) => state.employeeReducer.stats?.employeeStats || {});
-	const {statusList} = useAppSelector((state: RootState) => state.statusReducer);
-	
+	const {employeeList} = useAppSelector(
+		(state: RootState) => state.employeeReducer,
+	);
+	const employeeStats = useAppSelector(
+		(state: RootState) => state.employeeReducer.stats?.employeeStats || {},
+	);
+	const {statusList} = useAppSelector(
+		(state: RootState) => state.statusReducer,
+	);
+
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
 
@@ -75,7 +89,7 @@ const EmployeeTable = () => {
 			dispatch(getAllEmployees()),
 			dispatch(getEmployeeStats()),
 			dispatch(fetchServices()),
-			dispatch(fetchStatus())
+			dispatch(fetchStatus()),
 		]);
 		setLoading(false);
 		setIsRefreshing(false);
@@ -96,11 +110,15 @@ const EmployeeTable = () => {
 		.filter((status: any) => status.context === "employee")
 		.map((status) => ({label: status.name, value: status.id}));
 
-	const designations = Array.from(new Set(data.map((emp) => emp.designation))).filter(Boolean);
+	const designations = Array.from(
+		new Set(data.map((emp) => emp.designation)),
+	).filter(Boolean);
 
 	const handleEdit = (rowData: any) => {
-		const statusOption = employeeStatuses.find(status => status.label === rowData.status);
-		
+		const statusOption = employeeStatuses.find(
+			(status) => status.label === rowData.status,
+		);
+
 		const employeeData: iCreateEmployeeDTO = {
 			id: rowData.id ?? "",
 			name: rowData.name ?? "",
@@ -128,7 +146,9 @@ const EmployeeTable = () => {
 	};
 
 	const handleAddEmployeeSubmit = async () => {
-		const {error} = employeeValidationSchema.validate(formData, { abortEarly: false });
+		const {error} = employeeValidationSchema.validate(formData, {
+			abortEarly: false,
+		});
 		if (error) {
 			const errors: Record<string, string> = {};
 			error.details.forEach((detail: Joi.ValidationErrorItem) => {
@@ -137,7 +157,7 @@ const EmployeeTable = () => {
 			setAddFormErrors(errors);
 			return;
 		}
-		
+
 		setAddFormErrors({});
 		try {
 			await dispatch(createEmployee(formData));
@@ -185,30 +205,35 @@ const EmployeeTable = () => {
 		phoneNumber: "",
 		designation: "",
 		statusId: "",
-		joinedDate: new Date().toISOString().split('T')[0],
+		joinedDate: new Date().toISOString().split("T")[0],
 	};
 
-	const [formData, setFormData] = useState<iCreateEmployeeDTO>(initialFormValue);
+	const [formData, setFormData] =
+		useState<iCreateEmployeeDTO>(initialFormValue);
 
-	const handleFormChange = (field: keyof iCreateEmployeeDTO, value: any, isEdit: boolean = false) => {
+	const handleFormChange = (
+		field: keyof iCreateEmployeeDTO,
+		value: any,
+		isEdit = false,
+	) => {
 		if (field === "phoneNumber") {
 			value = value.replace(/\D/g, "").slice(0, 10);
 		}
 
 		if (isEdit) {
-			setEditingEmployee(prev => prev ? ({ ...prev, [field]: value }) : null);
+			setEditingEmployee((prev) => (prev ? {...prev, [field]: value} : null));
 			if (editFormErrors[field]) {
-				setEditFormErrors(prev => {
-					const newErrors = { ...prev };
+				setEditFormErrors((prev) => {
+					const newErrors = {...prev};
 					delete newErrors[field];
 					return newErrors;
 				});
 			}
 		} else {
-			setFormData(prev => ({ ...prev, [field]: value }));
+			setFormData((prev) => ({...prev, [field]: value}));
 			if (addFormErrors[field]) {
-				setAddFormErrors(prev => {
-					const newErrors = { ...prev };
+				setAddFormErrors((prev) => {
+					const newErrors = {...prev};
 					delete newErrors[field];
 					return newErrors;
 				});
@@ -216,25 +241,27 @@ const EmployeeTable = () => {
 		}
 	};
 
-	const filteredData = data.filter(row => 
-		(searchQuery === "" || row.name?.toLowerCase().includes(searchQuery.toLowerCase())) &&
-		(selectedDesignation === "" || row.designation === selectedDesignation) &&
-		(selectedStatus === "" || row.status === selectedStatus)
+	const filteredData = data.filter(
+		(row) =>
+			(searchQuery === "" ||
+				row.name?.toLowerCase().includes(searchQuery.toLowerCase())) &&
+			(selectedDesignation === "" || row.designation === selectedDesignation) &&
+			(selectedStatus === "" || row.status === selectedStatus),
 	);
 
 	const columns = [
-		{ key: "name", label: "Name" },
-		{ key: "designation", label: "Designation" },
-		{ key: "phoneNumber", label: "Phone" },
-		{ 
-			key: "status", 
+		{key: "name", label: "Name"},
+		{key: "designation", label: "Designation"},
+		{key: "phoneNumber", label: "Phone"},
+		{
+			key: "status",
 			label: "Status",
-			render: (row: any) => <StatusBadge status={row.status || "-"} />
+			render: (row: any) => <StatusBadge status={row.status || "-"} />,
 		},
-		{ 
-			key: "joinedDate", 
+		{
+			key: "joinedDate",
 			label: "Joined Date",
-			render: (row: any) => formatDate(row.joinedDate)
+			render: (row: any) => formatDate(row.joinedDate),
 		},
 		{
 			key: "actions",
@@ -273,13 +300,21 @@ const EmployeeTable = () => {
 		<div className="space-y-8 animate-in fade-in duration-500">
 			<div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
 				<div>
-					<h1 className="text-3xl font-black text-gray-900 tracking-tight">Employees</h1>
-					<p className="text-gray-500 font-medium mt-1">Manage your workforce and monitor performance</p>
+					<h1 className="text-3xl font-black text-gray-900 tracking-tight">
+						Employees
+					</h1>
+					<p className="text-gray-500 font-medium mt-1">
+						Manage your workforce and monitor performance
+					</p>
 				</div>
 				<div className="flex items-center gap-3">
 					<Button
 						variant="white"
-						icon={<RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />}
+						icon={
+							<RefreshCw
+								className={`w-4 h-4 ${isRefreshing ? "animate-spin" : ""}`}
+							/>
+						}
 						onClick={handleRefresh}
 						disabled={isRefreshing}
 					>
@@ -310,14 +345,16 @@ const EmployeeTable = () => {
 					<Select
 						placeholder="All Designations"
 						icon={<Filter className="w-4 h-4" />}
-						options={designations.map(d => ({ label: d, value: d }))}
+						options={designations.map((d) => ({label: d, value: d}))}
 						value={selectedDesignation}
 						onChange={(e) => setSelectedDesignation(e.target.value)}
 					/>
 					<Select
 						placeholder="All Statuses"
 						icon={<Filter className="w-4 h-4" />}
-						options={Array.from(new Set(data.map(emp => emp.status))).filter(Boolean).map(s => ({ label: s, value: s }))}
+						options={Array.from(new Set(data.map((emp) => emp.status)))
+							.filter(Boolean)
+							.map((s) => ({label: s, value: s}))}
 						value={selectedStatus}
 						onChange={(e) => setSelectedStatus(e.target.value)}
 					/>
@@ -336,7 +373,9 @@ const EmployeeTable = () => {
 
 			{Object.keys(employeeStats).length > 0 && (
 				<div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
-					<h2 className="text-xl font-bold text-gray-900 mb-6">Employee Statistics</h2>
+					<h2 className="text-xl font-bold text-gray-900 mb-6">
+						Employee Statistics
+					</h2>
 					<EmployeeStatsTable stats={employeeStats} onRefresh={handleRefresh} />
 				</div>
 			)}
@@ -348,7 +387,9 @@ const EmployeeTable = () => {
 				title="Add New Employee"
 				footer={
 					<>
-						<Button variant="ghost" onClick={() => setShowAddModal(false)}>Cancel</Button>
+						<Button variant="ghost" onClick={() => setShowAddModal(false)}>
+							Cancel
+						</Button>
 						<Button onClick={handleAddEmployeeSubmit}>Add Employee</Button>
 					</>
 				}
@@ -394,7 +435,11 @@ const EmployeeTable = () => {
 					<Input
 						label="Joined Date"
 						type="date"
-						value={typeof formData.joinedDate === "string" ? formData.joinedDate.split('T')[0] : ""}
+						value={
+							typeof formData.joinedDate === "string"
+								? formData.joinedDate.split("T")[0]
+								: ""
+						}
 						onChange={(e) => handleFormChange("joinedDate", e.target.value)}
 						error={addFormErrors.joinedDate}
 					/>
@@ -411,7 +456,9 @@ const EmployeeTable = () => {
 				title="Edit Employee"
 				footer={
 					<>
-						<Button variant="ghost" onClick={() => setShowEditModal(false)}>Cancel</Button>
+						<Button variant="ghost" onClick={() => setShowEditModal(false)}>
+							Cancel
+						</Button>
 						<Button onClick={handleEditEmployeeSubmit}>Save Changes</Button>
 					</>
 				}
@@ -435,27 +482,39 @@ const EmployeeTable = () => {
 							label="Phone Number"
 							type="tel"
 							value={editingEmployee.phoneNumber}
-							onChange={(e) => handleFormChange("phoneNumber", e.target.value, true)}
+							onChange={(e) =>
+								handleFormChange("phoneNumber", e.target.value, true)
+							}
 							error={editFormErrors.phoneNumber}
 						/>
 						<Input
 							label="Designation"
 							value={editingEmployee.designation}
-							onChange={(e) => handleFormChange("designation", e.target.value, true)}
+							onChange={(e) =>
+								handleFormChange("designation", e.target.value, true)
+							}
 							error={editFormErrors.designation}
 						/>
 						<Select
 							label="Status"
 							options={employeeStatuses}
 							value={editingEmployee.statusId}
-							onChange={(e) => handleFormChange("statusId", e.target.value, true)}
+							onChange={(e) =>
+								handleFormChange("statusId", e.target.value, true)
+							}
 							error={editFormErrors.statusId}
 						/>
 						<Input
 							label="Joined Date"
 							type="date"
-							value={typeof editingEmployee.joinedDate === "string" ? editingEmployee.joinedDate.split('T')[0] : ""}
-							onChange={(e) => handleFormChange("joinedDate", e.target.value, true)}
+							value={
+								typeof editingEmployee.joinedDate === "string"
+									? editingEmployee.joinedDate.split("T")[0]
+									: ""
+							}
+							onChange={(e) =>
+								handleFormChange("joinedDate", e.target.value, true)
+							}
 							error={editFormErrors.joinedDate}
 						/>
 					</div>
