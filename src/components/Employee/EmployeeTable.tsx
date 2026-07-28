@@ -38,9 +38,8 @@ const StatusBadge = ({status}: {status: string}) => {
 	if (status?.toLowerCase() === "active" || status?.toLowerCase() === "working")
 		color = "bg-emerald-100 text-emerald-700";
 	if (status?.toLowerCase() === "inactive")
-		color = "bg-amber-100 text-yellow-700";
-	if (status?.toLowerCase() === "terminated")
-		color = "bg-rose-100 text-red-700";
+		color = "bg-amber-100 text-amber-700";
+	if (status?.toLowerCase() === "terminated") color = "bg-red-100 text-red-700";
 
 	return (
 		<span
@@ -136,9 +135,16 @@ const EmployeeTable = () => {
 	const handleDelete = async (id: string) => {
 		if (window.confirm("Are you sure you want to delete this employee?")) {
 			try {
-				await dispatch(deleteEmployee(id));
-				toast.success("Employee deleted successfully");
-				handleRefresh();
+				const response: any = await dispatch(deleteEmployee(id));
+				if (response?.meta?.requestStatus === "fulfilled") {
+					toast.success("Employee deleted successfully");
+					handleRefresh();
+				} else {
+					toast.error(
+						response?.payload?.message?.error?.message ||
+							"Failed to delete employee",
+					);
+				}
 			} catch (error) {
 				toast.error("Failed to delete employee");
 			}
@@ -160,11 +166,18 @@ const EmployeeTable = () => {
 
 		setAddFormErrors({});
 		try {
-			await dispatch(createEmployee(formData));
-			toast.success("Employee added successfully");
-			setShowAddModal(false);
-			setFormData(initialFormValue);
-			handleRefresh();
+			const response: any = await dispatch(createEmployee(formData));
+			if (response?.meta?.requestStatus === "fulfilled") {
+				toast.success("Employee added successfully");
+				setShowAddModal(false);
+				setFormData(initialFormValue);
+				handleRefresh();
+			} else {
+				toast.error(
+					response?.payload?.message?.error?.message ||
+						"Failed to add employee",
+				);
+			}
 		} catch (error) {
 			toast.error("Failed to add employee");
 		}
@@ -189,11 +202,18 @@ const EmployeeTable = () => {
 
 		try {
 			setEditFormErrors({});
-			await dispatch(updateEmployee(editingEmployee));
-			toast.success("Employee updated successfully");
-			setShowEditModal(false);
-			setEditingEmployee(null);
-			handleRefresh();
+			const response: any = await dispatch(updateEmployee(editingEmployee));
+			if (response?.meta?.requestStatus === "fulfilled") {
+				toast.success("Employee updated successfully");
+				setShowEditModal(false);
+				setEditingEmployee(null);
+				handleRefresh();
+			} else {
+				toast.error(
+					response?.payload?.message?.error?.message ||
+						"Failed to update employee",
+				);
+			}
 		} catch (error) {
 			toast.error("Failed to update employee");
 		}
@@ -300,7 +320,7 @@ const EmployeeTable = () => {
 		<div className="space-y-8 animate-in fade-in duration-500">
 			<div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
 				<div>
-					<h1 className="text-3xl font-black text-gray-900 tracking-tight">
+					<h1 className="text-3xl font-display font-semibold text-[#2B2129]">
 						Employees
 					</h1>
 					<p className="text-gray-500 font-medium mt-1">
@@ -334,7 +354,7 @@ const EmployeeTable = () => {
 			</div>
 
 			{/* Filters Section */}
-			<div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm space-y-6">
+			<div className="bg-white rounded-3xl p-6 border border-brand-100/70 shadow-sm space-y-6">
 				<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 					<Input
 						placeholder="Search by name..."
@@ -361,7 +381,7 @@ const EmployeeTable = () => {
 				</div>
 			</div>
 
-			<div className="rounded-2xl overflow-hidden border border-gray-50">
+			<div className="rounded-2xl overflow-hidden border border-brand-100/50">
 				<CustomTable
 					data={filteredData}
 					loading={loading}
@@ -372,8 +392,8 @@ const EmployeeTable = () => {
 			</div>
 
 			{Object.keys(employeeStats).length > 0 && (
-				<div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
-					<h2 className="text-xl font-bold text-gray-900 mb-6">
+				<div className="bg-white rounded-3xl shadow-sm border border-brand-100/70 p-8">
+					<h2 className="text-xl font-bold text-[#2B2129] mb-6">
 						Employee Statistics
 					</h2>
 					<EmployeeStatsTable stats={employeeStats} onRefresh={handleRefresh} />

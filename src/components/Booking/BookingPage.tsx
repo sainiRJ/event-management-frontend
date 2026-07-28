@@ -15,6 +15,7 @@ import Joi from "joi";
 import {Plus, RefreshCw, Search, Filter} from "lucide-react";
 import Button from "../ui/Button";
 import Modal from "../ui/Modal";
+import {showToast} from "@/utils/showToatify";
 
 const initialFormValue: iCreateBookingDTO = {
 	id: "",
@@ -127,12 +128,23 @@ const BookingPage = () => {
 
 		setAddFormErrors({});
 		try {
-			await dispatch(createBooking(cleanedPayload));
-			setNewBooking(initialFormValue);
-			setShowAddModal(false);
-			handleRefresh();
+			const response: any = await dispatch(createBooking(cleanedPayload));
+			showToast({
+				response,
+				successMessage: "Booking created successfully",
+				errorMessage: "Failed to create booking. Please try again.",
+			});
+			if (response?.meta?.requestStatus === "fulfilled") {
+				setNewBooking(initialFormValue);
+				setShowAddModal(false);
+				handleRefresh();
+			}
 		} catch (error) {
 			console.error("Failed to create booking:", error);
+			showToast({
+				response: {meta: {requestStatus: "rejected"}, payload: {}},
+				errorMessage: "Something went wrong while creating the booking.",
+			});
 		}
 	};
 
@@ -187,12 +199,23 @@ const BookingPage = () => {
 
 		setEditFormErrors({});
 		try {
-			await dispatch(updateBooking(cleanedPayload));
-			setShowEditModal(false);
-			setEditingBooking(null);
-			handleRefresh();
+			const response: any = await dispatch(updateBooking(cleanedPayload));
+			showToast({
+				response,
+				successMessage: "Booking updated successfully",
+				errorMessage: "Failed to update booking. Please try again.",
+			});
+			if (response?.meta?.requestStatus === "fulfilled") {
+				setShowEditModal(false);
+				setEditingBooking(null);
+				handleRefresh();
+			}
 		} catch (error) {
 			console.error("Failed to update booking:", error);
+			showToast({
+				response: {meta: {requestStatus: "rejected"}, payload: {}},
+				errorMessage: "Something went wrong while updating the booking.",
+			});
 		}
 	};
 
@@ -234,7 +257,7 @@ const BookingPage = () => {
 		<div className="space-y-8 animate-in fade-in duration-500">
 			<div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
 				<div>
-					<h1 className="text-3xl font-bold text-gray-900 tracking-tight">
+					<h1 className="text-3xl font-display font-semibold text-[#2B2129] tracking-tight">
 						Bookings
 					</h1>
 					<p className="text-gray-500 mt-1">
@@ -264,7 +287,7 @@ const BookingPage = () => {
 				</div>
 			</div>
 
-			<div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
+			<div className="bg-white rounded-3xl shadow-sm border border-brand-100/70 p-8">
 				{/* Filters Section */}
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
 					<div className="relative">
@@ -274,7 +297,7 @@ const BookingPage = () => {
 							placeholder="Search by customer name..."
 							value={searchQuery}
 							onChange={(e) => setSearchQuery(e.target.value)}
-							className="w-full pl-10 pr-4 py-2 bg-gray-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 transition-all"
+							className="w-full pl-10 pr-4 py-2 bg-gray-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-brand-400 transition-all"
 						/>
 					</div>
 
@@ -283,7 +306,7 @@ const BookingPage = () => {
 						<select
 							value={selectedStatus}
 							onChange={(e) => setSelectedStatus(e.target.value)}
-							className="w-full pl-10 pr-4 py-2 bg-gray-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 appearance-none transition-all cursor-pointer"
+							className="w-full pl-10 pr-4 py-2 bg-gray-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-brand-400 appearance-none transition-all cursor-pointer"
 						>
 							<option value="">All Statuses</option>
 							{bookingStatuses.map((status) => (
@@ -295,7 +318,7 @@ const BookingPage = () => {
 					</div>
 				</div>
 
-				<div className="rounded-2xl overflow-hidden border border-gray-50">
+				<div className="rounded-2xl overflow-hidden border border-brand-100/50">
 					<BookingTable
 						onViewDetails={handleViewDetails}
 						searchQuery={searchQuery}

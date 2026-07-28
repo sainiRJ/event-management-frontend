@@ -71,10 +71,17 @@ const EmployeeStatsTable: React.FC<EmployeeStatsTableProps> = ({
 
 	const handleSubmit = async () => {
 		try {
-			await dispatch(updateEmployeePayment(formData));
-			toast.success("Payment updated successfully");
-			setShowEditModal(false);
-			onRefresh();
+			const response: any = await dispatch(updateEmployeePayment(formData));
+			if (response?.meta?.requestStatus === "fulfilled") {
+				toast.success("Payment updated successfully");
+				setShowEditModal(false);
+				onRefresh();
+			} else {
+				toast.error(
+					response?.payload?.message?.error?.message ||
+						"Failed to update payment",
+				);
+			}
 		} catch (error) {
 			toast.error("Failed to update payment");
 		}
@@ -104,7 +111,7 @@ const EmployeeStatsTable: React.FC<EmployeeStatsTableProps> = ({
 	if (loading && !Object.keys(stats).length) {
 		return (
 			<div className="flex flex-col items-center justify-center py-12">
-				<Loader2 className="w-8 h-8 text-indigo-600 animate-spin mb-4" />
+				<Loader2 className="w-8 h-8 text-brand-600 animate-spin mb-4" />
 				<p className="text-gray-500 font-medium">Loading statistics...</p>
 			</div>
 		);
@@ -124,7 +131,7 @@ const EmployeeStatsTable: React.FC<EmployeeStatsTableProps> = ({
 		<div className="overflow-x-auto">
 			<table className="min-w-full">
 				<thead>
-					<tr className="border-b border-gray-100">
+					<tr className="border-b border-brand-100/70">
 						<th className="px-4 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">
 							Employee
 						</th>
@@ -160,7 +167,7 @@ const EmployeeStatsTable: React.FC<EmployeeStatsTableProps> = ({
 							className="group hover:bg-gray-50/50 transition-colors"
 						>
 							<td className="px-4 py-4 whitespace-nowrap">
-								<div className="font-semibold text-gray-900">
+								<div className="font-semibold text-[#2B2129]">
 									{employee.name}
 								</div>
 							</td>
@@ -173,7 +180,7 @@ const EmployeeStatsTable: React.FC<EmployeeStatsTableProps> = ({
 										<span
 											className={`inline-flex items-center justify-center w-8 h-8 rounded-lg text-xs font-bold ${
 												stat && stat.count > 0
-													? "bg-indigo-50 text-indigo-600"
+													? "bg-brand-50 text-brand-600"
 													: "bg-gray-50 text-gray-300"
 											}`}
 										>
@@ -187,7 +194,7 @@ const EmployeeStatsTable: React.FC<EmployeeStatsTableProps> = ({
 									{employee.totalServices}
 								</span>
 							</td>
-							<td className="px-4 py-4 whitespace-nowrap font-medium text-gray-900">
+							<td className="px-4 py-4 whitespace-nowrap font-medium text-[#2B2129]">
 								{formatCurrency(employee.totalAmount)}
 							</td>
 							<td className="px-4 py-4 whitespace-nowrap text-emerald-600 font-medium">
@@ -233,15 +240,15 @@ const EmployeeStatsTable: React.FC<EmployeeStatsTableProps> = ({
 				}
 			>
 				<div className="space-y-4">
-					<div className="bg-indigo-50 rounded-xl p-4 mb-4">
-						<div className="text-sm text-indigo-600 font-medium mb-1">
+					<div className="bg-brand-50 rounded-xl p-4 mb-4">
+						<div className="text-sm text-brand-600 font-medium mb-1">
 							Paying To
 						</div>
 						<div className="text-lg font-bold text-indigo-900">
 							{selectedEmployee?.name}
 						</div>
 						<div className="flex justify-between mt-2 text-sm">
-							<span className="text-indigo-600/70">Remaining Balance:</span>
+							<span className="text-brand-600/70">Remaining Balance:</span>
 							<span className="font-bold text-indigo-900">
 								{formatCurrency(selectedEmployee?.totalRemaining || 0)}
 							</span>
@@ -278,7 +285,7 @@ const EmployeeStatsTable: React.FC<EmployeeStatsTableProps> = ({
 						<label className="block text-sm font-medium text-gray-700 mb-2">
 							Assign to Specific Services (Optional)
 						</label>
-						<div className="max-h-48 overflow-y-auto border border-gray-100 rounded-xl bg-gray-50/50">
+						<div className="max-h-48 overflow-y-auto border border-brand-100/70 rounded-xl bg-gray-50/50">
 							{getSelectedEmployeeServices().length > 0 ? (
 								getSelectedEmployeeServices().map((service) => {
 									const isSelected = formData.assignedEmployeeIds?.includes(
@@ -301,7 +308,7 @@ const EmployeeStatsTable: React.FC<EmployeeStatsTableProps> = ({
 											}}
 											className={`px-4 py-3 cursor-pointer flex items-center justify-between transition-colors border-b border-white last:border-0 ${
 												isSelected
-													? "bg-indigo-100/50 text-indigo-700"
+													? "bg-brand-100/50 text-brand-700"
 													: "text-gray-600 hover:bg-white"
 											}`}
 										>
@@ -327,7 +334,7 @@ const EmployeeStatsTable: React.FC<EmployeeStatsTableProps> = ({
 							onChange={(e) =>
 								setFormData((prev) => ({...prev, autoPaid: e.target.checked}))
 							}
-							className="w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500"
+							className="w-4 h-4 text-brand-600 rounded border-gray-300 focus:ring-brand-400"
 						/>
 						<span className="text-sm font-medium text-gray-700">
 							Auto-calculate from services

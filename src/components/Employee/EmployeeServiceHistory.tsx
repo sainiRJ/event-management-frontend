@@ -109,10 +109,17 @@ const EmployeeServiceHistory: React.FC = () => {
 
 	const handleSubmit = async () => {
 		try {
-			await dispatch(updateEmployeePayment(formData));
-			toast.success("Payment updated successfully");
-			setShowEditModal(false);
-			handleRefresh();
+			const response: any = await dispatch(updateEmployeePayment(formData));
+			if (response?.meta?.requestStatus === "fulfilled") {
+				toast.success("Payment updated successfully");
+				setShowEditModal(false);
+				handleRefresh();
+			} else {
+				toast.error(
+					response?.payload?.message?.error?.message ||
+						"Failed to update payment",
+				);
+			}
 		} catch (error) {
 			toast.error("Failed to update payment");
 		}
@@ -133,17 +140,17 @@ const EmployeeServiceHistory: React.FC = () => {
 
 	return (
 		<div className="space-y-8 animate-in fade-in duration-500">
-			<div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+			<div className="bg-white rounded-[2rem] shadow-sm border border-brand-100/70 p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
 				<div className="flex items-center gap-6">
 					<button
 						onClick={() => navigate(-1)}
-						className="p-3 bg-gray-50 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-2xl transition-all"
+						className="p-3 bg-gray-50 text-gray-400 hover:text-brand-600 hover:bg-brand-50 rounded-2xl transition-all"
 					>
 						<ArrowLeft className="w-6 h-6" />
 					</button>
 					<div>
-						<h1 className="text-3xl font-black text-gray-900 tracking-tight flex items-center gap-3">
-							<History className="w-8 h-8 text-indigo-600" />
+						<h1 className="text-3xl font-black text-[#2B2129] tracking-tight flex items-center gap-3">
+							<History className="w-8 h-8 text-brand-600" />
 							Service History
 						</h1>
 						<p className="text-gray-500 font-bold mt-1">
@@ -168,14 +175,14 @@ const EmployeeServiceHistory: React.FC = () => {
 				</div>
 			</div>
 
-			<div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8">
+			<div className="bg-white rounded-[2rem] shadow-sm border border-brand-100/70 p-8">
 				<div className="flex flex-wrap gap-4 items-center mb-8">
 					<div className="relative flex-1 max-w-xs">
 						<Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
 						<input
 							type="text"
 							placeholder="Search services..."
-							className="w-full pl-10 pr-4 py-2 bg-gray-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 transition-all"
+							className="w-full pl-10 pr-4 py-2 bg-gray-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-brand-400 transition-all"
 						/>
 					</div>
 
@@ -213,7 +220,7 @@ const EmployeeServiceHistory: React.FC = () => {
 					</div>
 				</div>
 
-				<div className="overflow-x-auto rounded-2xl border border-gray-100">
+				<div className="overflow-x-auto rounded-2xl border border-brand-100/70">
 					<table className="min-w-full">
 						<thead className="bg-gray-50/50">
 							<tr>
@@ -238,7 +245,7 @@ const EmployeeServiceHistory: React.FC = () => {
 							{loading ? (
 								<tr>
 									<td colSpan={5} className="px-6 py-20 text-center">
-										<Loader2 className="w-8 h-8 text-indigo-600 animate-spin mx-auto mb-4" />
+										<Loader2 className="w-8 h-8 text-brand-600 animate-spin mx-auto mb-4" />
 										<p className="text-gray-500 font-medium">
 											Loading history...
 										</p>
@@ -251,7 +258,7 @@ const EmployeeServiceHistory: React.FC = () => {
 										className="group hover:bg-gray-50/50 transition-colors"
 									>
 										<td className="px-6 py-4">
-											<div className="font-bold text-gray-900">
+											<div className="font-bold text-[#2B2129]">
 												{service.serviceName}
 											</div>
 											<div className="text-xs text-gray-500 font-medium">
@@ -267,7 +274,7 @@ const EmployeeServiceHistory: React.FC = () => {
 											</div>
 										</td>
 										<td className="px-6 py-4">
-											<div className="text-sm font-black text-indigo-600">
+											<div className="text-sm font-black text-brand-600">
 												{formatCurrency(service.amount)}
 											</div>
 										</td>
@@ -326,10 +333,8 @@ const EmployeeServiceHistory: React.FC = () => {
 				}
 			>
 				<div className="space-y-6">
-					<div className="bg-indigo-50 rounded-2xl p-4 flex justify-between items-center">
-						<span className="text-sm font-bold text-indigo-600">
-							Total Due:
-						</span>
+					<div className="bg-brand-50 rounded-2xl p-4 flex justify-between items-center">
+						<span className="text-sm font-bold text-brand-600">Total Due:</span>
 						<span className="text-lg font-black text-indigo-900">
 							{formatCurrency(formData.amount)}
 						</span>
@@ -360,7 +365,7 @@ const EmployeeServiceHistory: React.FC = () => {
 						<label className="block text-sm font-bold text-gray-700 mb-2">
 							Selected Services
 						</label>
-						<div className="max-h-48 overflow-y-auto border border-gray-100 rounded-2xl bg-gray-50/50 p-2">
+						<div className="max-h-48 overflow-y-auto border border-brand-100/70 rounded-2xl bg-gray-50/50 p-2">
 							{getSelectedEmployeeServices().map((service) => (
 								<div
 									key={service.assignedEmployeeId}
@@ -371,7 +376,7 @@ const EmployeeServiceHistory: React.FC = () => {
 										formData.assignedEmployeeIds?.includes(
 											service.assignedEmployeeId,
 										)
-											? "bg-indigo-600 text-white shadow-lg shadow-indigo-200"
+											? "bg-gradient-to-br from-brand-500 to-brand-700 text-white shadow-lg shadow-indigo-200"
 											: "bg-white text-gray-600 hover:bg-gray-100"
 									}`}
 								>
@@ -384,17 +389,17 @@ const EmployeeServiceHistory: React.FC = () => {
 						</div>
 					</div>
 
-					<label className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl cursor-pointer hover:bg-gray-100 transition-colors border border-gray-100">
+					<label className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl cursor-pointer hover:bg-gray-100 transition-colors border border-brand-100/70">
 						<input
 							type="checkbox"
 							checked={formData.autoPaid}
 							onChange={(e) =>
 								setFormData({...formData, autoPaid: e.target.checked})
 							}
-							className="w-5 h-5 text-indigo-600 rounded-lg border-gray-300 focus:ring-indigo-500"
+							className="w-5 h-5 text-brand-600 rounded-lg border-gray-300 focus:ring-brand-400"
 						/>
 						<div>
-							<p className="text-sm font-bold text-gray-900">
+							<p className="text-sm font-bold text-[#2B2129]">
 								Auto-calculate total
 							</p>
 							<p className="text-[10px] text-gray-500 font-medium">
