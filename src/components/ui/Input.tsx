@@ -18,9 +18,9 @@ const Input = React.forwardRef<
 		ref,
 	) => {
 		const baseStyles =
-			"block w-full rounded-2xl border-gray-100 bg-white px-4 py-3 text-sm font-medium text-gray-900 placeholder:text-gray-400 focus:border-indigo-600 focus:ring-4 focus:ring-indigo-50/50 transition-all duration-200 shadow-sm border";
+			"block w-full rounded-2xl border-brand-100 bg-white/70 backdrop-blur-sm px-4 py-3 text-sm font-medium text-[#2B2129] placeholder:text-gray-400 focus:border-brand-400 focus:ring-4 focus:ring-brand-50 transition-all duration-200 shadow-sm border outline-none";
 		const errorStyles = error
-			? "border-rose-300 text-rose-900 placeholder-rose-300 focus:border-rose-500 focus:ring-rose-50/50"
+			? "border-red-300 text-red-900 placeholder-red-300 focus:border-red-500 focus:ring-red-50 animate-shake"
 			: "";
 
 		const inputId = id || props.name;
@@ -37,7 +37,7 @@ const Input = React.forwardRef<
 				)}
 				<div className="relative">
 					{icon && (
-						<div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none transition-colors group-focus-within:text-indigo-600">
+						<div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none transition-colors group-focus-within:text-brand-500">
 							{icon}
 						</div>
 					)}
@@ -63,8 +63,11 @@ const Input = React.forwardRef<
 					)}
 				</div>
 				{error && (
-					<p className="mt-2 text-xs font-bold text-rose-600 flex items-center gap-1.5 ml-1 animate-in fade-in slide-in-from-top-1">
-						<span className="w-1 h-1 bg-rose-600 rounded-full" />
+					<p
+						role="alert"
+						className="mt-2 text-xs font-bold text-red-600 flex items-center gap-1.5 ml-1 animate-in fade-in slide-in-from-top-1 duration-200"
+					>
+						<span className="w-1 h-1 bg-red-600 rounded-full flex-shrink-0" />
 						{error}
 					</p>
 				)}

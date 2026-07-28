@@ -57,7 +57,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
 	return (
 		<div className="w-full" ref={containerRef}>
 			{label && (
-				<label className="block text-sm font-medium text-gray-700 mb-1">
+				<label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">
 					{label}
 				</label>
 			)}
@@ -74,13 +74,13 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
 						selectedOptions.map((opt) => (
 							<span
 								key={opt.value}
-								className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-100"
+								className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-brand-50 text-brand-700 border border-brand-100"
 							>
 								{opt.label}
 								<button
 									type="button"
 									onClick={(e) => removeOption(e, opt.value)}
-									className="ml-1 hover:text-indigo-900 focus:outline-none"
+									className="ml-1 hover:text-brand-900 focus:outline-none"
 								>
 									<X className="h-3 w-3" />
 								</button>
@@ -99,7 +99,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
 				</div>
 
 				{isOpen && (
-					<div className="absolute z-50 w-full mt-1 bg-white rounded-md shadow-lg border border-gray-200 max-h-60 overflow-auto py-1">
+					<div className="absolute z-50 w-full mt-2 bg-white/95 backdrop-blur-xl rounded-2xl shadow-glass-lg border border-brand-100 max-h-60 overflow-auto py-1.5 animate-in fade-in slide-in-from-top-1 duration-150">
 						{options.length > 0 ? (
 							options.map((opt) => (
 								<div
@@ -123,7 +123,15 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
 					</div>
 				)}
 			</div>
-			{error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+			{error && (
+				<p
+					role="alert"
+					className="mt-2 text-xs font-bold text-red-600 flex items-center gap-1.5 ml-1 animate-in fade-in slide-in-from-top-1 duration-200"
+				>
+					<span className="w-1 h-1 bg-red-600 rounded-full flex-shrink-0" />
+					{error}
+				</p>
+			)}
 		</div>
 	);
 };
