@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Routes, Route, BrowserRouter as Router} from "react-router-dom";
+import {Routes, Route} from "react-router-dom";
 import HeaderTab from "./components/layouts/Header";
 import Sidebar from "./components/layouts/Sidebar";
 import BookingPage from "./components/Booking/BookingPage";
@@ -13,16 +13,24 @@ import AuthGuard from "./Authguard";
 import ServiceTable from "./components/Services/ServiceTable";
 import EmployeeServiceHistory from "./components/Employee/EmployeeServiceHistory";
 import EmployeeDetails from "./components/Employee/EmployeeDetails";
+import ErrorBoundary from "./components/common/ErrorBoundary";
 import {Toaster} from "sonner";
 import "./App.css";
 
+/* Tailwind's `lg:` breakpoint activates at >=1024px, so mobile state must
+   flip at the same boundary — otherwise the sidebar and the content padding
+   disagree at exactly 1024px and the layout overlaps/breaks. */
+const MOBILE_BREAKPOINT = 1024;
+
 function App() {
-	const [isMobile, setIsMobile] = useState(window.innerWidth <= 1024);
+	const [isMobile, setIsMobile] = useState(
+		window.innerWidth < MOBILE_BREAKPOINT,
+	);
 	const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
 	useEffect(() => {
 		const handleResize = () => {
-			setIsMobile(window.innerWidth <= 1024);
+			setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
 		};
 
 		window.addEventListener("resize", handleResize);
@@ -32,7 +40,7 @@ function App() {
 	const token = localStorage.getItem("access_token");
 
 	return (
-		<div className="min-h-screen bg-gray-50/50 font-sans text-gray-900">
+		<div className="min-h-screen bg-cream-100 font-sans text-[#2B2129]">
 			<Toaster position="top-right" richColors />
 
 			{token && (
@@ -55,74 +63,76 @@ function App() {
 						token ? "pt-24" : ""
 					}`}
 				>
-					<Routes>
-						<Route
-							path="/"
-							element={
-								<AuthGuard requireAuth={true}>
-									<DashboardPage />
-								</AuthGuard>
-							}
-						/>
-						<Route
-							path="/dashboard"
-							element={
-								<AuthGuard requireAuth={true}>
-									<DashboardPage />
-								</AuthGuard>
-							}
-						/>
-						<Route
-							path="/employees"
-							element={
-								<AuthGuard requireAuth={true}>
-									<EmployeeTable />
-								</AuthGuard>
-							}
-						/>
-						<Route
-							path="/services"
-							element={
-								<AuthGuard requireAuth={true}>
-									<ServiceTable />
-								</AuthGuard>
-							}
-						/>
-						<Route
-							path="/booking"
-							element={
-								<AuthGuard requireAuth={true}>
-									<BookingPage />
-								</AuthGuard>
-							}
-						/>
-						<Route
-							path="/finance"
-							element={
-								<AuthGuard requireAuth={true}>
-									<FinancePage />
-								</AuthGuard>
-							}
-						/>
-						<Route
-							path="/login"
-							element={
-								<AuthGuard requireAuth={false}>
-									<LoginPage />
-								</AuthGuard>
-							}
-						/>
-						<Route path="/signup" element={<SignupPage />} />
-						<Route path="/auth/callback" element={<OAuthCallback />} />
-						<Route
-							path="/employee/:employeeId/details"
-							element={<EmployeeDetails />}
-						/>
-						<Route
-							path="/employee/:employeeId/service-history"
-							element={<EmployeeServiceHistory />}
-						/>
-					</Routes>
+					<ErrorBoundary>
+						<Routes>
+							<Route
+								path="/"
+								element={
+									<AuthGuard requireAuth={true}>
+										<DashboardPage />
+									</AuthGuard>
+								}
+							/>
+							<Route
+								path="/dashboard"
+								element={
+									<AuthGuard requireAuth={true}>
+										<DashboardPage />
+									</AuthGuard>
+								}
+							/>
+							<Route
+								path="/employees"
+								element={
+									<AuthGuard requireAuth={true}>
+										<EmployeeTable />
+									</AuthGuard>
+								}
+							/>
+							<Route
+								path="/services"
+								element={
+									<AuthGuard requireAuth={true}>
+										<ServiceTable />
+									</AuthGuard>
+								}
+							/>
+							<Route
+								path="/booking"
+								element={
+									<AuthGuard requireAuth={true}>
+										<BookingPage />
+									</AuthGuard>
+								}
+							/>
+							<Route
+								path="/finance"
+								element={
+									<AuthGuard requireAuth={true}>
+										<FinancePage />
+									</AuthGuard>
+								}
+							/>
+							<Route
+								path="/login"
+								element={
+									<AuthGuard requireAuth={false}>
+										<LoginPage />
+									</AuthGuard>
+								}
+							/>
+							<Route path="/signup" element={<SignupPage />} />
+							<Route path="/auth/callback" element={<OAuthCallback />} />
+							<Route
+								path="/employee/:employeeId/details"
+								element={<EmployeeDetails />}
+							/>
+							<Route
+								path="/employee/:employeeId/service-history"
+								element={<EmployeeServiceHistory />}
+							/>
+						</Routes>
+					</ErrorBoundary>
 				</main>
 			</div>
 		</div>
