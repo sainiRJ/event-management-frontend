@@ -108,7 +108,9 @@ const DetailsModal = <T extends Record<string, any>>({
 				<div className="text-gray-800">{field.render(data[field.name])}</div>
 			);
 		}
-		return <div className="text-gray-800">{data[field.name] as React.ReactNode}</div>;
+		return (
+			<div className="text-gray-800">{data[field.name] as React.ReactNode}</div>
+		);
 	};
 
 	return (
@@ -120,7 +122,7 @@ const DetailsModal = <T extends Record<string, any>>({
 				>
 					&times;
 				</button>
-				<h2 className="text-xl font-bold mb-4 text-indigo-700">{title}</h2>
+				<h2 className="text-xl font-bold mb-4 text-brand-700">{title}</h2>
 				<div className="space-y-3">
 					{fields.map((field) => (
 						<div key={field.name as string}>
@@ -134,7 +136,7 @@ const DetailsModal = <T extends Record<string, any>>({
 				<div className="flex justify-end gap-2 mt-6">
 					{externalEdit ? (
 						<button
-							className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+							className="bg-gradient-to-br from-brand-500 to-brand-700 text-white px-4 py-2 rounded hover:bg-indigo-700"
 							onClick={() => onSave(data)}
 						>
 							Edit
@@ -142,7 +144,7 @@ const DetailsModal = <T extends Record<string, any>>({
 					) : editMode ? (
 						<>
 							<button
-								className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+								className="bg-gradient-to-br from-brand-500 to-brand-700 text-white px-4 py-2 rounded hover:bg-indigo-700"
 								onClick={handleSave}
 							>
 								Save
@@ -162,7 +164,7 @@ const DetailsModal = <T extends Record<string, any>>({
 						</>
 					) : (
 						<button
-							className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+							className="bg-gradient-to-br from-brand-500 to-brand-700 text-white px-4 py-2 rounded hover:bg-indigo-700"
 							onClick={() => setEditMode(true)}
 						>
 							Edit

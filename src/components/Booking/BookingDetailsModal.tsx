@@ -108,23 +108,23 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
 			<div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 				{sections.map((section, idx) => (
 					<div key={idx} className="space-y-4">
-						<h4 className="flex items-center gap-2 text-indigo-600 font-black text-sm uppercase tracking-widest">
+						<h4 className="flex items-center gap-2 text-brand-600 font-black text-sm uppercase tracking-widest">
 							<section.icon className="w-4 h-4" />
 							{section.title}
 						</h4>
 
-						<div className="space-y-3 bg-gray-50/50 rounded-2xl p-5 border border-gray-50">
+						<div className="space-y-3 bg-gray-50/50 rounded-2xl p-5 border border-brand-100/50">
 							{section.items.map((item, i) => (
 								<div key={i} className={item.isFullWidth ? "col-span-2" : ""}>
 									<p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">
 										{item.label}
 									</p>
 									{item.isBadge ? (
-										<span className="inline-flex px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-white border border-gray-100 shadow-sm text-indigo-600">
+										<span className="inline-flex px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-white border border-brand-100/70 shadow-sm text-brand-600">
 											{item.value}
 										</span>
 									) : (
-										<p className="text-sm font-bold text-gray-900 leading-relaxed">
+										<p className="text-sm font-bold text-[#2B2129] leading-relaxed">
 											{item.value || "-"}
 										</p>
 									)}

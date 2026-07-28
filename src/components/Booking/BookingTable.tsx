@@ -112,7 +112,7 @@ const BookingTable: React.FC<BookingTableProps> = ({
 							return (
 								<span
 									key={employee.id}
-									className="px-2 py-1 bg-indigo-100 text-indigo-800 rounded-full text-xs"
+									className="px-2 py-1 bg-brand-100 text-indigo-800 rounded-full text-xs"
 								>
 									{employee.name}
 								</span>
