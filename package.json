@@ -24,6 +24,7 @@
     "react-scripts": "5.0.1",
     "recharts": "^2.15.1",
     "redux-logger": "^3.0.6",
+    "socket.io-client": "^4.8.3",
     "sonner": "^2.0.3",
     "tailwindcss-animate": "^1.0.7",
     "ts-loader": "^9.5.2"

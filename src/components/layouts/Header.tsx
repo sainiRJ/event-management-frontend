@@ -11,12 +11,37 @@ import {
 	Users,
 	ClipboardList,
 	TrendingUp,
+	CheckCheck,
+	Inbox,
 } from "lucide-react";
+
+import {useAppDispatch, useAppSelector} from "@/store/Hooks";
+import {RootState} from "@/store";
+import {
+	markAllAsRead,
+	markAsRead,
+} from "@/store/notification/NotificationSlice";
+
+const timeAgo = (iso: string) => {
+	const diffMs = Date.now() - new Date(iso).getTime();
+	const mins = Math.floor(diffMs / 60000);
+	if (mins < 1) return "just now";
+	if (mins < 60) return `${mins}m ago`;
+	const hours = Math.floor(mins / 60);
+	if (hours < 24) return `${hours}h ago`;
+	return `${Math.floor(hours / 24)}d ago`;
+};
 
 const HeaderTab = () => {
 	const navigate = useNavigate();
+	const dispatch = useAppDispatch();
 	const [showMobileMenu, setShowMobileMenu] = useState(false);
 	const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+	const [showNotifications, setShowNotifications] = useState(false);
+
+	const {items: notifications, unreadCount} = useAppSelector(
+		(state: RootState) => state.notificationReducer,
+	);
 
 	const handleLogout = () => {
 		localStorage.clear();
@@ -66,10 +91,81 @@ const HeaderTab = () => {
 				</div>
 
 				<nav className="flex items-center gap-2 sm:gap-4">
-					<button className="p-2 text-gray-400 hover:text-brand-600 hover:bg-brand-50 rounded-xl transition-all relative">
-						<Bell className="w-5 h-5" />
-						<span className="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
-					</button>
+					<div className="relative">
+						<button
+							onClick={() => setShowNotifications(!showNotifications)}
+							className="p-2 text-gray-400 hover:text-brand-600 hover:bg-brand-50 rounded-xl transition-all relative"
+						>
+							<Bell className="w-5 h-5" />
+							{unreadCount > 0 && (
+								<span className="absolute top-1.5 right-1.5 min-w-[16px] h-4 px-1 flex items-center justify-center text-[10px] font-black bg-red-500 text-white rounded-full border-2 border-white">
+									{unreadCount > 9 ? "9+" : unreadCount}
+								</span>
+							)}
+						</button>
+
+						{showNotifications && (
+							<>
+								<div
+									className="fixed inset-0 z-10"
+									onClick={() => setShowNotifications(false)}
+								/>
+								<div className="absolute right-0 mt-3 w-80 max-h-96 flex flex-col bg-white/70 backdrop-blur-xl rounded-2xl shadow-2xl border border-brand-100/70 z-20 animate-in fade-in slide-in-from-top-2 duration-200">
+									<div className="flex items-center justify-between px-4 py-3 border-b border-brand-100/50">
+										<p className="text-sm font-black text-[#2B2129]">
+											Notifications
+										</p>
+										{unreadCount > 0 && (
+											<button
+												onClick={() => dispatch(markAllAsRead())}
+												className="flex items-center gap-1 text-xs font-bold text-brand-600 hover:text-brand-700"
+											>
+												<CheckCheck className="w-3.5 h-3.5" />
+												Mark all read
+											</button>
+										)}
+									</div>
+									<div className="overflow-y-auto flex-1">
+										{notifications.length === 0 ? (
+											<div className="flex flex-col items-center justify-center py-10 px-4 text-center">
+												<Inbox className="w-8 h-8 text-brand-200 mb-2" />
+												<p className="text-xs text-gray-400 font-bold">
+													No notifications yet
+												</p>
+											</div>
+										) : (
+											notifications.map((n) => (
+												<button
+													key={n.id}
+													onClick={() => dispatch(markAsRead(n.id))}
+													className={`w-full text-left px-4 py-3 border-b border-brand-100/40 hover:bg-brand-50 transition-colors ${
+														!n.isRead ? "bg-brand-50/60" : ""
+													}`}
+												>
+													<div className="flex items-start gap-2">
+														{!n.isRead && (
+															<span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-brand-500 shrink-0" />
+														)}
+														<div className="min-w-0">
+															<p className="text-xs font-black text-[#2B2129] truncate">
+																{n.title}
+															</p>
+															<p className="text-xs text-gray-500 line-clamp-2 mt-0.5">
+																{n.message}
+															</p>
+															<p className="text-[10px] text-gray-400 mt-1 font-bold uppercase tracking-wide">
+																{timeAgo(n.createdAt)}
+															</p>
+														</div>
+													</div>
+												</button>
+											))
+										)}
+									</div>
+								</div>
+							</>
+						)}
+					</div>
 
 					<div className="relative">
 						<button
@@ -167,9 +263,20 @@ const HeaderTab = () => {
 							))}
 
 							<div className="my-4 border-t border-brand-100/50 pt-4">
-								<button className="w-full flex items-center gap-4 px-4 py-3.5 text-gray-600 hover:text-brand-600 hover:bg-brand-50 rounded-2xl font-bold transition-all">
+								<button
+									onClick={() => {
+										setShowMobileMenu(false);
+										setShowNotifications(true);
+									}}
+									className="w-full flex items-center gap-4 px-4 py-3.5 text-gray-600 hover:text-brand-600 hover:bg-brand-50 rounded-2xl font-bold transition-all relative"
+								>
 									<Bell className="w-5 h-5" />
 									Notifications
+									{unreadCount > 0 && (
+										<span className="ml-auto min-w-[20px] h-5 px-1.5 flex items-center justify-center text-[10px] font-black bg-red-500 text-white rounded-full">
+											{unreadCount > 9 ? "9+" : unreadCount}
+										</span>
+									)}
 								</button>
 								<button
 									onClick={() => handleNavigation("/profile")}

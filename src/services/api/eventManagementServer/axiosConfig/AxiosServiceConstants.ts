@@ -112,6 +112,15 @@ export const apiEndpoints = Object.freeze({
 		userProfileDetails: () => {
 			return "/user/me/profile";
 		},
+		updateProfile: () => {
+			return "/user/me/profile";
+		},
+		uploadProfilePhoto: () => {
+			return "/user/me/photo";
+		},
+		changePassword: () => {
+			return "/user/me/password";
+		},
 	},
 	service: {
 		getAllServices: () => {

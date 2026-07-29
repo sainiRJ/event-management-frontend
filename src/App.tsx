@@ -14,6 +14,9 @@ import ServiceTable from "./components/Services/ServiceTable";
 import EmployeeServiceHistory from "./components/Employee/EmployeeServiceHistory";
 import EmployeeDetails from "./components/Employee/EmployeeDetails";
 import ErrorBoundary from "./components/common/ErrorBoundary";
+import ProfilePage from "./components/Profile/ProfilePage";
+import NotFoundPage from "./components/common/NotFoundPage";
+import {useNotificationSocket} from "./hooks/useNotificationSocket";
 import {Toaster} from "sonner";
 import "./App.css";
 
@@ -38,6 +41,7 @@ function App() {
 	}, []);
 
 	const token = localStorage.getItem("access_token");
+	useNotificationSocket(Boolean(token));
 
 	return (
 		<div className="min-h-screen bg-cream-100 font-sans text-[#2B2129]">
@@ -131,6 +135,15 @@ function App() {
 								path="/employee/:employeeId/service-history"
 								element={<EmployeeServiceHistory />}
 							/>
+							<Route
+								path="/profile"
+								element={
+									<AuthGuard requireAuth={true}>
+										<ProfilePage />
+									</AuthGuard>
+								}
+							/>
+							<Route path="*" element={<NotFoundPage />} />
 						</Routes>
 					</ErrorBoundary>
 				</main>
