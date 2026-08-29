@@ -1,0 +1,333 @@
+import React, {useCallback, useEffect, useState} from "react";
+import {toast} from "sonner";
+import {
+	CalendarDays,
+	Check,
+	Inbox,
+	MapPin,
+	Phone,
+	RefreshCw,
+	X,
+} from "lucide-react";
+
+import {operationsService} from "@/services/api/eventManagementServer";
+import {iBookingRequest} from "@/customTypes/appDataTypes/operationsTypes";
+import {httpStatusCodes} from "@/customTypes/NetworkTypes";
+import PageHeader from "@/components/common/PageHeader";
+import StatusBadge from "@/components/common/StatusBadge";
+import Button from "@/components/ui/Button";
+import Input from "@/components/ui/Input";
+import Modal from "@/components/ui/Modal";
+
+const currency = new Intl.NumberFormat("en-IN", {
+	style: "currency",
+	currency: "INR",
+	maximumFractionDigits: 2,
+});
+
+function formatDate(value: string | null): string {
+	if (!value) return "—";
+
+	return new Date(value).toLocaleDateString("en-IN", {
+		day: "numeric",
+		month: "short",
+		year: "numeric",
+	});
+}
+
+/**
+ * Requests that arrived from the public website or the chat assistant.
+ *
+ * They land as bookings with no price and a pending status. Until this screen
+ * existed they simply accumulated in the database with nothing to show them,
+ * so a customer who asked to book was never answered.
+ */
+const BookingRequestsPage: React.FC = () => {
+	const [requests, setRequests] = useState<iBookingRequest[]>([]);
+	const [isLoading, setIsLoading] = useState(true);
+	const [shouldShowHandled, setShouldShowHandled] = useState(false);
+
+	const [approving, setApproving] = useState<iBookingRequest | null>(null);
+	const [totalCost, setTotalCost] = useState("");
+	const [advancePayment, setAdvancePayment] = useState("0");
+	const [formError, setFormError] = useState<string | null>(null);
+	const [isSaving, setIsSaving] = useState(false);
+
+	const load = useCallback(async () => {
+		setIsLoading(true);
+
+		const response = await operationsService.listBookingRequests({
+			includeHandled: shouldShowHandled,
+			limit: 50,
+		});
+
+		if (response?.httpStatusCode === httpStatusCodes.SUCCESS_OK) {
+			setRequests(response.data?.data?.items ?? []);
+		} else {
+			toast.error("Couldn't load booking requests");
+		}
+
+		setIsLoading(false);
+	}, [shouldShowHandled]);
+
+	useEffect(() => {
+		load();
+	}, [load]);
+
+	const openApprove = (request: iBookingRequest) => {
+		setApproving(request);
+		setTotalCost("");
+		setAdvancePayment("0");
+		setFormError(null);
+	};
+
+	const confirmApprove = async () => {
+		if (!approving) return;
+
+		const cost = Number(totalCost);
+		const advance = Number(advancePayment || 0);
+
+		if (!Number.isFinite(cost) || cost <= 0) {
+			setFormError("Enter the agreed price for this booking");
+			return;
+		}
+
+		if (advance > cost) {
+			setFormError("Advance cannot be more than the total price");
+			return;
+		}
+
+		setIsSaving(true);
+
+		const response = await operationsService.approveBookingRequest(
+			approving.id,
+			{totalCost: cost, advancePayment: advance},
+		);
+
+		setIsSaving(false);
+
+		if (response?.httpStatusCode === httpStatusCodes.SUCCESS_OK) {
+			toast.success(`Booking confirmed for ${approving.customerName}`);
+			setApproving(null);
+			load();
+			return;
+		}
+
+		setFormError(
+			response?.data?.error?.message ??
+				"Couldn't confirm this booking. Please try again.",
+		);
+	};
+
+	const reject = async (request: iBookingRequest) => {
+		const response = await operationsService.rejectBookingRequest(request.id);
+
+		if (response?.httpStatusCode === httpStatusCodes.SUCCESS_OK) {
+			toast.success(`Request from ${request.customerName} declined`);
+			load();
+			return;
+		}
+
+		toast.error("Couldn't decline this request");
+	};
+
+	return (
+		<div>
+			<PageHeader
+				title="Booking Requests"
+				subtitle="Enquiries that came in from your website and the chat assistant"
+				actions={
+					<>
+						<Button
+							variant="secondary"
+							onClick={() => setShouldShowHandled((v) => !v)}
+						>
+							{shouldShowHandled ? "Show only pending" : "Show all"}
+						</Button>
+						<Button variant="secondary" onClick={load} disabled={isLoading}>
+							<RefreshCw
+								className={`mr-2 h-4 w-4 ${isLoading ? "animate-spin" : ""}`}
+							/>
+							Refresh
+						</Button>
+					</>
+				}
+			/>
+
+			{isLoading && requests.length === 0 && (
+				<p className="py-12 text-center text-sm text-gray-500">
+					Loading requests…
+				</p>
+			)}
+
+			{!isLoading && requests.length === 0 && (
+				<div className="rounded-3xl border border-brand-100/70 bg-white py-16 text-center">
+					<Inbox className="mx-auto mb-3 h-10 w-10 text-brand-300" />
+					<h2 className="font-display text-lg font-semibold text-[#2B2129]">
+						Nothing waiting
+					</h2>
+					<p className="mt-1 text-sm text-gray-500">
+						New requests from your website and chat will appear here.
+					</p>
+				</div>
+			)}
+
+			{/* Cards rather than a table: each request is a decision, and this
+			    reads on a phone without horizontal scrolling. */}
+			<div className="grid gap-4 lg:grid-cols-2">
+				{requests.map((request) => {
+					const isPending = request.status?.toLowerCase() === "pending";
+
+					return (
+						<article
+							key={request.id}
+							className="rounded-3xl border border-brand-100/70 bg-white p-5 shadow-sm transition-shadow hover:shadow-md sm:p-6"
+						>
+							<div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+								<div className="min-w-0">
+									<h2 className="truncate font-display text-lg font-semibold text-[#2B2129]">
+										{request.customerName}
+									</h2>
+									<p className="mt-0.5 text-sm text-gray-500">
+										{request.serviceName} · {request.eventName}
+									</p>
+								</div>
+								<StatusBadge status={request.status} />
+							</div>
+
+							<dl className="grid gap-2 text-sm text-gray-600">
+								<div className="flex items-center gap-2">
+									<CalendarDays className="h-4 w-4 shrink-0 text-brand-400" />
+									<dt className="sr-only">Event date</dt>
+									<dd>{formatDate(request.eventDate)}</dd>
+								</div>
+								<div className="flex items-center gap-2">
+									<MapPin className="h-4 w-4 shrink-0 text-brand-400" />
+									<dt className="sr-only">Location</dt>
+									<dd className="truncate">{request.location}</dd>
+								</div>
+								<div className="flex items-center gap-2">
+									<Phone className="h-4 w-4 shrink-0 text-brand-400" />
+									<dt className="sr-only">Phone</dt>
+									<dd>
+										{request.phoneNumber ? (
+											<a
+												className="hover:text-brand-600"
+												href={`tel:${request.phoneNumber}`}
+											>
+												{request.phoneNumber}
+											</a>
+										) : (
+											"—"
+										)}
+									</dd>
+								</div>
+							</dl>
+
+							{request.notes && (
+								<p className="mt-4 rounded-2xl bg-cream-100 p-3 text-sm text-gray-600">
+									{request.notes}
+								</p>
+							)}
+
+							<p className="mt-4 text-xs text-gray-400">
+								Requested {formatDate(request.requestedAt)}
+							</p>
+
+							{isPending && (
+								<div className="mt-5 flex flex-col gap-2 sm:flex-row">
+									<Button
+										className="w-full sm:w-auto"
+										onClick={() => openApprove(request)}
+									>
+										<Check className="mr-2 h-4 w-4" />
+										Confirm &amp; set price
+									</Button>
+									<Button
+										variant="secondary"
+										className="w-full sm:w-auto"
+										onClick={() => reject(request)}
+									>
+										<X className="mr-2 h-4 w-4" />
+										Decline
+									</Button>
+								</div>
+							)}
+						</article>
+					);
+				})}
+			</div>
+
+			<Modal
+				isOpen={Boolean(approving)}
+				onClose={() => setApproving(null)}
+				title="Confirm booking"
+			>
+				{approving && (
+					<div className="space-y-4">
+						<p className="text-sm text-gray-600">
+							{approving.customerName} — {approving.serviceName} on{" "}
+							{formatDate(approving.eventDate)}
+						</p>
+
+						<Input
+							label="Agreed price"
+							type="number"
+							min="0"
+							value={totalCost}
+							onChange={(e) => setTotalCost(e.target.value)}
+							placeholder="e.g. 15000"
+						/>
+
+						<Input
+							label="Advance received (optional)"
+							type="number"
+							min="0"
+							value={advancePayment}
+							onChange={(e) => setAdvancePayment(e.target.value)}
+						/>
+
+						{totalCost && Number(totalCost) > 0 && (
+							<p className="text-sm text-gray-500">
+								Outstanding after advance:{" "}
+								<span className="font-semibold text-[#2B2129]">
+									{currency.format(
+										Math.max(
+											0,
+											Number(totalCost) - Number(advancePayment || 0),
+										),
+									)}
+								</span>
+							</p>
+						)}
+
+						{formError && (
+							<p className="rounded-xl bg-rose-50 p-3 text-sm text-rose-600">
+								{formError}
+							</p>
+						)}
+
+						<div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
+							<Button
+								variant="secondary"
+								className="w-full sm:w-auto"
+								onClick={() => setApproving(null)}
+							>
+								Cancel
+							</Button>
+							<Button
+								className="w-full sm:w-auto"
+								onClick={confirmApprove}
+								disabled={isSaving}
+							>
+								{isSaving ? "Confirming…" : "Confirm booking"}
+							</Button>
+						</div>
+					</div>
+				)}
+			</Modal>
+		</div>
+	);
+};
+
+export default BookingRequestsPage;

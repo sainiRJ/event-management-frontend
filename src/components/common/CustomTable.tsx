@@ -48,12 +48,12 @@ const CustomTable = <T extends Record<string, any>>({
 
 	if (loading) {
 		return (
-			<div className="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-gray-100 shadow-sm">
+			<div className="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-brand-100/70 shadow-sm">
 				<div className="relative">
-					<div className="w-16 h-16 border-4 border-indigo-50 border-t-indigo-600 rounded-full animate-spin" />
-					<Loader2 className="w-6 h-6 text-indigo-600 animate-spin absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+					<div className="w-16 h-16 border-4 border-brand-50 border-t-brand-600 rounded-full animate-spin" />
+					<Loader2 className="w-6 h-6 text-brand-600 animate-spin absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
 				</div>
-				<p className="text-gray-900 font-black text-sm uppercase tracking-widest mt-6">
+				<p className="text-[#2B2129] font-black text-sm uppercase tracking-widest mt-6">
 					Fetching records
 				</p>
 				<p className="text-gray-400 text-xs mt-1">Please wait a moment...</p>
@@ -63,11 +63,11 @@ const CustomTable = <T extends Record<string, any>>({
 
 	if (!data || data.length === 0) {
 		return (
-			<div className="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-gray-100 shadow-sm">
-				<div className="p-5 bg-gray-50 rounded-3xl mb-6">
+			<div className="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-brand-100/70 shadow-sm">
+				<div className="p-5 bg-brand-50/50 rounded-3xl mb-6">
 					<Inbox className="w-12 h-12 text-gray-300" />
 				</div>
-				<h3 className="text-gray-900 font-black text-xl mb-2">
+				<h3 className="text-[#2B2129] font-black text-xl mb-2">
 					No Records Found
 				</h3>
 				<p className="text-gray-400 text-sm max-w-[280px] text-center font-medium leading-relaxed">
@@ -80,24 +80,29 @@ const CustomTable = <T extends Record<string, any>>({
 
 	return (
 		<div
-			className={`w-full overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm ${className}`}
+			className={`w-full overflow-hidden rounded-3xl border border-brand-100/70 bg-white shadow-sm ${className}`}
 		>
-			<div className="overflow-x-auto">
+			{/* Desktop: a real table. Below `md` the card list below takes
+			    over — a seven-column table on a phone means scrolling
+			    sideways to read a single row. */}
+			<div className="hidden overflow-x-auto md:block">
 				<table className="w-full border-separate border-spacing-0">
 					<thead>
-						<tr className="bg-gray-50/50">
+						<tr className="bg-brand-50/30">
 							{selectable && (
-								<th className="px-6 py-5 text-left border-b border-gray-100 w-12 first:rounded-tl-3xl">
+								<th className="px-6 py-5 text-left border-b border-brand-100/70 w-12 first:rounded-tl-3xl">
 									<input
 										type="checkbox"
-										className="w-5 h-5 text-indigo-600 rounded-lg border-gray-200 focus:ring-indigo-500/20 transition-all cursor-pointer"
+										className="w-5 h-5 text-brand-600 rounded-lg border-gray-200 focus:ring-brand-400/20 transition-all cursor-pointer"
 										checked={
 											data.length > 0 && selectedKeys.length === data.length
 										}
 										ref={selectAllRef}
 										onChange={(e) => {
 											if (e.target.checked) {
-												onSelectChange?.(data.map((item) => item[rowKey] as unknown as string));
+												onSelectChange?.(
+													data.map((item) => item[rowKey] as unknown as string),
+												);
 											} else {
 												onSelectChange?.([]);
 											}
@@ -108,7 +113,7 @@ const CustomTable = <T extends Record<string, any>>({
 							{columns.map((col) => (
 								<th
 									key={col.key}
-									className={`px-6 py-5 text-left text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] border-b border-gray-100 whitespace-nowrap ${
+									className={`px-6 py-5 text-left text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] border-b border-brand-100/70 whitespace-nowrap ${
 										col.className || ""
 									}`}
 									style={col.width ? {width: col.width} : {}}
@@ -117,7 +122,7 @@ const CustomTable = <T extends Record<string, any>>({
 								</th>
 							))}
 							{actions.length > 0 && (
-								<th className="px-6 py-5 text-right text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] border-b border-gray-100 last:rounded-tr-3xl">
+								<th className="px-6 py-5 text-right text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] border-b border-brand-100/70 last:rounded-tr-3xl">
 									Actions
 								</th>
 							)}
@@ -127,22 +132,30 @@ const CustomTable = <T extends Record<string, any>>({
 						{data.map((row, idx) => (
 							<tr
 								key={(row[rowKey] as unknown as string) || idx}
-								className="group hover:bg-indigo-50/30 transition-all duration-200 cursor-pointer"
+								className="group hover:bg-brand-50/30 transition-all duration-200 cursor-pointer"
 								onClick={onRowClick ? () => onRowClick(row) : undefined}
 							>
 								{selectable && (
 									<td className="px-6 py-5 whitespace-nowrap">
 										<input
 											type="checkbox"
-											className="w-5 h-5 text-indigo-600 rounded-lg border-gray-200 focus:ring-indigo-500/20 transition-all cursor-pointer"
-											checked={selectedKeys.includes(row[rowKey] as unknown as string)}
+											className="w-5 h-5 text-brand-600 rounded-lg border-gray-200 focus:ring-brand-400/20 transition-all cursor-pointer"
+											checked={selectedKeys.includes(
+												row[rowKey] as unknown as string,
+											)}
 											onChange={(e) => {
 												e.stopPropagation();
 												if (e.target.checked) {
-													onSelectChange?.([...selectedKeys, row[rowKey] as unknown as string]);
+													onSelectChange?.([
+														...selectedKeys,
+														row[rowKey] as unknown as string,
+													]);
 												} else {
 													onSelectChange?.(
-														selectedKeys.filter((key) => key !== (row[rowKey] as unknown as string)),
+														selectedKeys.filter(
+															(key) =>
+																key !== (row[rowKey] as unknown as string),
+														),
 													);
 												}
 											}}
@@ -156,7 +169,9 @@ const CustomTable = <T extends Record<string, any>>({
 											col.className || ""
 										}`}
 									>
-										{col.render ? col.render(row) : (row[col.key] as React.ReactNode) || "-"}
+										{col.render
+											? col.render(row)
+											: (row[col.key] as React.ReactNode) || "-"}
 									</td>
 								))}
 								{actions.length > 0 && (
@@ -167,7 +182,7 @@ const CustomTable = <T extends Record<string, any>>({
 													key={i}
 													className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black transition-all hover:scale-105 active:scale-95 ${
 														action.className ||
-														"bg-white text-indigo-600 border border-indigo-100 hover:bg-indigo-600 hover:text-white shadow-sm"
+														"bg-white text-brand-600 border border-brand-100 hover:bg-gradient-to-br from-brand-500 to-brand-700 hover:text-white shadow-sm"
 													}`}
 													onClick={(e) => {
 														e.stopPropagation();
@@ -186,10 +201,91 @@ const CustomTable = <T extends Record<string, any>>({
 					</tbody>
 				</table>
 			</div>
-			{/* Mobile indicator for scrolling */}
-			<div className="lg:hidden h-1 w-full bg-gray-50">
-				<div className="h-full bg-indigo-100 w-1/3 rounded-full mx-auto" />
-			</div>
+			{/* Mobile: one card per row, built from the same column config so
+			    callers never define their layout twice. */}
+			<ul className="divide-y divide-brand-100/50 md:hidden">
+				{data.map((row, idx) => {
+					const key = (row[rowKey] as unknown as string) || String(idx);
+					const [titleColumn, ...restColumns] = columns;
+
+					return (
+						<li key={key} className="p-4">
+							<div className="flex items-start gap-3">
+								{selectable && (
+									<input
+										type="checkbox"
+										aria-label="Select row"
+										className="mt-1 h-5 w-5 shrink-0 cursor-pointer rounded-lg border-gray-200 text-brand-600"
+										checked={selectedKeys.includes(key)}
+										onChange={(e) => {
+											if (e.target.checked) {
+												onSelectChange?.([...selectedKeys, key]);
+											} else {
+												onSelectChange?.(
+													selectedKeys.filter((k) => {
+														return k !== key;
+													}),
+												);
+											}
+										}}
+									/>
+								)}
+
+								<div className="min-w-0 flex-1">
+									<button
+										type="button"
+										onClick={onRowClick ? () => onRowClick(row) : undefined}
+										disabled={!onRowClick}
+										className="block w-full text-left"
+									>
+										<p className="truncate text-base font-bold text-[#2B2129]">
+											{titleColumn?.render
+												? titleColumn.render(row)
+												: (row[titleColumn?.key] as React.ReactNode) ?? "-"}
+										</p>
+
+										<dl className="mt-2 grid grid-cols-2 gap-x-3 gap-y-2">
+											{restColumns.map((col) => (
+												<div key={col.key} className="min-w-0">
+													<dt className="text-[10px] font-bold uppercase tracking-wider text-gray-400">
+														{col.label}
+													</dt>
+													<dd className="truncate text-sm font-bold text-gray-700">
+														{col.render
+															? col.render(row)
+															: (row[col.key] as React.ReactNode) || "-"}
+													</dd>
+												</div>
+											))}
+										</dl>
+									</button>
+
+									{actions.length > 0 && (
+										<div className="mt-3 flex flex-wrap gap-2">
+											{actions.map((action, i) => (
+												<button
+													key={i}
+													className={`inline-flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-black transition-all active:scale-95 ${
+														action.className ||
+														"border border-brand-100 bg-white text-brand-600 shadow-sm"
+													}`}
+													onClick={(e) => {
+														e.stopPropagation();
+														action.action(row);
+													}}
+												>
+													{action.icon}
+													{action.label}
+												</button>
+											))}
+										</div>
+									)}
+								</div>
+							</div>
+						</li>
+					);
+				})}
+			</ul>
 		</div>
 	);
 };

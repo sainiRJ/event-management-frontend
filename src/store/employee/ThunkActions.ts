@@ -20,8 +20,6 @@ export const getAllEmployees = createAsyncThunk(
 				// Handle both array and nested object response formats
 				const responseData = data;
 				let employeeList: iCreateEmployeeDTO[] = [];
-
-				console.log("responseData", responseData);
 				if (Array.isArray(responseData)) {
 					employeeList = responseData;
 				} else if (
@@ -212,10 +210,7 @@ export const getAssignedServices = createAsyncThunk(
 	"employee/getAssignedServices",
 	async (_, {rejectWithValue}) => {
 		try {
-			console.log("Fetching assigned services...");
 			const response = await employeeService.getAssignedServices();
-			console.log("Assigned services response:", response);
-
 			if (!response) {
 				console.error("No response received from getAssignedServices");
 				return rejectWithValue({
@@ -224,8 +219,6 @@ export const getAssignedServices = createAsyncThunk(
 			}
 
 			const {httpStatusCode, data, message} = response;
-			console.log("Response data:", data);
-
 			if (httpStatusCode === 200) {
 				if (data?.data) {
 					return {

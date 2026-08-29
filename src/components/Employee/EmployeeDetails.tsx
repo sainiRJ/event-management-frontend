@@ -103,7 +103,7 @@ const EmployeeDetails: React.FC = () => {
 	if (loading && (!employeeList || employeeList.length === 0)) {
 		return (
 			<div className="flex flex-col items-center justify-center py-20">
-				<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+				<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-500 mx-auto"></div>
 				<p className="mt-4 text-gray-500 font-medium">
 					Loading employee records...
 				</p>
@@ -115,7 +115,7 @@ const EmployeeDetails: React.FC = () => {
 		return (
 			<div className="flex flex-col items-center justify-center py-20 text-center">
 				<AlertCircle className="w-16 h-16 text-gray-300 mb-4" />
-				<h3 className="text-xl font-bold text-gray-900">Employee Not Found</h3>
+				<h3 className="text-xl font-bold text-[#2B2129]">Employee Not Found</h3>
 				<p className="text-gray-500 mt-1 mb-6">
 					We couldn&apos;t find the employee you&apos;re looking for.
 				</p>
@@ -129,21 +129,21 @@ const EmployeeDetails: React.FC = () => {
 	return (
 		<div className="space-y-8 animate-in fade-in duration-500">
 			{/* Header Card */}
-			<div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+			<div className="bg-white rounded-[2rem] shadow-sm border border-brand-100/70 p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
 				<div className="flex items-center gap-6">
 					<button
 						onClick={() => navigate("/employees")}
-						className="p-3 bg-gray-50 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-2xl transition-all"
+						className="p-3 bg-gray-50 text-gray-400 hover:text-brand-600 hover:bg-brand-50 rounded-2xl transition-all"
 					>
 						<ArrowLeft className="w-6 h-6" />
 					</button>
 					<div className="flex items-center gap-5">
-						<div className="w-20 h-20 bg-indigo-50 rounded-3xl flex items-center justify-center text-indigo-600 border border-indigo-100 shadow-inner">
+						<div className="w-20 h-20 bg-brand-50 rounded-3xl flex items-center justify-center text-brand-600 border border-brand-100 shadow-inner">
 							<User className="w-10 h-10" />
 						</div>
 						<div>
 							<div className="flex items-center gap-3 mb-1">
-								<h1 className="text-3xl font-black text-gray-900 tracking-tight">
+								<h1 className="text-3xl font-black text-[#2B2129] tracking-tight">
 									{employee.name}
 								</h1>
 								{getStatusBadge((employee as any).status)}
@@ -174,13 +174,13 @@ const EmployeeDetails: React.FC = () => {
 							onClick={() => setActiveTab(tab.id)}
 							className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all ${
 								isActive
-									? "bg-white text-indigo-600 shadow-sm ring-1 ring-black/5"
-									: "text-gray-500 hover:text-gray-900 hover:bg-white/50"
+									? "bg-white text-brand-600 shadow-sm ring-1 ring-black/5"
+									: "text-gray-500 hover:text-[#2B2129] hover:bg-white/50"
 							}`}
 						>
 							<Icon
 								className={`w-4 h-4 ${
-									isActive ? "text-indigo-600" : "text-gray-400"
+									isActive ? "text-brand-600" : "text-gray-400"
 								}`}
 							/>
 							{tab.label}
@@ -190,7 +190,7 @@ const EmployeeDetails: React.FC = () => {
 			</div>
 
 			{/* Tab Content */}
-			<div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 min-h-[400px]">
+			<div className="bg-white rounded-[2rem] shadow-sm border border-brand-100/70 p-8 min-h-[400px]">
 				{activeTab === "profile" && (
 					<EmployeeProfileTab employee={employee} formatDate={formatDate} />
 				)}
@@ -234,8 +234,8 @@ const EmployeeProfileTab: React.FC<{
 	return (
 		<div className="grid grid-cols-1 md:grid-cols-2 gap-12 animate-in slide-in-from-bottom-4 duration-500">
 			<div className="space-y-8">
-				<h3 className="text-xl font-black text-gray-900 flex items-center gap-3">
-					<div className="w-1 h-6 bg-indigo-600 rounded-full"></div>
+				<h3 className="text-xl font-black text-[#2B2129] flex items-center gap-3">
+					<div className="w-1 h-6 bg-gradient-to-br from-brand-500 to-brand-700 rounded-full"></div>
 					Basic Information
 				</h3>
 
@@ -243,15 +243,15 @@ const EmployeeProfileTab: React.FC<{
 					{infoItems.map((item, idx) => (
 						<div
 							key={idx}
-							className="group p-6 bg-gray-50/50 rounded-3xl border border-gray-50 hover:bg-white hover:border-indigo-100 hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-300"
+							className="group p-6 bg-gray-50/50 rounded-3xl border border-brand-100/50 hover:bg-white hover:border-brand-100 hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-300"
 						>
-							<div className="p-2.5 bg-white rounded-xl text-indigo-600 w-fit mb-4 shadow-sm group-hover:scale-110 transition-transform">
+							<div className="p-2.5 bg-white rounded-xl text-brand-600 w-fit mb-4 shadow-sm group-hover:scale-110 transition-transform">
 								<item.icon className="w-5 h-5" />
 							</div>
 							<p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
 								{item.label}
 							</p>
-							<p className="text-sm font-bold text-gray-900 truncate">
+							<p className="text-sm font-bold text-[#2B2129] truncate">
 								{item.value || "Not provided"}
 							</p>
 						</div>
@@ -260,7 +260,7 @@ const EmployeeProfileTab: React.FC<{
 			</div>
 
 			<div className="space-y-8">
-				<h3 className="text-xl font-black text-gray-900 flex items-center gap-3">
+				<h3 className="text-xl font-black text-[#2B2129] flex items-center gap-3">
 					<div className="w-1 h-6 bg-emerald-600 rounded-full"></div>
 					Activity Summary
 				</h3>
@@ -337,10 +337,17 @@ const EmployeeServiceHistoryTab: React.FC<{serviceHistory: any}> = ({
 
 	const handleSubmit = async () => {
 		try {
-			await dispatch(updateEmployeePayment(formData));
-			toast.success("Payment updated successfully");
-			setShowEditModal(false);
-			dispatch(getEmployeeServiceHistory(employeeId || ""));
+			const response: any = await dispatch(updateEmployeePayment(formData));
+			if (response?.meta?.requestStatus === "fulfilled") {
+				toast.success("Payment updated successfully");
+				setShowEditModal(false);
+				dispatch(getEmployeeServiceHistory(employeeId || ""));
+			} else {
+				toast.error(
+					response?.payload?.message?.error?.message ||
+						"Failed to update payment",
+				);
+			}
 		} catch (error) {
 			toast.error("Failed to update payment");
 		}
@@ -370,8 +377,8 @@ const EmployeeServiceHistoryTab: React.FC<{serviceHistory: any}> = ({
 		{
 			label: "Total Completed",
 			value: services.length,
-			color: "text-indigo-600",
-			bgColor: "bg-indigo-50",
+			color: "text-brand-600",
+			bgColor: "bg-brand-50",
 		},
 		{
 			label: "Paid Services",
@@ -393,7 +400,7 @@ const EmployeeServiceHistoryTab: React.FC<{serviceHistory: any}> = ({
 				{stats.map((stat, idx) => (
 					<div
 						key={idx}
-						className={`p-6 rounded-3xl border border-gray-50 ${stat.bgColor} flex items-center justify-between`}
+						className={`p-6 rounded-3xl border border-brand-100/50 ${stat.bgColor} flex items-center justify-between`}
 					>
 						<div>
 							<p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">
@@ -418,7 +425,7 @@ const EmployeeServiceHistoryTab: React.FC<{serviceHistory: any}> = ({
 					<input
 						type="text"
 						placeholder="Search services..."
-						className="w-full pl-10 pr-4 py-2 bg-gray-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-indigo-500"
+						className="w-full pl-10 pr-4 py-2 bg-gray-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-brand-400"
 					/>
 				</div>
 				<div className="flex items-center gap-2">
@@ -446,7 +453,7 @@ const EmployeeServiceHistoryTab: React.FC<{serviceHistory: any}> = ({
 				</div>
 			</div>
 
-			<div className="overflow-x-auto rounded-2xl border border-gray-100">
+			<div className="overflow-x-auto rounded-2xl border border-brand-100/70">
 				<table className="min-w-full">
 					<thead className="bg-gray-50/50">
 						<tr>
@@ -474,7 +481,7 @@ const EmployeeServiceHistoryTab: React.FC<{serviceHistory: any}> = ({
 								className="group hover:bg-gray-50/50 transition-colors"
 							>
 								<td className="px-6 py-4">
-									<div className="font-bold text-gray-900">
+									<div className="font-bold text-[#2B2129]">
 										{service.serviceName}
 									</div>
 									<div className="text-xs text-gray-500 font-medium">
@@ -490,7 +497,7 @@ const EmployeeServiceHistoryTab: React.FC<{serviceHistory: any}> = ({
 									</div>
 								</td>
 								<td className="px-6 py-4">
-									<div className="text-sm font-black text-indigo-600">
+									<div className="text-sm font-black text-brand-600">
 										{formatCurrency(service.amount)}
 									</div>
 								</td>
@@ -583,7 +590,7 @@ const EmployeePaymentHistoryTab: React.FC<{serviceHistory: any}> = ({
 
 	return (
 		<div className="space-y-8 animate-in slide-in-from-bottom-4 duration-500">
-			<div className="bg-indigo-600 rounded-[2rem] p-8 text-white flex items-center justify-between shadow-xl shadow-indigo-200">
+			<div className="bg-gradient-to-br from-brand-500 to-brand-700 rounded-[2rem] p-8 text-white flex items-center justify-between shadow-xl shadow-indigo-200">
 				<div>
 					<p className="text-indigo-100 text-xs font-bold uppercase tracking-[0.2em] mb-1">
 						Lifetime Total Paid
@@ -595,7 +602,7 @@ const EmployeePaymentHistoryTab: React.FC<{serviceHistory: any}> = ({
 				</div>
 			</div>
 
-			<div className="overflow-x-auto rounded-2xl border border-gray-100">
+			<div className="overflow-x-auto rounded-2xl border border-brand-100/70">
 				<table className="min-w-full">
 					<thead className="bg-gray-50/50">
 						<tr>
@@ -625,7 +632,7 @@ const EmployeePaymentHistoryTab: React.FC<{serviceHistory: any}> = ({
 									</div>
 								</td>
 								<td className="px-6 py-4">
-									<div className="text-sm font-black text-gray-900">
+									<div className="text-sm font-black text-[#2B2129]">
 										{formatCurrency(parseFloat(payment.amount))}
 									</div>
 								</td>

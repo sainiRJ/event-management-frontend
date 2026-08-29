@@ -3,18 +3,18 @@
 @tailwind utilities;
 
 :root {
-	--foreground-rgb: 0, 0, 0;
-	--background-start-rgb: 214, 219, 220;
+	--foreground-rgb: 43, 33, 41;
+	--background-start-rgb: 250, 246, 241;
 	--background-end-rgb: 255, 255, 255;
 }
 
 body {
-	@apply bg-gray-50 text-gray-900 antialiased selection:bg-indigo-100 selection:text-indigo-900;
+	@apply bg-cream-100 text-[#2B2129] antialiased selection:bg-brand-100 selection:text-brand-800;
+	font-family: "Manrope", system-ui, sans-serif;
 }
 
-/* Custom transitions */
-.transition-all {
-	transition-duration: 300ms;
+h1, h2, h3, .font-display {
+	font-family: "Fraunces", Georgia, serif;
 }
 
 /* Custom scrollbar */
@@ -28,45 +28,29 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-	@apply bg-gray-200 rounded-full hover:bg-gray-300 transition-colors;
+	@apply bg-brand-200 rounded-full hover:bg-brand-300 transition-colors;
 }
 
-/* Animation classes */
-.animate-in {
-	animation-duration: 500ms;
-	animation-fill-mode: both;
+/* Reusable glass card utility */
+.glass-card {
+	@apply bg-white/65 backdrop-blur-xl border border-brand-100 shadow-glass rounded-2xl;
 }
 
-.fade-in {
-	animation-name: fadeIn;
-}
-
-.slide-in-from-bottom-4 {
-	animation-name: slideInFromBottom;
-}
-
-@keyframes fadeIn {
-	from { opacity: 0; }
-	to { opacity: 1; }
-}
-
-@keyframes slideInFromBottom {
-	from { 
-		opacity: 0;
-		transform: translateY(1rem);
-	}
-	to { 
-		opacity: 1;
-		transform: translateY(0);
-	}
-}
-
-/* Utility for glassmorphism */
-.glass {
-	@apply bg-white/80 backdrop-blur-md border border-white/20;
+.glass-panel {
+	@apply bg-white/50 backdrop-blur-md border border-brand-100/70;
 }
 
 /* Card hover effect */
 .card-hover {
-	@apply transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/5 hover:-translate-y-1;
+	@apply transition-all duration-300 hover:shadow-glass-lg hover:-translate-y-0.5;
+}
+
+@keyframes shake {
+	0%, 100% { transform: translateX(0); }
+	20%, 60% { transform: translateX(-4px); }
+	40%, 80% { transform: translateX(4px); }
+}
+
+.animate-shake {
+	animation: shake 0.4s ease-in-out;
 }

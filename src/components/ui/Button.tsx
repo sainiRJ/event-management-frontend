@@ -22,15 +22,15 @@ const Button: React.FC<ButtonProps> = ({
 
 	const variants = {
 		primary:
-			"bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-500 shadow-lg shadow-indigo-100",
+			"bg-gradient-to-br from-brand-500 to-brand-700 text-white hover:from-brand-600 hover:to-brand-800 focus:ring-brand-400 shadow-lg shadow-brand-200/60",
 		secondary:
-			"bg-indigo-50 text-indigo-600 hover:bg-indigo-100 focus:ring-indigo-500",
-		danger: "bg-rose-50 text-rose-600 hover:bg-rose-100 focus:ring-rose-500",
+			"bg-brand-50 text-brand-700 hover:bg-brand-100 focus:ring-brand-400",
+		danger: "bg-red-50 text-red-600 hover:bg-red-100 focus:ring-red-400",
 		outline:
-			"border-2 border-gray-100 bg-transparent hover:border-indigo-600 hover:text-indigo-600 focus:ring-indigo-500 text-gray-600",
-		ghost: "bg-transparent hover:bg-gray-50 focus:ring-gray-500 text-gray-600",
+			"border-2 border-brand-100 bg-transparent hover:border-brand-400 hover:text-brand-600 focus:ring-brand-400 text-gray-600",
+		ghost: "bg-transparent hover:bg-brand-50 focus:ring-gray-500 text-gray-600",
 		white:
-			"bg-white text-gray-900 hover:bg-gray-50 focus:ring-gray-200 shadow-sm border border-gray-100",
+			"bg-white text-gray-900 hover:bg-brand-50 focus:ring-gray-200 shadow-sm border border-brand-100",
 	};
 
 	const sizes = {

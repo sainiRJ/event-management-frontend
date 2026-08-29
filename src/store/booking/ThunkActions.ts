@@ -2,7 +2,7 @@ import {createAsyncThunk} from "@reduxjs/toolkit";
 
 import {curryGetThunkName} from "@/utils/ReduxUtil";
 
-import {httpStatusCodes} from "@/customTypes/NetworkTypes";
+import {httpStatusCodes, iPaginatedResult} from "@/customTypes/NetworkTypes";
 import {iStateMessage} from "@/customTypes/GenericReduxTypes";
 import {iGenericResponse} from "@/customTypes/CommonServiceTypes";
 
@@ -65,14 +65,14 @@ export const createBooking = createAsyncThunk<
 });
 
 export const getAllBookings = createAsyncThunk<
-	iGenericResponse<iCreateBookingDTO[] | null> | null,
-	void,
+	iGenericResponse<iPaginatedResult<iCreateBookingDTO> | null> | null,
+	{page?: number; limit?: number} | void,
 	{
 		rejectValue: iStateMessage;
 	}
 >(curriedGetThunkName("getAllBookings"), async (arg, {rejectWithValue}) => {
 	try {
-		const response = await bookingService.getAllBookings();
+		const response = await bookingService.getAllBookings(arg || {});
 
 		if (response) {
 			const {httpStatusCode, data, message} = response;

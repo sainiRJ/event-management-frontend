@@ -1,12 +1,11 @@
 import {AxiosError, AxiosInstance, AxiosResponse} from "axios";
 import {httpStatusCodes} from "../../../../customTypes/NetworkTypes";
 import {
-	isAccessTokenExpired,
-	isRefreshTokenExpired,
 	refreshAccessToken,
 	clearTokens,
 	getAccessToken,
 } from "../../../../utils/tokenUtils";
+import {apiEndpoints} from "./AxiosServiceConstants";
 
 /**
  * NOTE: Currently we're not using redux in this project.
@@ -51,36 +50,37 @@ function BIToolServerAxiosResponseInterceptors(
 				return Promise.reject(reason);
 			}
 
+			/**
+			 * Never try to refresh a failed refresh - that is an infinite
+			 * loop. A 401 here means the session is over.
+			 */
+			if (originalRequest.url?.includes(apiEndpoints.auth.refresh())) {
+				clearTokens();
+				window.location.href = "/login";
+				return Promise.reject(reason);
+			}
+
 			// Check if the error is due to unauthorized access
 			if (
 				reason.response?.status === httpStatusCodes.CLIENT_ERROR_UNAUTHORIZED
 			) {
 				const accessToken = getAccessToken();
 
-				if (accessToken && isAccessTokenExpired(accessToken)) {
-					// Check if refresh token is expired
-					if (isRefreshTokenExpired()) {
-						// If refresh token is expired, clear tokens and redirect to login
-						clearTokens();
-						window.location.href = "/login";
-						return Promise.reject(reason);
+				/**
+				 * The refresh token is an httpOnly cookie, so the browser
+				 * cannot inspect it. Attempt the refresh and read the result:
+				 * a failure means the session is genuinely over.
+				 */
+				if (accessToken) {
+					const newAccessToken = await refreshAccessToken();
+
+					if (newAccessToken) {
+						originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+						return apiServer(originalRequest);
 					}
 
-					try {
-						// Try to refresh the access token
-						const newAccessToken = await refreshAccessToken();
-						if (newAccessToken) {
-							// Update the original request with the new token
-							originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-							// Retry the original request
-							return apiServer(originalRequest);
-						}
-					} catch (error) {
-						console.error("Error refreshing token:", error);
-						// If refresh fails, redirect to login
-						clearTokens();
-						window.location.href = "/login";
-					}
+					clearTokens();
+					window.location.href = "/login";
 				}
 			}
 

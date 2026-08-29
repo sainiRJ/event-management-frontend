@@ -1,67 +1,59 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {useNavigate, useLocation} from "react-router-dom";
-import {
-	GOOGLE_CLIENT_SECRET,
-	GOOGLE_CLIENT_ID,
-	OAUTH_REDIRECT_URI,
-} from "../../config/oauth";
 import {handleGoogleCallback} from "../../store/auth/ThunkActions";
 import {useAppDispatch} from "../../store/Hooks";
 
+/**
+ * Google OAuth redirect landing page.
+ *
+ * The authorization code is handed straight to the backend, which exchanges
+ * it with Google using the client secret and verifies the resulting ID token.
+ * The browser never sees the client secret and never asserts an identity of
+ * its own - it only relays the code.
+ */
 const OAuthCallback: React.FC = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const dispatch = useAppDispatch();
 	const [error, setError] = useState<string | null>(null);
 
+	// React 18 StrictMode mounts effects twice in development; an OAuth code is
+	// single-use, so the second exchange would always fail.
+	const hasExchanged = useRef(false);
+
 	useEffect(() => {
+		if (hasExchanged.current) {
+			return;
+		}
+		hasExchanged.current = true;
+
 		const handleCallback = async () => {
 			const searchParams = new URLSearchParams(location.search);
 			const code = searchParams.get("code");
+			const oauthError = searchParams.get("error");
 
-			if (!code) {
-				setError("Authorization code not found");
+			if (oauthError) {
+				setError("Google sign-in was cancelled. Please try again.");
 				return;
 			}
 
-			try {
-				const tokenResponse = await fetch(
-					"https://oauth2.googleapis.com/token",
-					{
-						method: "POST",
-						headers: {"Content-Type": "application/x-www-form-urlencoded"},
-						body: new URLSearchParams({
-							code: code,
-							client_id:
-								GOOGLE_CLIENT_ID ||
-								"721675851182-8b5l16vm2qjrcnb3uj1fpv6niqg8va6i.apps.googleusercontent.com",
-							client_secret:
-								GOOGLE_CLIENT_SECRET || "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",
-							redirect_uri:
-								OAUTH_REDIRECT_URI || "http://localhost:3000/auth/callback",
-							grant_type: "authorization_code",
-						}),
-					},
-				);
-
-				const tokenData: any = await tokenResponse.json();
-				const userInfoResponse = await fetch(
-					"https://www.googleapis.com/oauth2/v2/userinfo",
-					{
-						headers: {Authorization: `Bearer ${tokenData.access_token}`},
-					},
-				);
-
-				const userData = await userInfoResponse.json();
-				await dispatch(handleGoogleCallback(userData));
-				navigate("/booking");
-			} catch (err: any) {
-				setError(err.message);
+			if (!code) {
+				setError("Authorization code not found. Please start sign-in again.");
+				return;
 			}
+
+			const result = await dispatch(handleGoogleCallback({code}));
+
+			if (handleGoogleCallback.fulfilled.match(result)) {
+				navigate("/", {replace: true});
+				return;
+			}
+
+			setError("We couldn't sign you in with Google. Please try again.");
 		};
 
 		handleCallback();
-	}, [location, navigate, dispatch]);
+	}, [location.search, navigate, dispatch]);
 
 	if (error) {
 		return (
@@ -69,7 +61,10 @@ const OAuthCallback: React.FC = () => {
 				<div className="auth-box">
 					<h2>Authentication Error</h2>
 					<p className="error-message">{error}</p>
-					<button className="submit-btn" onClick={() => navigate("/login")}>
+					<button
+						className="submit-btn"
+						onClick={() => navigate("/login", {replace: true})}
+					>
 						Back to Login
 					</button>
 				</div>
@@ -80,7 +75,7 @@ const OAuthCallback: React.FC = () => {
 	return (
 		<div className="auth-container">
 			<div className="auth-box">
-				<h2>Authenticating...</h2>
+				<h2>Signing you in...</h2>
 				<div className="loading-spinner"></div>
 			</div>
 		</div>

@@ -66,7 +66,7 @@ const DashboardPage: React.FC = () => {
 
 			<div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 				<div>
-					<h1 className="text-3xl font-bold text-gray-900 tracking-tight">
+					<h1 className="text-3xl font-display font-semibold text-[#2B2129] tracking-tight">
 						Dashboard
 					</h1>
 					<p className="text-gray-500 mt-1">
@@ -94,14 +94,14 @@ const DashboardPage: React.FC = () => {
 						eventDate={nextEvent.eventDate ?? ""}
 					/>
 
-					<div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 flex flex-col">
-						<h3 className="text-indigo-600 font-semibold text-lg mb-6 flex items-center">
-							<span className="w-2 h-2 bg-indigo-600 rounded-full mr-2"></span>
+					<div className="glass-card p-8 flex flex-col">
+						<h3 className="text-brand-600 font-semibold text-lg mb-6 flex items-center">
+							<span className="w-2 h-2 bg-gradient-to-br from-brand-500 to-brand-700 rounded-full mr-2"></span>
 							Next Event
 						</h3>
 
-						<div className="bg-indigo-50/50 rounded-2xl p-6 flex-1">
-							<div className="text-xl font-bold text-gray-900 mb-6">
+						<div className="bg-brand-50/50 rounded-2xl p-6 flex-1">
+							<div className="text-xl font-bold text-[#2B2129] mb-6">
 								{nextEvent.eventName}
 							</div>
 
@@ -110,7 +110,7 @@ const DashboardPage: React.FC = () => {
 									<span className="text-gray-400 w-28 text-sm font-medium">
 										Customer
 									</span>
-									<span className="text-gray-900 font-semibold bg-white px-3 py-1 rounded-lg border border-gray-100 shadow-sm group-hover:border-indigo-200 transition-colors">
+									<span className="text-[#2B2129] font-semibold bg-white px-3 py-1 rounded-lg border border-brand-100/70 shadow-sm group-hover:border-brand-200 transition-colors">
 										{nextEvent.customerName}
 									</span>
 								</div>
@@ -119,7 +119,7 @@ const DashboardPage: React.FC = () => {
 									<span className="text-gray-400 w-28 text-sm font-medium">
 										Date
 									</span>
-									<span className="text-gray-900 font-semibold bg-white px-3 py-1 rounded-lg border border-gray-100 shadow-sm group-hover:border-indigo-200 transition-colors">
+									<span className="text-[#2B2129] font-semibold bg-white px-3 py-1 rounded-lg border border-brand-100/70 shadow-sm group-hover:border-brand-200 transition-colors">
 										{nextEvent.eventDate
 											? new Date(nextEvent.eventDate).toLocaleDateString(
 													"en-US",
@@ -138,7 +138,7 @@ const DashboardPage: React.FC = () => {
 									<span className="text-gray-400 w-28 text-sm font-medium mt-1">
 										Location
 									</span>
-									<span className="text-gray-900 font-semibold bg-white px-3 py-1 rounded-lg border border-gray-100 shadow-sm group-hover:border-indigo-200 transition-colors flex-1">
+									<span className="text-[#2B2129] font-semibold bg-white px-3 py-1 rounded-lg border border-brand-100/70 shadow-sm group-hover:border-brand-200 transition-colors flex-1">
 										{nextEvent.venueAddress}
 									</span>
 								</div>

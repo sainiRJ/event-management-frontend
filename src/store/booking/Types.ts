@@ -1,3 +1,4 @@
+import {iPagination} from "@/customTypes/NetworkTypes";
 import {NullableNumber, NullableString} from "@/customTypes/CommonTypes";
 import {apiResponseStatuses} from "@/customTypes/NetworkTypes";
 
@@ -55,6 +56,7 @@ export interface iBookingState {
 	booking: iBooking | null;
 
 	bookingList: iBooking[];
+	pagination: iPagination | null;
 
 	bookingRequest: iBookingRequest[];
 }
