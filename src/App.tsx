@@ -19,6 +19,17 @@ import NotFoundPage from "./components/common/NotFoundPage";
 import {useNotificationSocket} from "./hooks/useNotificationSocket";
 import {Toaster} from "sonner";
 import "./App.css";
+import {useSession} from "./hooks/useSession";
+import {useAppDispatch} from "./store/Hooks";
+import {fetchProfile} from "./store/user/ThunkActions";
+import GalleryPage from "./components/Gallery/GalleryPage";
+import ChatTranscriptsPage from "./components/ChatTranscripts/ChatTranscriptsPage";
+import ContactMessagesPage from "./components/ContactMessages/ContactMessagesPage";
+import BookingRequestsPage from "./components/BookingRequests/BookingRequestsPage";
+import CalendarPage from "./components/Calendar/CalendarPage";
+import {usePendingCounts} from "./hooks/usePendingCounts";
+import ForgotPasswordPage from "./components/Auth/ForgotPasswordPage";
+import ResetPasswordPage from "./components/Auth/ResetPasswordPage";
 
 /* Tailwind's `lg:` breakpoint activates at >=1024px, so mobile state must
    flip at the same boundary — otherwise the sidebar and the content padding
@@ -40,31 +51,50 @@ function App() {
 		return () => window.removeEventListener("resize", handleResize);
 	}, []);
 
-	const token = localStorage.getItem("access_token");
-	useNotificationSocket(Boolean(token));
+	/**
+	 * Reactive: the shell appears the moment login succeeds, instead of only
+	 * after a manual page reload.
+	 */
+	const isAuthenticated = useSession();
+	const dispatch = useAppDispatch();
+
+	useNotificationSocket(isAuthenticated);
+	const counts = usePendingCounts(isAuthenticated);
+
+	// The header needs the signed-in user's real name and role.
+	useEffect(() => {
+		if (isAuthenticated) {
+			dispatch(fetchProfile());
+		}
+	}, [isAuthenticated, dispatch]);
 
 	return (
 		<div className="min-h-screen bg-cream-100 font-sans text-[#2B2129]">
 			<Toaster position="top-right" richColors />
 
-			{token && (
+			{isAuthenticated && (
 				<>
 					<Sidebar
 						isCollapsed={isSidebarCollapsed}
 						setIsCollapsed={setIsSidebarCollapsed}
+						counts={counts}
 					/>
-					<HeaderTab />
+					<HeaderTab counts={counts} />
 				</>
 			)}
 
 			<div
 				className={`transition-all duration-300 ${
-					token && !isMobile ? (isSidebarCollapsed ? "pl-20" : "pl-64") : ""
+					isAuthenticated && !isMobile
+						? isSidebarCollapsed
+							? "lg:pl-20"
+							: "lg:pl-64"
+						: ""
 				}`}
 			>
 				<main
 					className={`w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 ${
-						token ? "pt-24" : ""
+						isAuthenticated ? "pt-24" : ""
 					}`}
 				>
 					<ErrorBoundary>
@@ -126,6 +156,8 @@ function App() {
 								}
 							/>
 							<Route path="/signup" element={<SignupPage />} />
+							<Route path="/forgot-password" element={<ForgotPasswordPage />} />
+							<Route path="/reset-password" element={<ResetPasswordPage />} />
 							<Route path="/auth/callback" element={<OAuthCallback />} />
 							<Route
 								path="/employee/:employeeId/details"
@@ -140,6 +172,46 @@ function App() {
 								element={
 									<AuthGuard requireAuth={true}>
 										<ProfilePage />
+									</AuthGuard>
+								}
+							/>
+							<Route
+								path="/calendar"
+								element={
+									<AuthGuard requireAuth={true}>
+										<CalendarPage />
+									</AuthGuard>
+								}
+							/>
+							<Route
+								path="/booking-requests"
+								element={
+									<AuthGuard requireAuth={true}>
+										<BookingRequestsPage />
+									</AuthGuard>
+								}
+							/>
+							<Route
+								path="/enquiries"
+								element={
+									<AuthGuard requireAuth={true}>
+										<ContactMessagesPage />
+									</AuthGuard>
+								}
+							/>
+							<Route
+								path="/conversations"
+								element={
+									<AuthGuard requireAuth={true}>
+										<ChatTranscriptsPage />
+									</AuthGuard>
+								}
+							/>
+							<Route
+								path="/gallery"
+								element={
+									<AuthGuard requireAuth={true}>
+										<GalleryPage />
 									</AuthGuard>
 								}
 							/>

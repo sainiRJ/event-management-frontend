@@ -2,7 +2,11 @@ import React, {useState, useEffect} from "react";
 import {useAppDispatch, useAppSelector} from "../../store/Hooks";
 import {fetchServices} from "@/store/services/ThunkActions";
 import {fetchStatus} from "@/store/status/ThunkActions";
-import {createBooking, updateBooking} from "@/store/booking/ThunkActions";
+import {
+	createBooking,
+	updateBooking,
+	getAllBookings,
+} from "@/store/booking/ThunkActions";
 import {getAllEmployees} from "@/store/employee/ThunkActions";
 import {RootState} from "@store/index";
 import BookingTable from "./BookingTable";
@@ -10,7 +14,7 @@ import BookingForm from "./BookingForm";
 import {bookingValidationSchema} from "../../validations/BookingValidationSchema";
 import {iCreateBookingDTO} from "@/types/booking";
 import {iBooking} from "@/store/booking/Types";
-import DetailsModal from "../common/DetailsModal";
+import BookingDetailsModal from "./BookingDetailsModal";
 import Joi from "joi";
 import {Plus, RefreshCw, Search, Filter} from "lucide-react";
 import Button from "../ui/Button";
@@ -265,7 +269,7 @@ const BookingPage = () => {
 					</p>
 				</div>
 
-				<div className="flex items-center gap-3">
+				<div className="flex flex-wrap items-center gap-2 sm:gap-3">
 					<Button
 						variant="outline"
 						icon={
@@ -379,14 +383,15 @@ const BookingPage = () => {
 				)}
 			</Modal>
 
-			<DetailsModal
-				open={showDetailsModal}
+			{/* The booking-specific modal, which also carries the payment
+			    ledger. The generic DetailsModal used here before could not
+			    show payments. */}
+			<BookingDetailsModal
+				booking={selectedBooking}
+				show={showDetailsModal}
 				onClose={() => setShowDetailsModal(false)}
-				data={selectedBooking}
-				onSave={handleEditBooking}
-				title="Booking Details"
-				fields={bookingDetailsFields}
-				externalEdit={true}
+				onEdit={handleEditBooking}
+				onPaymentChange={() => dispatch(getAllBookings())}
 			/>
 		</div>
 	);

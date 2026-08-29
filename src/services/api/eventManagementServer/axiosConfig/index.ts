@@ -24,8 +24,6 @@ const apiServer = axios.create(axiosRequestConfig);
  * @param store
  */
 export const injectStore = (store: StoreType): void => {
-	console.log("Injecting store into axios instance");
-
 	// registering common axios response interceptors
 	AxiosResponseInterceptors(store, apiServer);
 
@@ -36,7 +34,6 @@ export const injectStore = (store: StoreType): void => {
 	EventServerAxiosResponseInterceptors(store, apiServer);
 
 	// Log that interceptors have been registered
-	console.log("Axios interceptors have been registered");
 };
 
 export {apiServer};

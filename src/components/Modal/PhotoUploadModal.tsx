@@ -7,6 +7,7 @@ import Button from "../ui/Button";
 import Select from "../ui/Select";
 import {toast} from "sonner";
 import {Upload, X} from "lucide-react";
+import config from "@/config/index";
 
 interface PhotoUploadModalProps {
 	open: boolean;
@@ -81,7 +82,7 @@ const PhotoUploadModal: React.FC<PhotoUploadModalProps> = ({open, onClose}) => {
 
 		try {
 			const response = await fetch(
-				`${process.env.REACT_APP_EVENT_MANAGEMENT_BACKEND_BASEURL}/photo/upload`,
+				`${config.EVENT_MANAGEMENT_BASE_URL}/photo/upload`,
 				{
 					method: "POST",
 					body: formData,

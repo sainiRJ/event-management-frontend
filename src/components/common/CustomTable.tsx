@@ -82,7 +82,10 @@ const CustomTable = <T extends Record<string, any>>({
 		<div
 			className={`w-full overflow-hidden rounded-3xl border border-brand-100/70 bg-white shadow-sm ${className}`}
 		>
-			<div className="overflow-x-auto">
+			{/* Desktop: a real table. Below `md` the card list below takes
+			    over — a seven-column table on a phone means scrolling
+			    sideways to read a single row. */}
+			<div className="hidden overflow-x-auto md:block">
 				<table className="w-full border-separate border-spacing-0">
 					<thead>
 						<tr className="bg-brand-50/30">
@@ -198,10 +201,91 @@ const CustomTable = <T extends Record<string, any>>({
 					</tbody>
 				</table>
 			</div>
-			{/* Mobile indicator for scrolling */}
-			<div className="lg:hidden h-1 w-full bg-gray-50">
-				<div className="h-full bg-brand-100 w-1/3 rounded-full mx-auto" />
-			</div>
+			{/* Mobile: one card per row, built from the same column config so
+			    callers never define their layout twice. */}
+			<ul className="divide-y divide-brand-100/50 md:hidden">
+				{data.map((row, idx) => {
+					const key = (row[rowKey] as unknown as string) || String(idx);
+					const [titleColumn, ...restColumns] = columns;
+
+					return (
+						<li key={key} className="p-4">
+							<div className="flex items-start gap-3">
+								{selectable && (
+									<input
+										type="checkbox"
+										aria-label="Select row"
+										className="mt-1 h-5 w-5 shrink-0 cursor-pointer rounded-lg border-gray-200 text-brand-600"
+										checked={selectedKeys.includes(key)}
+										onChange={(e) => {
+											if (e.target.checked) {
+												onSelectChange?.([...selectedKeys, key]);
+											} else {
+												onSelectChange?.(
+													selectedKeys.filter((k) => {
+														return k !== key;
+													}),
+												);
+											}
+										}}
+									/>
+								)}
+
+								<div className="min-w-0 flex-1">
+									<button
+										type="button"
+										onClick={onRowClick ? () => onRowClick(row) : undefined}
+										disabled={!onRowClick}
+										className="block w-full text-left"
+									>
+										<p className="truncate text-base font-bold text-[#2B2129]">
+											{titleColumn?.render
+												? titleColumn.render(row)
+												: (row[titleColumn?.key] as React.ReactNode) ?? "-"}
+										</p>
+
+										<dl className="mt-2 grid grid-cols-2 gap-x-3 gap-y-2">
+											{restColumns.map((col) => (
+												<div key={col.key} className="min-w-0">
+													<dt className="text-[10px] font-bold uppercase tracking-wider text-gray-400">
+														{col.label}
+													</dt>
+													<dd className="truncate text-sm font-bold text-gray-700">
+														{col.render
+															? col.render(row)
+															: (row[col.key] as React.ReactNode) || "-"}
+													</dd>
+												</div>
+											))}
+										</dl>
+									</button>
+
+									{actions.length > 0 && (
+										<div className="mt-3 flex flex-wrap gap-2">
+											{actions.map((action, i) => (
+												<button
+													key={i}
+													className={`inline-flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-black transition-all active:scale-95 ${
+														action.className ||
+														"border border-brand-100 bg-white text-brand-600 shadow-sm"
+													}`}
+													onClick={(e) => {
+														e.stopPropagation();
+														action.action(row);
+													}}
+												>
+													{action.icon}
+													{action.label}
+												</button>
+											))}
+										</div>
+									)}
+								</div>
+							</div>
+						</li>
+					);
+				})}
+			</ul>
 		</div>
 	);
 };

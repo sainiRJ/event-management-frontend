@@ -2,7 +2,8 @@ import {createSlice} from "@reduxjs/toolkit";
 import {apiResponseStatuses} from "@/customTypes/NetworkTypes";
 import {handleGoogleCallback, login, signup} from "./ThunkActions";
 import {iAuthState, REDUCER_NAME} from "./Types";
-import Cookies from "js-cookie";
+import {clearTokens} from "@/utils/tokenUtils";
+import {notifyAuthChanged} from "@/hooks/useSession";
 
 const initialState: iAuthState = {
 	isLoading: false,
@@ -20,9 +21,14 @@ export const authSlice = createSlice({
 		resetAuthState: () => {
 			return initialState;
 		},
+		/**
+		 * Clears local session state and asks the backend to revoke the
+		 * refresh token. The refresh cookie is httpOnly, so only the server
+		 * can clear it - removing it here is not possible and not needed.
+		 */
 		logout: () => {
-			localStorage.removeItem("access_token");
-			Cookies.remove("refresh_token");
+			clearTokens();
+			notifyAuthChanged();
 			return initialState;
 		},
 	},

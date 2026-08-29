@@ -12,12 +12,16 @@ import {
 	ClipboardCheck,
 	MessageSquare,
 } from "lucide-react";
+import {IndianRupee} from "lucide-react";
+import PaymentLedger from "./PaymentLedger";
 
 interface BookingDetailsModalProps {
 	booking: iBooking | null;
 	show: boolean;
 	onClose: () => void;
 	onEdit: (booking: any) => void;
+	/** Called after a payment is added or removed, so the list can refresh. */
+	onPaymentChange?: () => void;
 }
 
 interface DetailItem {
@@ -38,6 +42,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
 	show,
 	onClose,
 	onEdit,
+	onPaymentChange,
 }) => {
 	if (!booking) return null;
 
@@ -105,7 +110,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
 				</>
 			}
 		>
-			<div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+			<div className="grid grid-cols-1 gap-8 md:grid-cols-2">
 				{sections.map((section, idx) => (
 					<div key={idx} className="space-y-4">
 						<h4 className="flex items-center gap-2 text-brand-600 font-black text-sm uppercase tracking-widest">
@@ -134,6 +139,17 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
 					</div>
 				))}
 			</div>
+
+			{/* The payment ledger: every receipt against this booking. The
+			    booking's advance is derived from these, not typed in. */}
+			<section className="mt-8 border-t border-brand-100/50 pt-6">
+				<h4 className="mb-4 flex items-center gap-2 text-sm font-black uppercase tracking-widest text-brand-600">
+					<IndianRupee className="h-4 w-4" />
+					Payments
+				</h4>
+
+				<PaymentLedger bookingId={booking.id} onChange={onPaymentChange} />
+			</section>
 		</Modal>
 	);
 };

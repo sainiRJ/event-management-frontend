@@ -1,8 +1,10 @@
 # Real-time Notifications — Socket.IO Contract
 
-Frontend uses `socket.io-client` and is already wired up (connects on
-login, disconnects on logout). It's waiting on the backend to run a
-Socket.IO server implementing the events below.
+**Status: implemented on both sides.** The backend serves this contract
+from `src/services/socketService.ts` (transport + handshake auth) and
+`src/services/notificationService.ts` (persistence + emit). Notifications
+are stored in the `notifications` table; see migration
+`20260822000000_add_notifications`.
 
 ## Connection
 
@@ -13,11 +15,11 @@ host if that env var isn't set) and sends the access token like this:
 io(SOCKET_URL, { auth: { token: accessToken } })
 ```
 
-**Backend needs to**: read `socket.handshake.auth.token`, verify it the
-same way the REST API verifies the `Authorization` bearer token, and
-reject the connection (or emit an `auth_error`) if it's invalid/expired.
-Please scope notifications to the authenticated admin/org — don't
-broadcast to everyone connected.
+**Backend does**: reads `socket.handshake.auth.token` in an `io.use()`
+middleware, verifies it with the same secret and rules as the REST API
+(refresh tokens are rejected), and refuses the connection otherwise.
+Each socket joins only its own `user:<id>` room, so a notification can
+never reach another vendor.
 
 ## Events the backend should emit
 
@@ -58,15 +60,15 @@ display, so new types are safe to add without a frontend change.
 - `notification:backlog` — array, see above
 - `notification:new` — single object, see above
 
-## Not yet implemented (frontend currently only reflects local state)
-"Mark as read" only updates the frontend's local Redux state right now —
-it does **not** call the backend. If you want read-state to persist
-across page reloads / devices, we'll need:
-- `PATCH /notifications/:id/read`
-- `PATCH /notifications/read-all`
+## Read-state (implemented)
+Read-state persists. The frontend updates optimistically and then calls:
+- `GET /api/notifications` — recent notifications for the caller
+- `PATCH /api/notifications/:id/read`
+- `PATCH /api/notifications/read-all`
 
-Let me know if you want these added now or later — the frontend is easy
-to wire up once these exist.
+All three require a bearer token and are scoped to the caller, so one
+admin cannot mark another's notifications read by guessing an id. The
+socket also accepts `notification:read` and `notification:read-all`.
 
 ---
 

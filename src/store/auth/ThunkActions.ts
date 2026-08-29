@@ -1,6 +1,6 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
 import {curryGetThunkName} from "@/utils/ReduxUtil";
-import {iGoogleUserData, iAuthResponse} from "./Types";
+import {iGoogleAuthRequest, iAuthResponse} from "./Types";
 import {
 	iLoginDTO,
 	iLoginResponse,
@@ -14,14 +14,22 @@ interface iSignupResponse {
 import {iStateMessage} from "@/customTypes/GenericReduxTypes";
 import {iGenericResponse} from "@/customTypes/CommonServiceTypes";
 import {httpStatusCodes} from "@/customTypes/NetworkTypes";
-import Cookies from "js-cookie";
 import {REDUCER_NAME} from "./Types";
 import {authService} from "@/services/api/eventManagementServer";
+import {notifyAuthChanged} from "@/hooks/useSession";
 const curriedGetThunkName = curryGetThunkName(REDUCER_NAME);
 
-const setTokens = (accessToken: string, refreshToken: string) => {
+/**
+ * Stores the access token only.
+ *
+ * The refresh token is set by the backend as an httpOnly cookie, so it is
+ * neither written nor readable here - that is what keeps it out of reach of
+ * any script on the page.
+ */
+const setTokens = (accessToken: string) => {
 	localStorage.setItem("access_token", accessToken);
-	Cookies.set("refresh_token", refreshToken, {expires: 7}); // Cookie expires in 7 days
+	// Lets the app shell react immediately instead of waiting for a reload.
+	notifyAuthChanged();
 };
 
 export const login = createAsyncThunk<
@@ -38,10 +46,7 @@ export const login = createAsyncThunk<
 			switch (httpStatusCode) {
 				case httpStatusCodes.SUCCESS_OK: {
 					if (data && data.data) {
-						setTokens(
-							data.data.token.accessToken,
-							data.data.token.refreshToken,
-						);
+						setTokens(data.data.token.accessToken);
 						const payload = {
 							...data,
 							data: data.data,
@@ -119,15 +124,15 @@ export const signup = createAsyncThunk<
 
 export const handleGoogleCallback = createAsyncThunk(
 	"auth/handleGoogleCallback",
-	async (userData: iGoogleUserData) => {
+	async (payload: iGoogleAuthRequest) => {
 		const response = await fetch(
 			`${config.EVENT_MANAGEMENT_BASE_URL}/auth/google/callback`,
 			{
 				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify(userData),
+				headers: {"Content-Type": "application/json"},
+				// Required so the backend can set the httpOnly refresh cookie.
+				credentials: "include",
+				body: JSON.stringify(payload),
 			},
 		);
 
@@ -136,7 +141,7 @@ export const handleGoogleCallback = createAsyncThunk(
 		}
 
 		const data: iAuthResponse = await response.json();
-		setTokens(data.data.token.accessToken, data.data.token.refreshToken);
+		setTokens(data.data.token.accessToken);
 		return data;
 	},
 );

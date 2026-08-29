@@ -9,6 +9,7 @@ import {showToast} from "../../utils/showToatify";
 import Button from "../ui/Button";
 import Input from "../ui/Input";
 import {LogIn, Sparkles, Star} from "lucide-react";
+import {GOOGLE_AUTH_URL} from "@/config/oauth";
 
 const Login: React.FC = () => {
 	const navigate = useNavigate();
@@ -42,7 +43,7 @@ const Login: React.FC = () => {
 	};
 
 	const handleGoogleLogin = () => {
-		window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.REACT_APP_GOOGLE_CLIENT_ID}&redirect_uri=${process.env.REACT_APP_OAUTH_REDIRECT_URI}&response_type=code&scope=email profile`;
+		window.location.href = GOOGLE_AUTH_URL;
 	};
 
 	return (
@@ -86,9 +87,10 @@ const Login: React.FC = () => {
 								<label className="block text-sm font-bold text-gray-700">
 									Password
 								</label>
+							</div>
+							<div className="flex items-center justify-end">
 								<Link
 									to="/forgot-password"
-									title="Forgot password link"
 									className="text-xs font-bold text-brand-600 hover:text-brand-700"
 								>
 									Forgot Password?

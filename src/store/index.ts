@@ -18,7 +18,7 @@ const store = configureStore({
 	middleware: (getDefaultMiddleware) => {
 		const middleware = getDefaultMiddleware();
 
-		if (process.env.NODE_ENV === "development") {
+		if (import.meta.env.DEV) {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			middleware.push(reduxLogger as any);
 		}

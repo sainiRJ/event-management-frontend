@@ -21,6 +21,12 @@ import {
 	markAllAsRead,
 	markAsRead,
 } from "@/store/notification/NotificationSlice";
+import {
+	markAllNotificationsRead,
+	markNotificationRead,
+} from "@/store/notification/ThunkActions";
+import MobileNav from "./MobileNav";
+import {iPendingCounts} from "@/hooks/usePendingCounts";
 
 const timeAgo = (iso: string) => {
 	const diffMs = Date.now() - new Date(iso).getTime();
@@ -32,7 +38,31 @@ const timeAgo = (iso: string) => {
 	return `${Math.floor(hours / 24)}d ago`;
 };
 
-const HeaderTab = () => {
+interface iHeaderTabProps {
+	counts: iPendingCounts;
+}
+
+const HeaderTab: React.FC<iHeaderTabProps> = ({counts}) => {
+	const profile = useAppSelector((state) => {
+		return state.userReducer.profile;
+	});
+
+	/**
+	 * The real signed-in user. This was hardcoded to "AD" / "Admin", so a
+	 * vendor never saw whose account they were in - and neither did anyone
+	 * looking at a support screenshot.
+	 */
+	const displayName = profile?.name?.trim() || "Account";
+	const initials =
+		displayName
+			.split(/\s+/)
+			.slice(0, 2)
+			.map((part: string) => {
+				return part[0];
+			})
+			.join("")
+			.toUpperCase() || "AC";
+
 	const navigate = useNavigate();
 	const dispatch = useAppDispatch();
 	const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -53,14 +83,6 @@ const HeaderTab = () => {
 		setShowMobileMenu(false);
 		setShowProfileDropdown(false);
 	};
-
-	const navItems = [
-		{label: "Dashboard", icon: LayoutDashboard, path: "/dashboard"},
-		{label: "Services", icon: Settings, path: "/services"},
-		{label: "Employees", icon: Users, path: "/employees"},
-		{label: "Booking", icon: ClipboardList, path: "/booking"},
-		{label: "Finance", icon: TrendingUp, path: "/finance"},
-	];
 
 	return (
 		<>
@@ -86,7 +108,7 @@ const HeaderTab = () => {
 
 					{/* Page Title or Search could go here */}
 					<h2 className="hidden sm:block text-sm font-bold text-gray-400 uppercase tracking-widest ml-2">
-						Admin Console
+						{profile?.role ? `${profile.role} console` : "Console"}
 					</h2>
 				</div>
 
@@ -117,7 +139,10 @@ const HeaderTab = () => {
 										</p>
 										{unreadCount > 0 && (
 											<button
-												onClick={() => dispatch(markAllAsRead())}
+												onClick={() => {
+													dispatch(markAllAsRead());
+													dispatch(markAllNotificationsRead());
+												}}
 												className="flex items-center gap-1 text-xs font-bold text-brand-600 hover:text-brand-700"
 											>
 												<CheckCheck className="w-3.5 h-3.5" />
@@ -137,7 +162,10 @@ const HeaderTab = () => {
 											notifications.map((n) => (
 												<button
 													key={n.id}
-													onClick={() => dispatch(markAsRead(n.id))}
+													onClick={() => {
+														dispatch(markAsRead(n.id));
+														dispatch(markNotificationRead(n.id));
+													}}
 													className={`w-full text-left px-4 py-3 border-b border-brand-100/40 hover:bg-brand-50 transition-colors ${
 														!n.isRead ? "bg-brand-50/60" : ""
 													}`}
@@ -177,9 +205,11 @@ const HeaderTab = () => {
 							}`}
 						>
 							<div className="w-8 h-8 rounded-xl bg-brand-100 text-brand-600 flex items-center justify-center font-black text-xs shrink-0">
-								AD
+								{initials}
 							</div>
-							<span className="hidden sm:block text-sm font-bold">Admin</span>
+							<span className="hidden sm:block text-sm font-bold">
+								{displayName}
+							</span>
 						</button>
 
 						{showProfileDropdown && (
@@ -219,87 +249,14 @@ const HeaderTab = () => {
 			</header>
 
 			{/* Mobile Drawer */}
-			{showMobileMenu && (
-				<div className="fixed inset-0 z-[60] lg:hidden">
-					{/* Backdrop */}
-					<div
-						className="fixed inset-0 bg-[#2B2129]/40 backdrop-blur-sm transition-opacity"
-						onClick={() => setShowMobileMenu(false)}
-					/>
-
-					{/* Drawer Content */}
-					<div className="fixed top-0 left-0 h-full w-72 bg-white/70 backdrop-blur-xl shadow-2xl animate-in slide-in-from-left duration-300 flex flex-col">
-						<div className="p-6 flex items-center justify-between border-b border-brand-100/50">
-							<div className="flex items-center gap-3">
-								<div className="w-8 h-8 bg-gradient-to-br from-brand-500 to-brand-700 rounded-lg flex items-center justify-center text-white">
-									<Sparkles className="w-5 h-5" />
-								</div>
-								<span className="text-xl font-display font-semibold text-[#2B2129]">
-									Saini <span className="text-brand-600">Events</span>
-								</span>
-							</div>
-							<button
-								onClick={() => setShowMobileMenu(false)}
-								className="p-2 text-gray-400 hover:text-[#2B2129] hover:bg-brand-50 rounded-xl transition-all"
-							>
-								<X className="w-6 h-6" />
-							</button>
-						</div>
-
-						<nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-							{navItems.map((item) => (
-								<button
-									key={item.path}
-									onClick={() => handleNavigation(item.path)}
-									className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl font-bold transition-all ${
-										window.location.pathname === item.path
-											? "bg-gradient-to-br from-brand-500 to-brand-700 text-white shadow-lg shadow-brand-200/50"
-											: "text-gray-600 hover:text-brand-600 hover:bg-brand-50"
-									}`}
-								>
-									<item.icon className="w-5 h-5" />
-									{item.label}
-								</button>
-							))}
-
-							<div className="my-4 border-t border-brand-100/50 pt-4">
-								<button
-									onClick={() => {
-										setShowMobileMenu(false);
-										setShowNotifications(true);
-									}}
-									className="w-full flex items-center gap-4 px-4 py-3.5 text-gray-600 hover:text-brand-600 hover:bg-brand-50 rounded-2xl font-bold transition-all relative"
-								>
-									<Bell className="w-5 h-5" />
-									Notifications
-									{unreadCount > 0 && (
-										<span className="ml-auto min-w-[20px] h-5 px-1.5 flex items-center justify-center text-[10px] font-black bg-red-500 text-white rounded-full">
-											{unreadCount > 9 ? "9+" : unreadCount}
-										</span>
-									)}
-								</button>
-								<button
-									onClick={() => handleNavigation("/profile")}
-									className="w-full flex items-center gap-4 px-4 py-3.5 text-gray-600 hover:text-brand-600 hover:bg-brand-50 rounded-2xl font-bold transition-all"
-								>
-									<Settings className="w-5 h-5" />
-									Account Settings
-								</button>
-							</div>
-						</nav>
-
-						<div className="p-4 border-t border-brand-100/50">
-							<button
-								onClick={handleLogout}
-								className="w-full flex items-center gap-4 px-4 py-3.5 text-red-600 hover:bg-red-50 rounded-2xl font-black transition-all"
-							>
-								<LogOut className="w-5 h-5" />
-								Sign Out
-							</button>
-						</div>
-					</div>
-				</div>
-			)}
+			{/* One navigation list, shared with the desktop sidebar. This used
+			    to be a second hardcoded copy, so new screens appeared on
+			    desktop and silently not on mobile. */}
+			<MobileNav
+				isOpen={showMobileMenu}
+				onClose={() => setShowMobileMenu(false)}
+				counts={counts}
+			/>
 		</>
 	);
 };

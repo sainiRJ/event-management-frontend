@@ -26,6 +26,7 @@ import {
 	ArrowUpRight,
 	ArrowDownRight,
 	Filter,
+	ChevronDown,
 	RefreshCw,
 	PieChart as PieChartIcon,
 	BarChart3,
@@ -34,13 +35,19 @@ import Button from "../ui/Button";
 import Input from "../ui/Input";
 import Select from "../ui/Select";
 
+/**
+ * Categorical series colours, drawn from the app's own brand scale plus two
+ * supporting hues that sit beside it. The charts previously used Recharts'
+ * default indigo/blue, which made the densest panel in the product look like
+ * it came from a different app.
+ */
 const COLORS = [
-	"#6366f1",
-	"#10b981",
-	"#f59e0b",
-	"#ef4444",
-	"#8b5cf6",
-	"#06b6d4",
+	"#A23C5C", // brand-500
+	"#DE8FA7", // brand-300
+	"#7D2C46", // brand-700
+	"#C95E82", // brand-400
+	"#5E2035", // brand-800
+	"#EBB9C8", // brand-200
 ];
 
 const FinancePage: React.FC = () => {
@@ -97,8 +104,6 @@ const FinancePage: React.FC = () => {
 			icon: Wallet,
 			color: "text-brand-600",
 			bgColor: "bg-brand-50",
-			trend: "+12.5%",
-			isUp: true,
 		},
 		{
 			label: "Advance Payments",
@@ -106,8 +111,6 @@ const FinancePage: React.FC = () => {
 			icon: TrendingUp,
 			color: "text-emerald-600",
 			bgColor: "bg-emerald-50",
-			trend: "+8.2%",
-			isUp: true,
 		},
 		{
 			label: "Outstanding",
@@ -115,13 +118,15 @@ const FinancePage: React.FC = () => {
 			icon: ArrowDownRight,
 			color: "text-amber-600",
 			bgColor: "bg-amber-50",
-			trend: "-2.4%",
-			isUp: false,
 		},
 	];
 
+	const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+
+	const activeFilterCount = Object.values(filters).filter(Boolean).length;
+
 	return (
-		<div className="space-y-8 animate-in fade-in duration-500">
+		<div className="space-y-6 duration-500 animate-in fade-in sm:space-y-8">
 			<div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
 				<div>
 					<h1 className="text-3xl font-display font-semibold text-[#2B2129] tracking-tight">
@@ -132,7 +137,7 @@ const FinancePage: React.FC = () => {
 					</p>
 				</div>
 
-				<div className="flex items-center gap-3">
+				<div className="flex flex-wrap items-center gap-2 sm:gap-3">
 					<Button
 						variant="outline"
 						icon={
@@ -148,62 +153,6 @@ const FinancePage: React.FC = () => {
 				</div>
 			</div>
 
-			{/* Filter Section */}
-			<div className="bg-white rounded-3xl shadow-sm border border-brand-100/70 p-8">
-				<div className="flex items-center gap-2 mb-6 text-[#2B2129] font-bold">
-					<Filter className="w-5 h-5 text-brand-600" />
-					Filters
-				</div>
-				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-					<Input
-						label="From Date"
-						type="date"
-						value={filters.fromDate || ""}
-						onChange={(e) =>
-							setFilters({...filters, fromDate: e.target.value || undefined})
-						}
-					/>
-					<Input
-						label="To Date"
-						type="date"
-						value={filters.toDate || ""}
-						onChange={(e) =>
-							setFilters({...filters, toDate: e.target.value || undefined})
-						}
-					/>
-					<Select
-						label="Booking Status"
-						options={bookingStatuses}
-						value={filters.bookingStatusId || ""}
-						onChange={(e) =>
-							setFilters({
-								...filters,
-								bookingStatusId: e.target.value || undefined,
-							})
-						}
-					/>
-					<Select
-						label="Payment Status"
-						options={paymentStatuses}
-						value={filters.paymentStatusId || ""}
-						onChange={(e) =>
-							setFilters({
-								...filters,
-								paymentStatusId: e.target.value || undefined,
-							})
-						}
-					/>
-					<Select
-						label="Service"
-						options={services}
-						value={filters.serviceId || ""}
-						onChange={(e) =>
-							setFilters({...filters, serviceId: e.target.value || undefined})
-						}
-					/>
-				</div>
-			</div>
-
 			{/* Stats Cards */}
 			<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 				{stats.map((stat, idx) => (
@@ -211,23 +160,13 @@ const FinancePage: React.FC = () => {
 						key={idx}
 						className="bg-white p-8 rounded-3xl shadow-sm border border-brand-100/70 transition-all hover:shadow-md"
 					>
-						<div className="flex items-center justify-between mb-4">
-							<div className={`p-3 rounded-2xl ${stat.bgColor} ${stat.color}`}>
-								<stat.icon className="w-6 h-6" />
-							</div>
+						{/* No trend badge: there is no comparison period to compute
+						    one from, and a hardcoded arrow is worse than none. */}
+						<div className="mb-4">
 							<div
-								className={`flex items-center text-xs font-bold px-2 py-1 rounded-lg ${
-									stat.isUp
-										? "bg-emerald-50 text-emerald-600"
-										: "bg-rose-50 text-rose-600"
-								}`}
+								className={`inline-flex p-3 rounded-2xl ${stat.bgColor} ${stat.color}`}
 							>
-								{stat.isUp ? (
-									<ArrowUpRight className="w-3 h-3 mr-1" />
-								) : (
-									<ArrowDownRight className="w-3 h-3 mr-1" />
-								)}
-								{stat.trend}
+								<stat.icon className="w-6 h-6" />
 							</div>
 						</div>
 						<h3 className="text-gray-500 text-sm font-semibold uppercase tracking-wider">
@@ -238,6 +177,84 @@ const FinancePage: React.FC = () => {
 						</div>
 					</div>
 				))}
+			</div>
+
+			{/* Filters sit below the numbers and start collapsed: the figures
+			    are what this page is for, and refining them is the second
+			    step, not the first thing that fills the screen. */}
+			<div className="rounded-3xl border border-brand-100/70 bg-white shadow-sm">
+				<button
+					type="button"
+					onClick={() => setIsFiltersOpen((open) => !open)}
+					aria-expanded={isFiltersOpen}
+					className="flex w-full items-center justify-between gap-2 p-5 text-left font-bold text-[#2B2129] sm:p-6"
+				>
+					<span className="flex items-center gap-2">
+						<Filter className="h-5 w-5 text-brand-600" />
+						Filters
+						{activeFilterCount > 0 && (
+							<span className="rounded-full bg-brand-500 px-2 py-0.5 text-xs font-bold text-white">
+								{activeFilterCount}
+							</span>
+						)}
+					</span>
+					<ChevronDown
+						className={`h-5 w-5 shrink-0 text-gray-400 transition-transform ${
+							isFiltersOpen ? "rotate-180" : ""
+						}`}
+					/>
+				</button>
+
+				<div className={isFiltersOpen ? "px-5 pb-5 sm:px-6 sm:pb-6" : "hidden"}>
+					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+						<Input
+							label="From Date"
+							type="date"
+							value={filters.fromDate || ""}
+							onChange={(e) =>
+								setFilters({...filters, fromDate: e.target.value || undefined})
+							}
+						/>
+						<Input
+							label="To Date"
+							type="date"
+							value={filters.toDate || ""}
+							onChange={(e) =>
+								setFilters({...filters, toDate: e.target.value || undefined})
+							}
+						/>
+						<Select
+							label="Booking Status"
+							options={bookingStatuses}
+							value={filters.bookingStatusId || ""}
+							onChange={(e) =>
+								setFilters({
+									...filters,
+									bookingStatusId: e.target.value || undefined,
+								})
+							}
+						/>
+						<Select
+							label="Payment Status"
+							options={paymentStatuses}
+							value={filters.paymentStatusId || ""}
+							onChange={(e) =>
+								setFilters({
+									...filters,
+									paymentStatusId: e.target.value || undefined,
+								})
+							}
+						/>
+						<Select
+							label="Service"
+							options={services}
+							value={filters.serviceId || ""}
+							onChange={(e) =>
+								setFilters({...filters, serviceId: e.target.value || undefined})
+							}
+						/>
+					</div>
+				</div>
 			</div>
 
 			{/* Charts Section */}
@@ -260,7 +277,7 @@ const FinancePage: React.FC = () => {
 									<CartesianGrid
 										strokeDasharray="3 3"
 										vertical={false}
-										stroke="#f1f5f9"
+										stroke="#F3ECE3"
 									/>
 									<XAxis
 										dataKey="serviceName"
@@ -285,7 +302,7 @@ const FinancePage: React.FC = () => {
 									/>
 									<Bar
 										dataKey="totalCost"
-										fill="#6366f1"
+										fill="#A23C5C"
 										radius={[6, 6, 0, 0]}
 										name="Total Revenue"
 									/>

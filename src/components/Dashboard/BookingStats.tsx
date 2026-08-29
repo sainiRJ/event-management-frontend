@@ -30,7 +30,6 @@ const BookingStats: React.FC<BookingStatsProps> = ({
 					value={total}
 					icon={<Sparkles className="w-6 h-6" />}
 					color="indigo"
-					trend={{value: 12, isPositive: true}}
 					className="lg:col-span-1"
 				/>
 

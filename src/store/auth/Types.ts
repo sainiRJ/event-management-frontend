@@ -30,15 +30,15 @@ export interface iAuthState {
 	message: string | null;
 }
 
-export interface iGoogleUserData {
-	id: string;
-	email: string;
-	verified_email: boolean;
-	name: string;
-	given_name: string;
-	family_name: string;
-	picture: string;
-	locale: string;
+/**
+ * What the browser sends for Google sign-in: the authorization code only.
+ *
+ * The backend exchanges it with Google (using the client secret it holds) and
+ * reads the identity from the verified ID token, so no profile fields are
+ * sent from here - a client-supplied email could not be trusted.
+ */
+export interface iGoogleAuthRequest {
+	code: string;
 }
 
 export interface iLoginCredentials {

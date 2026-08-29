@@ -5,7 +5,7 @@
  * @returns isDev
  */
 function isDev(): boolean {
-	return process.env.NODE_ENV === "development";
+	return import.meta.env.DEV;
 }
 
 const AppUtil = {
