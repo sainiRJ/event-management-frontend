@@ -6,7 +6,8 @@ import Modal from "../ui/Modal";
 import Button from "../ui/Button";
 import Select from "../ui/Select";
 import {toast} from "sonner";
-import {Upload, X, Image as ImageIcon} from "lucide-react";
+import {Upload, X} from "lucide-react";
+import config from "@/config/index";
 
 interface PhotoUploadModalProps {
 	open: boolean;
@@ -31,13 +32,12 @@ const PhotoUploadModal: React.FC<PhotoUploadModalProps> = ({open, onClose}) => {
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const selectedFiles = Array.from(e.target.files || []);
 		const validFiles: File[] = [];
-		const newPreviews: string[] = [];
 
 		selectedFiles.forEach((file) => {
-			if (file.size > 5 * 1024 * 1024) {
-				toast.error(`${file.name} is too large (max 5MB)`);
-				return;
-			}
+			// if (file.size > 5 * 1024 * 1024) {
+			// 	toast.error(`${file.name} is too large (max 5MB)`);
+			// 	return;
+			// }
 			validFiles.push(file);
 			const reader = new FileReader();
 			reader.onloadend = () => {
@@ -82,7 +82,7 @@ const PhotoUploadModal: React.FC<PhotoUploadModalProps> = ({open, onClose}) => {
 
 		try {
 			const response = await fetch(
-				`${process.env.REACT_APP_EVENT_MANAGEMENT_BACKEND_BASEURL}/photo/upload`,
+				`${config.EVENT_MANAGEMENT_BASE_URL}/photo/upload`,
 				{
 					method: "POST",
 					body: formData,
@@ -140,7 +140,7 @@ const PhotoUploadModal: React.FC<PhotoUploadModalProps> = ({open, onClose}) => {
 						{files.length > 0 && (
 							<button
 								onClick={() => fileInputRef.current?.click()}
-								className="text-xs font-bold text-indigo-600 hover:text-indigo-700 transition-colors"
+								className="text-xs font-bold text-brand-600 hover:text-brand-700 transition-colors"
 							>
 								Add More
 							</button>
@@ -150,12 +150,12 @@ const PhotoUploadModal: React.FC<PhotoUploadModalProps> = ({open, onClose}) => {
 					{previews.length === 0 ? (
 						<div
 							onClick={() => fileInputRef.current?.click()}
-							className="border-2 border-dashed border-gray-200 rounded-[2rem] p-12 flex flex-col items-center justify-center bg-gray-50/50 hover:bg-indigo-50/30 hover:border-indigo-200 transition-all cursor-pointer group"
+							className="border-2 border-dashed border-gray-200 rounded-[2rem] p-12 flex flex-col items-center justify-center bg-gray-50/50 hover:bg-brand-50/30 hover:border-indigo-200 transition-all cursor-pointer group"
 						>
-							<div className="p-4 bg-white rounded-2xl shadow-sm text-gray-400 group-hover:text-indigo-600 group-hover:scale-110 transition-all mb-4">
+							<div className="p-4 bg-white/70 backdrop-blur-xl rounded-2xl shadow-sm text-gray-400 group-hover:text-brand-600 group-hover:scale-110 transition-all mb-4">
 								<Upload className="w-8 h-8" />
 							</div>
-							<p className="text-sm font-bold text-gray-900 mb-1">
+							<p className="text-sm font-bold text-[#2B2129] mb-1">
 								Click to select photos
 							</p>
 							<p className="text-xs text-gray-400 font-medium">
@@ -173,7 +173,10 @@ const PhotoUploadModal: React.FC<PhotoUploadModalProps> = ({open, onClose}) => {
 					) : (
 						<div className="grid grid-cols-2 gap-4">
 							{previews.map((preview, index) => (
-								<div key={index} className="relative group rounded-2xl overflow-hidden border border-gray-100 shadow-sm h-40">
+								<div
+									key={index}
+									className="relative group rounded-2xl overflow-hidden border border-brand-100/70 shadow-sm h-40"
+								>
 									<img
 										src={preview}
 										alt={`Preview ${index}`}
@@ -188,7 +191,7 @@ const PhotoUploadModal: React.FC<PhotoUploadModalProps> = ({open, onClose}) => {
 										</button>
 									</div>
 									<div className="absolute bottom-2 left-2 right-2 p-2 bg-white/90 backdrop-blur-md rounded-lg flex items-center gap-2">
-										<span className="text-[10px] font-bold text-gray-900 truncate flex-1">
+										<span className="text-[10px] font-bold text-[#2B2129] truncate flex-1">
 											{files[index]?.name}
 										</span>
 									</div>
@@ -196,10 +199,12 @@ const PhotoUploadModal: React.FC<PhotoUploadModalProps> = ({open, onClose}) => {
 							))}
 							<div
 								onClick={() => fileInputRef.current?.click()}
-								className="border-2 border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center bg-gray-50/50 hover:bg-indigo-50/30 hover:border-indigo-200 transition-all cursor-pointer group h-40"
+								className="border-2 border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center bg-gray-50/50 hover:bg-brand-50/30 hover:border-indigo-200 transition-all cursor-pointer group h-40"
 							>
-								<Upload className="w-6 h-6 text-gray-400 group-hover:text-indigo-600 transition-colors" />
-								<span className="text-[10px] font-bold text-gray-500 mt-2">Add More</span>
+								<Upload className="w-6 h-6 text-gray-400 group-hover:text-brand-600 transition-colors" />
+								<span className="text-[10px] font-bold text-gray-500 mt-2">
+									Add More
+								</span>
 								<input
 									ref={fileInputRef}
 									type="file"

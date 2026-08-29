@@ -25,10 +25,10 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
 }) => {
 	const colorClasses = {
 		indigo: {
-			bg: "bg-indigo-50",
-			text: "text-indigo-600",
-			shadow: "shadow-indigo-100",
-			iconBg: "bg-indigo-600",
+			bg: "bg-brand-50",
+			text: "text-brand-600",
+			shadow: "shadow-brand-200/50",
+			iconBg: "bg-gradient-to-br from-brand-500 to-brand-700",
 		},
 		rose: {
 			bg: "bg-rose-50",
@@ -61,7 +61,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
 
 	return (
 		<div
-			className={`group relative bg-white rounded-3xl p-6 border border-gray-100 shadow-sm hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 hover:-translate-y-1 ${className}`}
+			className={`group relative bg-white/70 backdrop-blur-xl rounded-3xl p-6 border border-brand-100/70 shadow-glass hover:shadow-glass-lg transition-all duration-300 hover:-translate-y-1 ${className}`}
 		>
 			<div className="flex items-start justify-between mb-4">
 				<div
@@ -92,14 +92,14 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
 					{title}
 				</h3>
 				<div className="flex items-baseline gap-2">
-					<span className="text-3xl font-black text-gray-900 tracking-tight">
+					<span className="text-3xl font-black text-[#2B2129] tracking-tight">
 						{value}
 					</span>
 				</div>
 			</div>
 
 			{children && (
-				<div className="mt-4 pt-4 border-t border-gray-50">{children}</div>
+				<div className="mt-4 pt-4 border-t border-brand-100/50">{children}</div>
 			)}
 		</div>
 	);

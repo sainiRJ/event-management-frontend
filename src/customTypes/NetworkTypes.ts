@@ -4,12 +4,37 @@ import {iGenericResponse} from "./CommonServiceTypes";
 
 type APIResponseMessageType = NullableString;
 
+/**
+ * List endpoints return their rows alongside pagination metadata rather than
+ * a bare array, so a table can page instead of rendering every row it has.
+ */
+type iPagination = {
+	page: number;
+	limit: number;
+	total: number;
+	totalPages: number;
+	hasNextPage: boolean;
+};
+
+type iPaginatedResult<T> = {
+	items: T[];
+	pagination: iPagination;
+};
+
+/**
+ * The shape every backend error carries. Matches serviceUtil.buildResult on
+ * the server, so the two envelopes stay in step.
+ */
+type iAPIError = {
+	error: string;
+	message: string;
+	validationErrors?: Record<string, unknown> | null;
+};
+
 type APIResponse<SuccessResultType> = {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	error: any;
+	error: iAPIError | null;
 	httpStatusCode: httpStatusCodes | null;
 	message: NullableString;
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	data: iGenericResponse<SuccessResultType> | null;
 };
 
@@ -67,6 +92,13 @@ interface iAPIRequestStatus {
 	responseStatus: apiResponseStatuses;
 }
 
-export type {APIResponseMessageType, APIResponse, iAPIRequestStatus};
+export type {
+	APIResponseMessageType,
+	APIResponse,
+	iAPIError,
+	iAPIRequestStatus,
+	iPagination,
+	iPaginatedResult,
+};
 
 export {apiResponseStatuses, httpStatusCodes};

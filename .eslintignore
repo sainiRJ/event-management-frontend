@@ -1,0 +1,11 @@
+# Build artifacts. Linting the minified bundle is meaningless, and with
+# type-aware rules it is what made `npm run lint` take >15 minutes.
+build
+dist
+coverage
+
+# Root-level tooling config. tsconfig.json includes only "src" and
+# vite.config.ts, so these sit outside the TS program and the type-aware
+# parser cannot handle them.
+/postcss.config.js
+/tailwind.config.js

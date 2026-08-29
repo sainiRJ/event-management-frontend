@@ -92,15 +92,12 @@ function EmployeeService(apiServer: AxiosInstance) {
 				apiEndpoints.employee.updateEmployee(employeeId),
 				employeeData,
 			);
-			console.log("Update employee API response:", response);
-
 			result = NetworkUtil.buildResult<iCreateEmployeeDTO>(
 				response.data,
 				response.status,
 				null,
 				null,
 			);
-			console.log("Built result:", result);
 		} catch (error: any) {
 			console.error("Error in updateEmployee service:", error);
 			if (error.response) {
@@ -111,7 +108,6 @@ function EmployeeService(apiServer: AxiosInstance) {
 					data,
 					null,
 				);
-				console.log("Error response built:", result);
 			}
 			throw error;
 		}
@@ -160,19 +156,16 @@ function EmployeeService(apiServer: AxiosInstance) {
 				.get(apiEndpoints.employee.getEmployeeStats())
 				.then(
 					(value) => {
-						console.log("Employee stats API raw response:", value.data);
 						result = NetworkUtil.buildResult<iEmployeeStatsResponse>(
 							value.data,
 							value.status,
 							null,
 							null,
 						);
-						console.log("Employee stats API processed result:", result);
 					},
 					(reason) => {
 						const {response} = reason;
 						const {status, data} = response;
-						console.log("Employee stats API error:", data);
 						result = NetworkUtil.buildResult<null>(data, status, data, null);
 					},
 				)
@@ -219,12 +212,9 @@ function EmployeeService(apiServer: AxiosInstance) {
 		let result: APIResponse<iEmployeeAssignedServices[]> | null = null;
 
 		try {
-			console.log("Calling assigned services API...");
 			const response = await apiServer.get(
 				apiEndpoints.employee.getAssignedServices(),
 			);
-			console.log("Raw API response:", response);
-
 			if (response.data?.data) {
 				result = NetworkUtil.buildResult<iEmployeeAssignedServices[]>(
 					response.data,
@@ -252,7 +242,6 @@ function EmployeeService(apiServer: AxiosInstance) {
 					null,
 				);
 			}
-			console.log("Processed result:", result);
 		} catch (error: any) {
 			console.error("Error in getAssignedServices service:", error);
 			if (error.response) {

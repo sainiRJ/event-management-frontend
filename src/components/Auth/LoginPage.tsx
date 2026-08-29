@@ -9,6 +9,7 @@ import {showToast} from "../../utils/showToatify";
 import Button from "../ui/Button";
 import Input from "../ui/Input";
 import {LogIn, Sparkles, Star} from "lucide-react";
+import {GOOGLE_AUTH_URL} from "@/config/oauth";
 
 const Login: React.FC = () => {
 	const navigate = useNavigate();
@@ -42,19 +43,19 @@ const Login: React.FC = () => {
 	};
 
 	const handleGoogleLogin = () => {
-		window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.REACT_APP_GOOGLE_CLIENT_ID}&redirect_uri=${process.env.REACT_APP_OAUTH_REDIRECT_URI}&response_type=code&scope=email profile`;
+		window.location.href = GOOGLE_AUTH_URL;
 	};
 
 	return (
-		<div className="min-h-screen flex items-center justify-center bg-gray-50 p-4 sm:p-6 lg:p-8">
-			<div className="w-full max-w-5xl bg-white rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:flex-row min-h-[600px] border border-gray-100">
+		<div className="min-h-screen flex items-center justify-center bg-cream-100 p-4 sm:p-6 lg:p-8">
+			<div className="w-full max-w-5xl bg-white rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:flex-row min-h-[600px] border border-brand-100/70">
 				{/* Left: Login Form */}
 				<div className="flex-1 p-8 sm:p-12 lg:p-16 flex flex-col justify-center">
 					<div className="mb-10">
-						<div className="inline-flex items-center justify-center p-3 bg-indigo-50 rounded-2xl mb-6">
-							<LogIn className="w-8 h-8 text-indigo-600" />
+						<div className="inline-flex items-center justify-center p-3 bg-brand-50 rounded-2xl mb-6">
+							<LogIn className="w-8 h-8 text-brand-600" />
 						</div>
-						<h2 className="text-4xl font-black text-gray-900 tracking-tight mb-3">
+						<h2 className="text-4xl font-black text-[#2B2129] tracking-tight mb-3">
 							Welcome Back
 						</h2>
 						<p className="text-gray-500 font-medium">
@@ -86,10 +87,11 @@ const Login: React.FC = () => {
 								<label className="block text-sm font-bold text-gray-700">
 									Password
 								</label>
+							</div>
+							<div className="flex items-center justify-end">
 								<Link
 									to="/forgot-password"
-									title="Forgot password link"
-									className="text-xs font-bold text-indigo-600 hover:text-indigo-700"
+									className="text-xs font-bold text-brand-600 hover:text-brand-700"
 								>
 									Forgot Password?
 								</Link>
@@ -107,7 +109,7 @@ const Login: React.FC = () => {
 
 						<Button
 							type="submit"
-							className="w-full h-14 text-lg font-bold shadow-xl shadow-indigo-100 hover:shadow-indigo-200 transition-all active:scale-[0.98]"
+							className="w-full h-14 text-lg font-bold shadow-xl shadow-brand-200/50 hover:shadow-brand-300/50 transition-all active:scale-[0.98]"
 							isLoading={isLoading}
 						>
 							Log In
@@ -116,7 +118,7 @@ const Login: React.FC = () => {
 
 					<div className="relative my-10">
 						<div className="absolute inset-0 flex items-center">
-							<div className="w-full border-t border-gray-100"></div>
+							<div className="w-full border-t border-brand-100/70"></div>
 						</div>
 						<div className="relative flex justify-center text-sm font-bold uppercase tracking-widest">
 							<span className="px-4 bg-white text-gray-400">
@@ -128,7 +130,7 @@ const Login: React.FC = () => {
 					<button
 						type="button"
 						onClick={handleGoogleLogin}
-						className="w-full h-14 flex items-center justify-center gap-4 bg-white border-2 border-gray-100 rounded-2xl font-bold text-gray-700 hover:bg-gray-50 hover:border-gray-200 transition-all active:scale-[0.98]"
+						className="w-full h-14 flex items-center justify-center gap-4 bg-white border-2 border-brand-100/70 rounded-2xl font-bold text-gray-700 hover:bg-brand-50 hover:border-brand-200 transition-all active:scale-[0.98]"
 					>
 						<img
 							src="https://www.svgrepo.com/show/475656/google-color.svg"
@@ -142,7 +144,7 @@ const Login: React.FC = () => {
 						Don&apos;t have an account?{" "}
 						<Link
 							to="/signup"
-							className="text-indigo-600 font-black hover:underline underline-offset-4"
+							className="text-brand-600 font-black hover:underline underline-offset-4"
 						>
 							Create Account
 						</Link>
@@ -150,10 +152,10 @@ const Login: React.FC = () => {
 				</div>
 
 				{/* Right: Brand Section */}
-				<div className="hidden md:flex flex-1 bg-indigo-600 p-12 lg:p-16 flex-col justify-between relative overflow-hidden">
+				<div className="hidden md:flex flex-1 bg-gradient-to-br from-brand-500 to-brand-700 p-12 lg:p-16 flex-col justify-between relative overflow-hidden">
 					{/* Decorative background elements */}
-					<div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500 rounded-full -mr-32 -mt-32 opacity-20"></div>
-					<div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-700 rounded-full -ml-48 -mb-48 opacity-20"></div>
+					<div className="absolute top-0 right-0 w-64 h-64 bg-brand-500 rounded-full -mr-32 -mt-32 opacity-20"></div>
+					<div className="absolute bottom-0 left-0 w-96 h-96 bg-brand-700 rounded-full -ml-48 -mb-48 opacity-20"></div>
 
 					<div className="relative z-10">
 						<div className="flex items-center gap-3 mb-12">
@@ -167,19 +169,19 @@ const Login: React.FC = () => {
 
 						<h1 className="text-5xl font-black text-white leading-tight mb-8">
 							Crafting Memories, <br />
-							<span className="text-indigo-200">One Event at a Time.</span>
+							<span className="text-brand-100">One Event at a Time.</span>
 						</h1>
 
 						<div className="space-y-6">
 							<div className="flex items-start gap-4">
-								<div className="p-2 bg-indigo-500 rounded-lg text-indigo-100">
+								<div className="p-2 bg-brand-500 rounded-lg text-brand-50">
 									<Star className="w-5 h-5" />
 								</div>
 								<div>
 									<h4 className="text-white font-bold mb-1">
 										Elite Decoration
 									</h4>
-									<p className="text-indigo-100 text-sm font-medium opacity-80 leading-relaxed">
+									<p className="text-brand-50 text-sm font-medium opacity-80 leading-relaxed">
 										Professional-grade management tools for your creative
 										decoration business.
 									</p>
@@ -194,7 +196,7 @@ const Login: React.FC = () => {
 								{[1, 2, 3, 4].map((i) => (
 									<div
 										key={i}
-										className="w-10 h-10 rounded-full border-2 border-indigo-600 bg-indigo-400 overflow-hidden shadow-lg"
+										className="w-10 h-10 rounded-full border-2 border-brand-500 bg-brand-400 overflow-hidden shadow-lg"
 									>
 										<img
 											src={`https://i.pravatar.cc/100?img=${i + 10}`}
@@ -202,7 +204,7 @@ const Login: React.FC = () => {
 										/>
 									</div>
 								))}
-								<div className="w-10 h-10 rounded-full border-2 border-indigo-600 bg-white/20 backdrop-blur-md flex items-center justify-center text-xs font-bold text-white shadow-lg">
+								<div className="w-10 h-10 rounded-full border-2 border-brand-500 bg-white/20 backdrop-blur-md flex items-center justify-center text-xs font-bold text-white shadow-lg">
 									+50
 								</div>
 							</div>

@@ -12,6 +12,7 @@ const initialState: iBookingState = {
 	booking: null,
 	message: null,
 	bookingList: [],
+	pagination: null,
 	bookingRequest: [],
 };
 export const bookingSlice = createSlice({
@@ -46,7 +47,8 @@ export const bookingSlice = createSlice({
 			.addCase(getAllBookings.fulfilled, (state, action) => {
 				const payload = action.payload;
 				if (payload && payload.data) {
-					state.bookingList = payload.data as iBooking[]; // Cast to iBooking[]
+					state.bookingList = payload.data.items as iBooking[];
+					state.pagination = payload.data.pagination;
 					state.isLoading = false;
 					state.responseStatus = apiResponseStatuses.SUCCESS;
 				}

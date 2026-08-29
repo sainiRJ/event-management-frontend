@@ -1,90 +1,129 @@
-import Cookies from "js-cookie";
-import config from "../config";
+import {authService} from "@/services/api/eventManagementServer";
+import {httpStatusCodes} from "@/customTypes/NetworkTypes";
 
-interface DecodedToken {
+/**
+ * Token handling.
+ *
+ * The refresh token is an httpOnly cookie set by the backend, so this file
+ * deliberately cannot read it. The only way to learn whether a session is
+ * still valid is to call the refresh endpoint and look at the result.
+ */
+
+interface iDecodedToken {
 	exp: number;
 	id: string;
 	email: string;
+	role?: string;
 	iat: number;
 }
 
-const decodeToken = (token: string): DecodedToken | null => {
+const ACCESS_TOKEN_KEY = "access_token";
+
+const decodeToken = (token: string): iDecodedToken | null => {
 	try {
-		const payload = JSON.parse(atob(token.split(".")[1]));
-		return payload as DecodedToken;
-	} catch (error) {
-		console.error("Error decoding token:", error);
-		return null;
-	}
-};
-
-export const isAccessTokenExpired = (token: string): boolean => {
-	try {
-		const decodedToken = decodeToken(token);
-		if (!decodedToken) return true;
-		return Date.now() >= decodedToken.exp * 1000;
-	} catch (error) {
-		console.error("Error checking access token expiration:", error);
-		return true;
-	}
-};
-
-export const isRefreshTokenExpired = (): boolean => {
-	const refreshToken = Cookies.get("refresh_token");
-	if (!refreshToken) {
-		console.log("No refresh token found in cookies");
-		return true;
-	}
-
-	try {
-		const decodedToken = decodeToken(refreshToken);
-		if (!decodedToken) return true;
-		return Date.now() >= decodedToken.exp * 1000;
-	} catch (error) {
-		console.error("Error checking refresh token expiration:", error);
-		return true;
-	}
-};
-
-export const refreshAccessToken = async (): Promise<string | null> => {
-	try {
-		const response = await fetch(
-			`${config.EVENT_MANAGEMENT_BASE_URL}/auth/refresh-token`,
-			{
-				method: "POST",
-				credentials: "include", // This is important to send cookies
-			},
-		);
-
-		if (!response.ok) {
-			throw new Error("Failed to refresh token");
-		}
-
-		const data = await response.json();
-		if (data.data?.accessToken) {
-			localStorage.setItem("access_token", data.data.accessToken);
-			console.log("Access token refreshed successfully");
-			return data.data.accessToken;
-		}
-		console.log("No access token in refresh response");
-		return null;
-	} catch (error) {
-		console.error("Error refreshing token:", error);
+		return JSON.parse(atob(token.split(".")[1])) as iDecodedToken;
+	} catch {
 		return null;
 	}
 };
 
 export const getAccessToken = (): string | null => {
-	const token = localStorage.getItem("access_token");
-	console.log(
-		"Retrieved access token from localStorage:",
-		token ? "Token exists" : "No token found",
-	);
-	return token;
+	return localStorage.getItem(ACCESS_TOKEN_KEY);
 };
 
-export const clearTokens = () => {
-	localStorage.removeItem("access_token");
-	Cookies.remove("refresh_token");
-	console.log("Tokens cleared from storage");
+export const setAccessToken = (token: string): void => {
+	localStorage.setItem(ACCESS_TOKEN_KEY, token);
+};
+
+export const isAccessTokenExpired = (token: string): boolean => {
+	const decoded = decodeToken(token);
+
+	if (!decoded?.exp) {
+		return true;
+	}
+
+	// 30-second buffer for clock skew and time in transit.
+	return Date.now() + 30 * 1000 >= decoded.exp * 1000;
+};
+
+/**
+ * True when a present, unexpired access token exists. Use this for route
+ * guards rather than checking that any string is stored.
+ */
+export const hasValidSession = (): boolean => {
+	const token = getAccessToken();
+	return Boolean(token) && !isAccessTokenExpired(token as string);
+};
+
+export const getCurrentUserRole = (): string | null => {
+	const token = getAccessToken();
+	return token ? decodeToken(token)?.role ?? null : null;
+};
+
+export const clearTokens = (): void => {
+	localStorage.removeItem(ACCESS_TOKEN_KEY);
+	// The refresh cookie is httpOnly; only the server can clear it.
+	void authService.logout();
+};
+
+let refreshPromise: Promise<string | null> | null = null;
+
+/**
+ * Exchanges the httpOnly refresh cookie for a new access token.
+ *
+ * De-duplicated, which matters because the backend rotates the refresh token
+ * on every use - two concurrent refreshes would invalidate each other.
+ */
+export const refreshAccessToken = async (): Promise<string | null> => {
+	if (refreshPromise) {
+		return refreshPromise;
+	}
+
+	refreshPromise = (async () => {
+		try {
+			const response = await authService.refreshToken();
+
+			if (response?.httpStatusCode === httpStatusCodes.SUCCESS_OK) {
+				const accessToken = response.data?.data?.accessToken;
+
+				if (accessToken) {
+					setAccessToken(accessToken);
+					return accessToken;
+				}
+			}
+
+			return null;
+		} catch {
+			return null;
+		} finally {
+			refreshPromise = null;
+		}
+	})();
+
+	return refreshPromise;
+};
+
+/**
+ * Returns a usable access token, refreshing first when the current one has
+ * expired. Returns null when the session is over.
+ */
+export const validateAndRefreshToken = async (): Promise<string | null> => {
+	const token = getAccessToken();
+
+	if (!token) {
+		return null;
+	}
+
+	if (!isAccessTokenExpired(token)) {
+		return token;
+	}
+
+	const refreshed = await refreshAccessToken();
+
+	if (!refreshed) {
+		localStorage.removeItem(ACCESS_TOKEN_KEY);
+		return null;
+	}
+
+	return refreshed;
 };

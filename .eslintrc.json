@@ -14,8 +14,7 @@
       "project": "./tsconfig.json",
       "tsconfigRootDir": "./",
       "ecmaVersion": "latest",
-      "sourceType": "module",
-      "createDefaultProgram": true
+      "sourceType": "module"
     },
     "plugins": [
       "react",

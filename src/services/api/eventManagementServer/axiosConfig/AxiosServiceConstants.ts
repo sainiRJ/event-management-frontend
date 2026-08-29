@@ -33,7 +33,7 @@ export const axiosRequestConfig: AxiosRequestConfig =
 		 * the API_SERVER_REQUEST_TIMEOUT is not set in the
 		 * environment files.
 		 */
-		timeout: API_SERVER_REQUEST_TIMEOUT || 15000,
+		timeout: Number(API_SERVER_REQUEST_TIMEOUT) || 15000,
 	});
 
 /**
@@ -65,6 +65,56 @@ export const apiEndpoints = Object.freeze({
 		signup: () => {
 			return "auth/signup";
 		},
+		refresh: () => {
+			return "auth/refresh-token";
+		},
+		logout: () => {
+			return "auth/logout";
+		},
+		forgotPassword: () => {
+			return "auth/forgot-password";
+		},
+		resetPassword: () => {
+			return "auth/reset-password";
+		},
+		user: () => {
+			return "auth/user";
+		},
+	},
+
+	bookingRequests: {
+		list: () => "booking-requests",
+		count: () => "booking-requests/count",
+		approve: (id: string) => `booking-requests/${id}/approve`,
+		reject: (id: string) => `booking-requests/${id}/reject`,
+	},
+
+	contactMessages: {
+		list: () => "contact-messages",
+		count: () => "contact-messages/count",
+		markRead: (id: number) => `contact-messages/${id}/read`,
+	},
+
+	calendar: {
+		range: () => "calendar",
+	},
+
+	payments: {
+		ledger: (bookingId: string) => `payments/booking/${bookingId}`,
+		record: (bookingId: string) => `payments/booking/${bookingId}`,
+		remove: (paymentId: string) => `payments/${paymentId}`,
+	},
+
+	gallery: {
+		mine: () => "photo/mine",
+		remove: (photoId: string) => `photo/${photoId}`,
+		upload: () => "photo/upload",
+	},
+
+	notifications: {
+		list: () => "notifications",
+		markRead: (id: string) => `notifications/${id}/read`,
+		markAllRead: () => "notifications/read-all",
 	},
 
 	employee: {
@@ -111,6 +161,15 @@ export const apiEndpoints = Object.freeze({
 	user: {
 		userProfileDetails: () => {
 			return "/user/me/profile";
+		},
+		updateProfile: () => {
+			return "/user/me/profile";
+		},
+		uploadProfilePhoto: () => {
+			return "/user/me/photo";
+		},
+		changePassword: () => {
+			return "/user/me/password";
 		},
 	},
 	service: {

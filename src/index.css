@@ -1,3 +1,1 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Tailwind base/components/utilities are loaded once, from App.css */
