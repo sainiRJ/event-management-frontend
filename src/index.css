@@ -1,1 +1,39 @@
 /* Tailwind base/components/utilities are loaded once, from App.css */
+
+/**
+ * Printing a booking receipt.
+ *
+ * The receipt lives inside the details modal, so printing without this would
+ * put the whole dashboard - sidebar, header, modal chrome - onto the page.
+ * Everything is hidden, then the receipt alone is promoted to the top of the
+ * sheet.
+ */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  #booking-receipt,
+  #booking-receipt * {
+    visibility: visible;
+  }
+
+  #booking-receipt {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background: #fff;
+  }
+
+  /* Backgrounds and shadows waste ink and read badly on paper. */
+  #booking-receipt * {
+    box-shadow: none !important;
+    background: transparent !important;
+    color: #000 !important;
+  }
+
+  @page {
+    margin: 16mm;
+  }
+}

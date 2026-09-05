@@ -4,9 +4,10 @@ import {Check, MailOpen, MessageSquare, Phone, RefreshCw} from "lucide-react";
 
 import {operationsService} from "@/services/api/eventManagementServer";
 import {iContactMessage} from "@/customTypes/appDataTypes/operationsTypes";
-import {httpStatusCodes} from "@/customTypes/NetworkTypes";
+import {httpStatusCodes, iPagination} from "@/customTypes/NetworkTypes";
 import PageHeader from "@/components/common/PageHeader";
 import Button from "@/components/ui/Button";
+import Pagination from "@/components/common/Pagination";
 
 function formatWhen(value: string): string {
 	return new Date(value).toLocaleString("en-IN", {
@@ -28,23 +29,34 @@ const ContactMessagesPage: React.FC = () => {
 	const [messages, setMessages] = useState<iContactMessage[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [isUnreadOnly, setIsUnreadOnly] = useState(false);
+	const [pagination, setPagination] = useState<iPagination | null>(null);
 
-	const load = useCallback(async () => {
-		setIsLoading(true);
+	/**
+	 * Paged, like every other list. The API returns 25 a page by default and
+	 * this screen asked for 50 and rendered whatever came back - so enquiry 51
+	 * onwards was unreachable and nobody could tell.
+	 */
+	const load = useCallback(
+		async (page = 1) => {
+			setIsLoading(true);
 
-		const response = await operationsService.listContactMessages({
-			unreadOnly: isUnreadOnly,
-			limit: 50,
-		});
+			const response = await operationsService.listContactMessages({
+				unreadOnly: isUnreadOnly,
+				page,
+				limit: 25,
+			});
 
-		if (response?.httpStatusCode === httpStatusCodes.SUCCESS_OK) {
-			setMessages(response.data?.data?.items ?? []);
-		} else {
-			toast.error("Couldn't load enquiries");
-		}
+			if (response?.httpStatusCode === httpStatusCodes.SUCCESS_OK) {
+				setMessages(response.data?.data?.items ?? []);
+				setPagination(response.data?.data?.pagination ?? null);
+			} else {
+				toast.error("Couldn't load enquiries");
+			}
 
-		setIsLoading(false);
-	}, [isUnreadOnly]);
+			setIsLoading(false);
+		},
+		[isUnreadOnly],
+	);
 
 	useEffect(() => {
 		load();
@@ -88,7 +100,13 @@ const ContactMessagesPage: React.FC = () => {
 						>
 							{isUnreadOnly ? "Show all" : "Show unanswered"}
 						</Button>
-						<Button variant="secondary" onClick={load} disabled={isLoading}>
+						<Button
+							variant="secondary"
+							onClick={() => {
+								void load(pagination?.page ?? 1);
+							}}
+							disabled={isLoading}
+						>
 							<RefreshCw
 								className={`mr-2 h-4 w-4 ${isLoading ? "animate-spin" : ""}`}
 							/>
@@ -189,6 +207,19 @@ const ContactMessagesPage: React.FC = () => {
 					);
 				})}
 			</div>
+
+			{pagination && (
+				<Pagination
+					page={pagination.page}
+					totalPages={pagination.totalPages}
+					total={pagination.total}
+					limit={pagination.limit}
+					isLoading={isLoading}
+					onPageChange={(nextPage) => {
+						void load(nextPage);
+					}}
+				/>
+			)}
 		</div>
 	);
 };

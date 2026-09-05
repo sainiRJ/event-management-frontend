@@ -4,6 +4,7 @@ import {useAppDispatch, useAppSelector} from "../../store/Hooks";
 import {getAllBookings} from "@/store/booking/ThunkActions";
 import {fetchServices} from "@/store/services/ThunkActions";
 import WeatherCard from "./WeatherCard";
+import MoneyCard from "./MoneyCard";
 import BookingStats from "./BookingStats";
 import PhotoUploadModal from "../Modal/PhotoUploadModal";
 import Button from "../ui/Button";
@@ -86,6 +87,9 @@ const DashboardPage: React.FC = () => {
 				completed={stats.completed}
 				cancelled={stats.cancelled}
 			/>
+
+			{/* Counts answer "how busy am I"; this answers "how am I doing". */}
+			<MoneyCard />
 
 			{nextEvent && (
 				<div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

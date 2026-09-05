@@ -4,8 +4,9 @@ import {Images, RefreshCw, Trash2, Upload} from "lucide-react";
 
 import {operationsService} from "@/services/api/eventManagementServer";
 import {iGalleryPhoto} from "@/customTypes/appDataTypes/operationsTypes";
-import {httpStatusCodes} from "@/customTypes/NetworkTypes";
+import {httpStatusCodes, iPagination} from "@/customTypes/NetworkTypes";
 import PageHeader from "@/components/common/PageHeader";
+import Pagination from "@/components/common/Pagination";
 import Button from "@/components/ui/Button";
 import Modal from "@/components/ui/Modal";
 import PhotoUploadModal from "@/components/Modal/PhotoUploadModal";
@@ -25,14 +26,21 @@ const GalleryPage: React.FC = () => {
 		null,
 	);
 	const [isDeleting, setIsDeleting] = useState(false);
+	const [pagination, setPagination] = useState<iPagination | null>(null);
 
-	const load = useCallback(async () => {
+	/**
+	 * Paged. This asked for 100 and rendered whatever came back, but the API
+	 * caps a page at 100 - so a vendor with more photos than that simply
+	 * could not see or delete the rest.
+	 */
+	const load = useCallback(async (page = 1) => {
 		setIsLoading(true);
 
-		const response = await operationsService.listMyPhotos({limit: 100});
+		const response = await operationsService.listMyPhotos({page, limit: 24});
 
 		if (response?.httpStatusCode === httpStatusCodes.SUCCESS_OK) {
 			setPhotos(response.data?.data?.items ?? []);
+			setPagination(response.data?.data?.pagination ?? null);
 		} else {
 			toast.error("Couldn't load your gallery");
 		}
@@ -82,7 +90,13 @@ const GalleryPage: React.FC = () => {
 				} on your public site`}
 				actions={
 					<>
-						<Button variant="secondary" onClick={load} disabled={isLoading}>
+						<Button
+							variant="secondary"
+							onClick={() => {
+								void load(pagination?.page ?? 1);
+							}}
+							disabled={isLoading}
+						>
 							<RefreshCw
 								className={`mr-2 h-4 w-4 ${isLoading ? "animate-spin" : ""}`}
 							/>
@@ -158,6 +172,19 @@ const GalleryPage: React.FC = () => {
 					onClose={() => {
 						setIsUploadOpen(false);
 						load();
+					}}
+				/>
+			)}
+
+			{pagination && (
+				<Pagination
+					page={pagination.page}
+					totalPages={pagination.totalPages}
+					total={pagination.total}
+					limit={pagination.limit}
+					isLoading={isLoading}
+					onPageChange={(nextPage) => {
+						void load(nextPage);
 					}}
 				/>
 			)}

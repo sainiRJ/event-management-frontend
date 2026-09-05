@@ -1,3 +1,7 @@
-# https://www.robotstxt.org/robotstxt.html
+# The admin dashboard is not a public site.
+#
+# This file previously read "Disallow:" with nothing after it, which is the
+# robots.txt way of saying "crawl everything" - the exact opposite of what was
+# intended. A trailing slash is the whole difference.
 User-agent: *
-Disallow:
+Disallow: /

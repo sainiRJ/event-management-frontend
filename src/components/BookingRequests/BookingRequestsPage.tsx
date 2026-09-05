@@ -12,10 +12,11 @@ import {
 
 import {operationsService} from "@/services/api/eventManagementServer";
 import {iBookingRequest} from "@/customTypes/appDataTypes/operationsTypes";
-import {httpStatusCodes} from "@/customTypes/NetworkTypes";
+import {httpStatusCodes, iPagination} from "@/customTypes/NetworkTypes";
 import PageHeader from "@/components/common/PageHeader";
 import StatusBadge from "@/components/common/StatusBadge";
 import Button from "@/components/ui/Button";
+import Pagination from "@/components/common/Pagination";
 import Input from "@/components/ui/Input";
 import Modal from "@/components/ui/Modal";
 
@@ -52,23 +53,31 @@ const BookingRequestsPage: React.FC = () => {
 	const [advancePayment, setAdvancePayment] = useState("0");
 	const [formError, setFormError] = useState<string | null>(null);
 	const [isSaving, setIsSaving] = useState(false);
+	const [selectedIds, setSelectedIds] = useState<string[]>([]);
+	const [isBulkRejecting, setIsBulkRejecting] = useState(false);
+	const [pagination, setPagination] = useState<iPagination | null>(null);
 
-	const load = useCallback(async () => {
-		setIsLoading(true);
+	const load = useCallback(
+		async (page = 1) => {
+			setIsLoading(true);
 
-		const response = await operationsService.listBookingRequests({
-			includeHandled: shouldShowHandled,
-			limit: 50,
-		});
+			const response = await operationsService.listBookingRequests({
+				includeHandled: shouldShowHandled,
+				page,
+				limit: 25,
+			});
 
-		if (response?.httpStatusCode === httpStatusCodes.SUCCESS_OK) {
-			setRequests(response.data?.data?.items ?? []);
-		} else {
-			toast.error("Couldn't load booking requests");
-		}
+			if (response?.httpStatusCode === httpStatusCodes.SUCCESS_OK) {
+				setRequests(response.data?.data?.items ?? []);
+				setPagination(response.data?.data?.pagination ?? null);
+			} else {
+				toast.error("Couldn't load booking requests");
+			}
 
-		setIsLoading(false);
-	}, [shouldShowHandled]);
+			setIsLoading(false);
+		},
+		[shouldShowHandled],
+	);
 
 	useEffect(() => {
 		load();
@@ -131,6 +140,66 @@ const BookingRequestsPage: React.FC = () => {
 		toast.error("Couldn't decline this request");
 	};
 
+	/**
+	 * Decline several at once.
+	 *
+	 * Spam and duplicate submissions arrive in runs, and clearing them one
+	 * card at a time is the kind of chore that stops people triaging the
+	 * inbox at all. Only rejection is batched: approving sets a price, which
+	 * is a per-booking decision and must stay one.
+	 */
+	const rejectSelected = async (): Promise<void> => {
+		const chosen = pendingRequests.filter((request) => {
+			return selectedIds.includes(request.id);
+		});
+
+		if (chosen.length === 0) {
+			return;
+		}
+
+		setIsBulkRejecting(true);
+
+		const outcomes = await Promise.all(
+			chosen.map(async (request) => {
+				const response = await operationsService.rejectBookingRequest(
+					request.id,
+				);
+				return response?.httpStatusCode === httpStatusCodes.SUCCESS_OK;
+			}),
+		);
+
+		setIsBulkRejecting(false);
+
+		const declined = outcomes.filter(Boolean).length;
+
+		if (declined > 0) {
+			toast.success(`${declined} request${declined === 1 ? "" : "s"} declined`);
+		}
+
+		if (declined < chosen.length) {
+			toast.error(
+				`${chosen.length - declined} could not be declined. Try those again.`,
+			);
+		}
+
+		setSelectedIds([]);
+		load();
+	};
+
+	const toggleSelected = (id: string): void => {
+		setSelectedIds((current) => {
+			return current.includes(id)
+				? current.filter((value) => {
+						return value !== id;
+				  })
+				: [...current, id];
+		});
+	};
+
+	const pendingRequests = requests.filter((request) => {
+		return request.status?.toLowerCase() === "pending";
+	});
+
 	return (
 		<div>
 			<PageHeader
@@ -144,7 +213,13 @@ const BookingRequestsPage: React.FC = () => {
 						>
 							{shouldShowHandled ? "Show only pending" : "Show all"}
 						</Button>
-						<Button variant="secondary" onClick={load} disabled={isLoading}>
+						<Button
+							variant="secondary"
+							onClick={() => {
+								void load(pagination?.page ?? 1);
+							}}
+							disabled={isLoading}
+						>
 							<RefreshCw
 								className={`mr-2 h-4 w-4 ${isLoading ? "animate-spin" : ""}`}
 							/>
@@ -172,6 +247,32 @@ const BookingRequestsPage: React.FC = () => {
 				</div>
 			)}
 
+			{selectedIds.length > 0 && (
+				<div className="mb-4 flex flex-col gap-3 rounded-2xl border border-brand-200 bg-brand-50/60 p-4 sm:flex-row sm:items-center sm:justify-between">
+					<p className="text-sm font-bold text-brand-700">
+						{selectedIds.length} selected
+					</p>
+
+					<div className="flex gap-2">
+						<Button
+							variant="secondary"
+							className="flex-1 sm:flex-none"
+							onClick={() => setSelectedIds([])}
+						>
+							Clear
+						</Button>
+						<Button
+							variant="danger"
+							className="flex-1 sm:flex-none"
+							onClick={rejectSelected}
+							disabled={isBulkRejecting}
+						>
+							{isBulkRejecting ? "Declining…" : `Decline ${selectedIds.length}`}
+						</Button>
+					</div>
+				</div>
+			)}
+
 			{/* Cards rather than a table: each request is a decision, and this
 			    reads on a phone without horizontal scrolling. */}
 			<div className="grid gap-4 lg:grid-cols-2">
@@ -184,13 +285,27 @@ const BookingRequestsPage: React.FC = () => {
 							className="rounded-3xl border border-brand-100/70 bg-white p-5 shadow-sm transition-shadow hover:shadow-md sm:p-6"
 						>
 							<div className="mb-4 flex flex-wrap items-start justify-between gap-3">
-								<div className="min-w-0">
-									<h2 className="truncate font-display text-lg font-semibold text-[#2B2129]">
-										{request.customerName}
-									</h2>
-									<p className="mt-0.5 text-sm text-gray-500">
-										{request.serviceName} · {request.eventName}
-									</p>
+								<div className="flex min-w-0 items-start gap-3">
+									{/* Only pending requests can be batched - a handled one
+									    has nothing left to decide. */}
+									{isPending && (
+										<input
+											type="checkbox"
+											checked={selectedIds.includes(request.id)}
+											onChange={() => toggleSelected(request.id)}
+											aria-label={`Select the request from ${request.customerName}`}
+											className="mt-1.5 h-4 w-4 shrink-0 cursor-pointer accent-brand-600"
+										/>
+									)}
+
+									<div className="min-w-0">
+										<h2 className="truncate font-display text-lg font-semibold text-[#2B2129]">
+											{request.customerName}
+										</h2>
+										<p className="mt-0.5 text-sm text-gray-500">
+											{request.serviceName} · {request.eventName}
+										</p>
+									</div>
 								</div>
 								<StatusBadge status={request.status} />
 							</div>
