@@ -11,9 +11,11 @@ import {
 	Wallet,
 	ClipboardCheck,
 	MessageSquare,
+	Printer,
 } from "lucide-react";
 import {IndianRupee} from "lucide-react";
 import PaymentLedger from "./PaymentLedger";
+import BookingReceipt from "./BookingReceipt";
 
 interface BookingDetailsModalProps {
 	booking: iBooking | null;
@@ -103,6 +105,12 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
 			title="Booking Overview"
 			footer={
 				<>
+					{/* Something to hand the customer. The ledger was accurate and
+					    trapped on screen. */}
+					<Button variant="secondary" onClick={() => window.print()}>
+						<Printer className="mr-2 h-4 w-4" />
+						Print receipt
+					</Button>
 					<Button variant="ghost" onClick={onClose}>
 						Close
 					</Button>
@@ -150,6 +158,9 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
 
 				<PaymentLedger bookingId={booking.id} onChange={onPaymentChange} />
 			</section>
+
+			{/* Hidden on screen; this is what the browser prints. */}
+			<BookingReceipt booking={booking} />
 		</Modal>
 	);
 };

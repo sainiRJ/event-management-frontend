@@ -6,6 +6,7 @@ import StatusService from "./statusService";
 import AuthService from "./AuthService";
 import NotificationService from "./NotificationService";
 import OperationsService from "./OperationsService";
+import InsightService from "./InsightService";
 import {apiServer} from "./axiosConfig";
 
 const employeeService = EmployeeService(apiServer);
@@ -15,6 +16,7 @@ const serviceService = ServiceService(apiServer);
 const statusService = StatusService(apiServer);
 const authService = AuthService(apiServer);
 const notificationService = NotificationService(apiServer);
+const insightService = InsightService(apiServer);
 const operationsService = OperationsService(apiServer);
 
 export {
@@ -26,4 +28,5 @@ export {
 	authService,
 	notificationService,
 	operationsService,
+	insightService,
 };

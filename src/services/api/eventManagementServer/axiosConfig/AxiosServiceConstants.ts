@@ -188,4 +188,16 @@ export const apiEndpoints = Object.freeze({
 			return "/status/all";
 		},
 	},
+	/** Views that read across bookings rather than listing them. */
+	insights: {
+		money: () => {
+			return "/insights/money";
+		},
+		customers: () => {
+			return "/insights/customers";
+		},
+		activity: () => {
+			return "/insights/activity";
+		},
+	},
 });

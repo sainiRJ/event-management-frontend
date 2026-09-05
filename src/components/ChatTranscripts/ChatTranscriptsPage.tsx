@@ -7,8 +7,9 @@ import {
 	iChatSessionSummary,
 	iChatTranscript,
 } from "@/customTypes/appDataTypes/operationsTypes";
-import {httpStatusCodes} from "@/customTypes/NetworkTypes";
+import {httpStatusCodes, iPagination} from "@/customTypes/NetworkTypes";
 import PageHeader from "@/components/common/PageHeader";
+import Pagination from "@/components/common/Pagination";
 import Button from "@/components/ui/Button";
 
 function formatWhen(value: string): string {
@@ -33,14 +34,19 @@ const ChatTranscriptsPage: React.FC = () => {
 	const [isLoading, setIsLoading] = useState(true);
 	const [isLoadingTranscript, setIsLoadingTranscript] = useState(false);
 	const [isUnavailable, setIsUnavailable] = useState(false);
+	const [pagination, setPagination] = useState<iPagination | null>(null);
 
-	const load = useCallback(async () => {
+	const load = useCallback(async (page = 1) => {
 		setIsLoading(true);
 
-		const response = await chatTranscriptService.listSessions({limit: 50});
+		const response = await chatTranscriptService.listSessions({
+			page,
+			limit: 25,
+		});
 
 		if (response?.httpStatusCode === httpStatusCodes.SUCCESS_OK) {
 			setSessions(response.data?.data?.items ?? []);
+			setPagination(response.data?.data?.pagination ?? null);
 			setIsUnavailable(false);
 		} else {
 			// The assistant is a separate service; it may simply be down.
@@ -135,7 +141,13 @@ const ChatTranscriptsPage: React.FC = () => {
 				title="Chat Conversations"
 				subtitle="What customers asked the assistant on your website"
 				actions={
-					<Button variant="secondary" onClick={load} disabled={isLoading}>
+					<Button
+						variant="secondary"
+						onClick={() => {
+							void load(pagination?.page ?? 1);
+						}}
+						disabled={isLoading}
+					>
 						<RefreshCw
 							className={`mr-2 h-4 w-4 ${isLoading ? "animate-spin" : ""}`}
 						/>
@@ -202,6 +214,19 @@ const ChatTranscriptsPage: React.FC = () => {
 					</button>
 				))}
 			</div>
+
+			{pagination && (
+				<Pagination
+					page={pagination.page}
+					totalPages={pagination.totalPages}
+					total={pagination.total}
+					limit={pagination.limit}
+					isLoading={isLoading}
+					onPageChange={(nextPage) => {
+						void load(nextPage);
+					}}
+				/>
+			)}
 		</div>
 	);
 };

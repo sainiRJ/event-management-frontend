@@ -49,9 +49,11 @@ notification-worthy happens server-side — the obvious first ones:
 - `booking_updated` — booking status changes
 - `payment_received` — a payment/advance is recorded
 - `booking_cancelled` — a booking is cancelled
+- `contact_message` — someone submitted the website contact form
 
 `type` is a free string on the frontend (`new_booking` |
-`booking_updated` | `payment_received` | `booking_cancelled` | `generic`)
+`booking_updated` | `payment_received` | `booking_cancelled` |
+`contact_message` | `generic`)
 — add more as needed, the frontend doesn't hard-branch on it beyond
 display, so new types are safe to add without a frontend change.
 

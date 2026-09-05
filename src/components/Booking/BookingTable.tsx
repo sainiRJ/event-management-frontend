@@ -3,6 +3,7 @@ import {useAppDispatch, useAppSelector} from "@/store/Hooks";
 import {getAllBookings} from "@/store/booking/ThunkActions";
 import {RootState} from "@/store";
 import CustomTable from "../common/CustomTable";
+import Pagination from "../common/Pagination";
 import {iBooking} from "@/store/booking/Types";
 import {formatDate} from "../../utils/dateUtils";
 import {formatCurrency} from "../../utils/currencyUtils";
@@ -26,48 +27,60 @@ const BookingTable: React.FC<BookingTableProps> = ({
 	selectedStatus = null,
 }) => {
 	const [loading, setLoading] = useState(true);
-	const [data, setData] = useState<iBooking[]>([]);
 	const [filteredData, setFilteredData] = useState<iBooking[]>([]);
 	const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
 	const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
 	const [isDeleting, setIsDeleting] = useState(false);
 
 	const dispatch = useAppDispatch();
-	const {bookingList} = useAppSelector(
+	const {bookingList, pagination} = useAppSelector(
 		(state: RootState) => state.bookingReducer,
 	);
 	const {employeeList} = useAppSelector(
 		(state: RootState) => state.employeeReducer,
 	);
 
+	/**
+	 * Search and filtering happen on the server now.
+	 *
+	 * They used to run over `data` - the 25 rows this component happened to
+	 * be holding - so searching for a customer from three months ago found
+	 * nothing, and the status filter only filtered the current page. Both are
+	 * query parameters, so they apply to the whole table.
+	 */
 	useEffect(() => {
-		dispatch(getAllBookings());
-	}, [dispatch]);
+		// Debounced, so typing a name does not fire a request per keystroke.
+		const timer = setTimeout(() => {
+			setLoading(true);
+			void dispatch(
+				getAllBookings({
+					page: 1,
+					search: searchQuery || undefined,
+					statusId: selectedStatus || undefined,
+				}),
+			);
+		}, 300);
+
+		return () => clearTimeout(timer);
+	}, [dispatch, searchQuery, selectedStatus]);
 
 	useEffect(() => {
 		if (bookingList) {
-			setData(bookingList);
+			setFilteredData(bookingList);
 			setLoading(false);
 		}
 	}, [bookingList]);
 
-	useEffect(() => {
-		let filtered = [...data];
-
-		if (searchQuery) {
-			filtered = filtered.filter((booking) =>
-				booking.customerName.toLowerCase().includes(searchQuery.toLowerCase()),
-			);
-		}
-
-		if (selectedStatus) {
-			filtered = filtered.filter(
-				(booking) => booking.bookingStatusId === selectedStatus,
-			);
-		}
-
-		setFilteredData(filtered);
-	}, [data, searchQuery, selectedStatus]);
+	const goToPage = (nextPage: number) => {
+		setLoading(true);
+		void dispatch(
+			getAllBookings({
+				page: nextPage,
+				search: searchQuery || undefined,
+				statusId: selectedStatus || undefined,
+			}),
+		);
+	};
 
 	const columns = [
 		{
@@ -226,6 +239,17 @@ const BookingTable: React.FC<BookingTableProps> = ({
 				onSelectChange={setSelectedKeys}
 				onRowClick={(rowData) => onViewDetails(rowData as iBooking)}
 			/>
+
+			{pagination && (
+				<Pagination
+					page={pagination.page}
+					totalPages={pagination.totalPages}
+					total={pagination.total}
+					limit={pagination.limit}
+					onPageChange={goToPage}
+					isLoading={loading}
+				/>
+			)}
 
 			<Modal
 				isOpen={isConfirmingDelete}

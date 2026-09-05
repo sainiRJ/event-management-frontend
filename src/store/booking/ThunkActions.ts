@@ -66,7 +66,7 @@ export const createBooking = createAsyncThunk<
 
 export const getAllBookings = createAsyncThunk<
 	iGenericResponse<iPaginatedResult<iCreateBookingDTO> | null> | null,
-	{page?: number; limit?: number} | void,
+	{page?: number; limit?: number; search?: string; statusId?: string} | void,
 	{
 		rejectValue: iStateMessage;
 	}

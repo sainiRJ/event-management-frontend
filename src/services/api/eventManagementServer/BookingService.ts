@@ -45,7 +45,13 @@ function BookingService(apiServer: AxiosInstance) {
 	};
 
 	const getAllBookings = async (
-		params: {page?: number; limit?: number} = {},
+		params: {
+			page?: number;
+			limit?: number;
+			/** Matched in the database against customer name, phone and event. */
+			search?: string;
+			statusId?: string;
+		} = {},
 	): Promise<APIResponse<iPaginatedResult<iCreateBookingDTO>> | null> => {
 		let result = null;
 

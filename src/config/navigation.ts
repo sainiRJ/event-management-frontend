@@ -1,6 +1,8 @@
 import {
 	CalendarDays,
 	ClipboardList,
+	Contact,
+	History,
 	Images,
 	Inbox,
 	LayoutDashboard,
@@ -40,6 +42,7 @@ export const navigation: iNavGroup[] = [
 			{label: "Dashboard", icon: LayoutDashboard, path: "/dashboard"},
 			{label: "Calendar", icon: CalendarDays, path: "/calendar"},
 			{label: "Bookings", icon: ClipboardList, path: "/booking"},
+			{label: "Customers", icon: Contact, path: "/customers"},
 		],
 	},
 	{
@@ -67,6 +70,7 @@ export const navigation: iNavGroup[] = [
 			{label: "Employees", icon: Users, path: "/employees"},
 			{label: "Services", icon: Settings, path: "/services"},
 			{label: "Gallery", icon: Images, path: "/gallery"},
+			{label: "Activity", icon: History, path: "/activity"},
 		],
 	},
 ];
