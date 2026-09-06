@@ -117,7 +117,7 @@ const ResetPasswordPage: React.FC = () => {
 						</p>
 					)}
 
-					<Button type="submit" className="w-full" disabled={isSaving}>
+					<Button type="submit" className="w-full" isLoading={isSaving}>
 						{isSaving ? "Saving…" : "Change password"}
 					</Button>
 				</form>

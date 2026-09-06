@@ -36,6 +36,8 @@ const ServiceTable = () => {
 		{},
 	);
 	const [isRefreshing, setIsRefreshing] = useState(false);
+	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [deletingId, setDeletingId] = useState<string | null>(null);
 
 	const dispatch = useAppDispatch();
 	const {serviceList} = useAppSelector(
@@ -68,7 +70,10 @@ const ServiceTable = () => {
 		}
 
 		try {
-			const response: any = await dispatch(createService(formData));
+			setIsSubmitting(true);
+			const response: any = await dispatch(createService(formData)).finally(
+				() => setIsSubmitting(false),
+			);
 			if (response?.meta?.requestStatus === "fulfilled") {
 				toast.success("Service created successfully");
 				setShowAddModal(false);
@@ -119,7 +124,10 @@ const ServiceTable = () => {
 		}
 
 		try {
-			const response: any = await dispatch(updateService(editingService));
+			setIsSubmitting(true);
+			const response: any = await dispatch(
+				updateService(editingService),
+			).finally(() => setIsSubmitting(false));
 			if (response?.meta?.requestStatus === "fulfilled") {
 				toast.success("Service updated successfully");
 				setShowEditModal(false);
@@ -138,9 +146,13 @@ const ServiceTable = () => {
 	};
 
 	const handleDeleteService = async (id: string) => {
+		if (deletingId) return;
 		if (window.confirm("Are you sure you want to delete this service?")) {
 			try {
-				const response: any = await dispatch(deleteService(id));
+				setDeletingId(id);
+				const response: any = await dispatch(deleteService(id)).finally(() =>
+					setDeletingId(null),
+				);
 				if (response?.meta?.requestStatus === "fulfilled") {
 					toast.success("Service deleted successfully");
 					handleRefresh();
@@ -196,6 +208,8 @@ const ServiceTable = () => {
 						className="text-rose-600 hover:bg-rose-50 hover:text-rose-700"
 						icon={<Trash2 className="w-3.5 h-3.5" />}
 						onClick={() => handleDeleteService(row.id)}
+						isLoading={deletingId === row.id}
+						disabled={deletingId !== null}
 					>
 						Delete
 					</Button>
@@ -271,7 +285,9 @@ const ServiceTable = () => {
 						<Button variant="ghost" onClick={() => setShowAddModal(false)}>
 							Cancel
 						</Button>
-						<Button onClick={handleAddService}>Create Service</Button>
+						<Button onClick={handleAddService} isLoading={isSubmitting}>
+							Create Service
+						</Button>
 					</>
 				}
 			>
@@ -337,7 +353,9 @@ const ServiceTable = () => {
 						<Button variant="ghost" onClick={() => setShowEditModal(false)}>
 							Cancel
 						</Button>
-						<Button onClick={handleUpdateService}>Save Changes</Button>
+						<Button onClick={handleUpdateService} isLoading={isSubmitting}>
+							Save Changes
+						</Button>
 					</>
 				}
 			>

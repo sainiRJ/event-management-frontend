@@ -67,6 +67,8 @@ const EmployeeTable = () => {
 		{},
 	);
 	const [isRefreshing, setIsRefreshing] = useState(false);
+	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [deletingId, setDeletingId] = useState<string | null>(null);
 
 	const {employeeList} = useAppSelector(
 		(state: RootState) => state.employeeReducer,
@@ -133,9 +135,13 @@ const EmployeeTable = () => {
 	};
 
 	const handleDelete = async (id: string) => {
+		if (deletingId) return;
 		if (window.confirm("Are you sure you want to delete this employee?")) {
 			try {
-				const response: any = await dispatch(deleteEmployee(id));
+				setDeletingId(id);
+				const response: any = await dispatch(deleteEmployee(id)).finally(() =>
+					setDeletingId(null),
+				);
 				if (response?.meta?.requestStatus === "fulfilled") {
 					toast.success("Employee deleted successfully");
 					handleRefresh();
@@ -166,7 +172,10 @@ const EmployeeTable = () => {
 
 		setAddFormErrors({});
 		try {
-			const response: any = await dispatch(createEmployee(formData));
+			setIsSubmitting(true);
+			const response: any = await dispatch(createEmployee(formData)).finally(
+				() => setIsSubmitting(false),
+			);
 			if (response?.meta?.requestStatus === "fulfilled") {
 				toast.success("Employee added successfully");
 				setShowAddModal(false);
@@ -202,7 +211,10 @@ const EmployeeTable = () => {
 
 		try {
 			setEditFormErrors({});
-			const response: any = await dispatch(updateEmployee(editingEmployee));
+			setIsSubmitting(true);
+			const response: any = await dispatch(
+				updateEmployee(editingEmployee),
+			).finally(() => setIsSubmitting(false));
 			if (response?.meta?.requestStatus === "fulfilled") {
 				toast.success("Employee updated successfully");
 				setShowEditModal(false);
@@ -308,6 +320,8 @@ const EmployeeTable = () => {
 							e.stopPropagation();
 							handleDelete(row.id);
 						}}
+						isLoading={deletingId === row.id}
+						disabled={deletingId !== null}
 					>
 						Delete
 					</Button>
@@ -410,7 +424,9 @@ const EmployeeTable = () => {
 						<Button variant="ghost" onClick={() => setShowAddModal(false)}>
 							Cancel
 						</Button>
-						<Button onClick={handleAddEmployeeSubmit}>Add Employee</Button>
+						<Button onClick={handleAddEmployeeSubmit} isLoading={isSubmitting}>
+							Add Employee
+						</Button>
 					</>
 				}
 			>
@@ -479,7 +495,9 @@ const EmployeeTable = () => {
 						<Button variant="ghost" onClick={() => setShowEditModal(false)}>
 							Cancel
 						</Button>
-						<Button onClick={handleEditEmployeeSubmit}>Save Changes</Button>
+						<Button onClick={handleEditEmployeeSubmit} isLoading={isSubmitting}>
+							Save Changes
+						</Button>
 					</>
 				}
 			>

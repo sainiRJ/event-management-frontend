@@ -92,6 +92,7 @@ const BookingPage = () => {
 	const [addFormErrors, setAddFormErrors] = useState<BookingFormErrors>({});
 	const [editFormErrors, setEditFormErrors] = useState<BookingFormErrors>({});
 	const [isRefreshing, setIsRefreshing] = useState(false);
+	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	const {statusList} = useAppSelector(
 		(state: RootState) => state.statusReducer,
@@ -132,7 +133,10 @@ const BookingPage = () => {
 
 		setAddFormErrors({});
 		try {
-			const response: any = await dispatch(createBooking(cleanedPayload));
+			setIsSubmitting(true);
+			const response: any = await dispatch(
+				createBooking(cleanedPayload),
+			).finally(() => setIsSubmitting(false));
 			showToast({
 				response,
 				successMessage: "Booking created successfully",
@@ -203,7 +207,10 @@ const BookingPage = () => {
 
 		setEditFormErrors({});
 		try {
-			const response: any = await dispatch(updateBooking(cleanedPayload));
+			setIsSubmitting(true);
+			const response: any = await dispatch(
+				updateBooking(cleanedPayload),
+			).finally(() => setIsSubmitting(false));
 			showToast({
 				response,
 				successMessage: "Booking updated successfully",
@@ -342,7 +349,9 @@ const BookingPage = () => {
 						<Button variant="ghost" onClick={() => setShowAddModal(false)}>
 							Cancel
 						</Button>
-						<Button onClick={handleSubmit}>Create Booking</Button>
+						<Button onClick={handleSubmit} isLoading={isSubmitting}>
+							Create Booking
+						</Button>
 					</>
 				}
 			>
@@ -368,7 +377,9 @@ const BookingPage = () => {
 						<Button variant="ghost" onClick={() => setShowEditModal(false)}>
 							Cancel
 						</Button>
-						<Button onClick={handleEditSubmit}>Save Changes</Button>
+						<Button onClick={handleEditSubmit} isLoading={isSubmitting}>
+							Save Changes
+						</Button>
 					</>
 				}
 			>
