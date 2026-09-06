@@ -173,8 +173,14 @@ export const apiEndpoints = Object.freeze({
 		},
 	},
 	service: {
+		/**
+		 * The vendor's own services. `/service/all` is the public list across
+		 * every vendor account, which is what the dashboard used to load - so
+		 * a second vendor account's services appeared in this vendor's
+		 * tables, photo-upload picker and booking forms.
+		 */
 		getAllServices: () => {
-			return "/service/all";
+			return "/service/mine";
 		},
 		createService: () => {
 			return "service/create";
