@@ -221,7 +221,7 @@ const GalleryPage: React.FC = () => {
 							variant="danger"
 							className="w-full sm:w-auto"
 							onClick={confirmDelete}
-							disabled={isDeleting}
+							isLoading={isDeleting}
 						>
 							{isDeleting ? "Removing…" : "Remove photo"}
 						</Button>

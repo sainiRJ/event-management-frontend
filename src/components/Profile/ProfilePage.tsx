@@ -257,7 +257,7 @@ const ProfilePage: React.FC = () => {
 						/>
 					</div>
 					<div className="flex justify-end">
-						<Button type="submit" variant="primary" disabled={savingProfile}>
+						<Button type="submit" variant="primary" isLoading={savingProfile}>
 							<Save className="w-4 h-4" />
 							{savingProfile ? "Saving..." : "Save Changes"}
 						</Button>
@@ -313,7 +313,7 @@ const ProfilePage: React.FC = () => {
 						/>
 					</div>
 					<div className="flex justify-end">
-						<Button type="submit" variant="primary" disabled={savingPassword}>
+						<Button type="submit" variant="primary" isLoading={savingPassword}>
 							{savingPassword ? "Updating..." : "Update Password"}
 						</Button>
 					</div>

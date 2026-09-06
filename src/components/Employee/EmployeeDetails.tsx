@@ -312,6 +312,7 @@ const EmployeeServiceHistoryTab: React.FC<{serviceHistory: any}> = ({
 	const {employeeId} = useParams<{employeeId: string}>();
 	const dispatch = useAppDispatch();
 	const [showEditModal, setShowEditModal] = useState(false);
+	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [formData, setFormData] = useState<iEmployeePaymentUpdate>({
 		employeeId: employeeId || "",
 		amount: 0,
@@ -337,7 +338,10 @@ const EmployeeServiceHistoryTab: React.FC<{serviceHistory: any}> = ({
 
 	const handleSubmit = async () => {
 		try {
-			const response: any = await dispatch(updateEmployeePayment(formData));
+			setIsSubmitting(true);
+			const response: any = await dispatch(
+				updateEmployeePayment(formData),
+			).finally(() => setIsSubmitting(false));
 			if (response?.meta?.requestStatus === "fulfilled") {
 				toast.success("Payment updated successfully");
 				setShowEditModal(false);
@@ -539,7 +543,9 @@ const EmployeeServiceHistoryTab: React.FC<{serviceHistory: any}> = ({
 						<Button variant="ghost" onClick={() => setShowEditModal(false)}>
 							Cancel
 						</Button>
-						<Button onClick={handleSubmit}>Confirm Payment</Button>
+						<Button onClick={handleSubmit} isLoading={isSubmitting}>
+							Confirm Payment
+						</Button>
 					</>
 				}
 			>

@@ -53,6 +53,7 @@ const BookingRequestsPage: React.FC = () => {
 	const [advancePayment, setAdvancePayment] = useState("0");
 	const [formError, setFormError] = useState<string | null>(null);
 	const [isSaving, setIsSaving] = useState(false);
+	const [rejectingId, setRejectingId] = useState<string | null>(null);
 	const [selectedIds, setSelectedIds] = useState<string[]>([]);
 	const [isBulkRejecting, setIsBulkRejecting] = useState(false);
 	const [pagination, setPagination] = useState<iPagination | null>(null);
@@ -129,7 +130,11 @@ const BookingRequestsPage: React.FC = () => {
 	};
 
 	const reject = async (request: iBookingRequest) => {
-		const response = await operationsService.rejectBookingRequest(request.id);
+		if (rejectingId) return;
+		setRejectingId(request.id);
+		const response = await operationsService
+			.rejectBookingRequest(request.id)
+			.finally(() => setRejectingId(null));
 
 		if (response?.httpStatusCode === httpStatusCodes.SUCCESS_OK) {
 			toast.success(`Request from ${request.customerName} declined`);
@@ -362,6 +367,8 @@ const BookingRequestsPage: React.FC = () => {
 										variant="secondary"
 										className="w-full sm:w-auto"
 										onClick={() => reject(request)}
+										isLoading={rejectingId === request.id}
+										disabled={rejectingId !== null}
 									>
 										<X className="mr-2 h-4 w-4" />
 										Decline
@@ -433,7 +440,7 @@ const BookingRequestsPage: React.FC = () => {
 							<Button
 								className="w-full sm:w-auto"
 								onClick={confirmApprove}
-								disabled={isSaving}
+								isLoading={isSaving}
 							>
 								{isSaving ? "Confirming…" : "Confirm booking"}
 							</Button>
