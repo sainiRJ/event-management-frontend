@@ -121,23 +121,23 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
 			<div className="grid grid-cols-1 gap-8 md:grid-cols-2">
 				{sections.map((section, idx) => (
 					<div key={idx} className="space-y-4">
-						<h4 className="flex items-center gap-2 text-brand-600 font-black text-sm uppercase tracking-widest">
+						<h4 className="flex items-center gap-2 text-brand-600 font-semibold text-sm uppercase tracking-widest">
 							<section.icon className="w-4 h-4" />
 							{section.title}
 						</h4>
 
-						<div className="space-y-3 bg-gray-50/50 rounded-2xl p-5 border border-brand-100/50">
+						<div className="space-y-3 bg-gray-50/50 rounded-2xl p-5 border border-ink-200/60">
 							{section.items.map((item, i) => (
 								<div key={i} className={item.isFullWidth ? "col-span-2" : ""}>
-									<p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">
+									<p className="text-[10px] font-bold text-ink-400 uppercase tracking-wider mb-0.5">
 										{item.label}
 									</p>
 									{item.isBadge ? (
-										<span className="inline-flex px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-white border border-brand-100/70 shadow-sm text-brand-600">
+										<span className="inline-flex px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-white border border-ink-200/70 shadow-sm text-brand-600">
 											{item.value}
 										</span>
 									) : (
-										<p className="text-sm font-bold text-[#2B2129] leading-relaxed">
+										<p className="text-sm font-bold text-ink-900 leading-relaxed">
 											{item.value || "-"}
 										</p>
 									)}
@@ -150,8 +150,8 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
 
 			{/* The payment ledger: every receipt against this booking. The
 			    booking's advance is derived from these, not typed in. */}
-			<section className="mt-8 border-t border-brand-100/50 pt-6">
-				<h4 className="mb-4 flex items-center gap-2 text-sm font-black uppercase tracking-widest text-brand-600">
+			<section className="mt-8 border-t border-ink-200/60 pt-6">
+				<h4 className="mb-4 flex items-center gap-2 text-sm font-semibold uppercase tracking-widest text-brand-600">
 					<IndianRupee className="h-4 w-4" />
 					Payments
 				</h4>

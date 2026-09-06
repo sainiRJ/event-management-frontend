@@ -62,11 +62,11 @@ const ResetPasswordPage: React.FC = () => {
 	if (!token) {
 		return (
 			<div className="mx-auto w-full max-w-md px-4 py-12">
-				<div className="rounded-3xl border border-brand-100/70 bg-white p-6 text-center shadow-sm sm:p-8">
-					<h1 className="font-display text-2xl font-semibold text-[#2B2129]">
+				<div className="rounded-3xl border border-ink-200/70 bg-white p-6 text-center shadow-sm sm:p-8">
+					<h1 className="font-display text-2xl font-semibold text-ink-900">
 						This link is incomplete
 					</h1>
-					<p className="mt-2 text-sm text-gray-500">
+					<p className="mt-2 text-sm text-ink-500">
 						Open the link from your email exactly as it was sent, or request a
 						new one.
 					</p>
@@ -80,15 +80,15 @@ const ResetPasswordPage: React.FC = () => {
 
 	return (
 		<div className="mx-auto w-full max-w-md px-4 py-12">
-			<div className="rounded-3xl border border-brand-100/70 bg-white p-6 shadow-sm sm:p-8">
+			<div className="rounded-3xl border border-ink-200/70 bg-white p-6 shadow-sm sm:p-8">
 				<div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-50 text-brand-600">
 					<ShieldCheck className="h-6 w-6" />
 				</div>
 
-				<h1 className="font-display text-2xl font-semibold text-[#2B2129]">
+				<h1 className="font-display text-2xl font-semibold text-ink-900">
 					Choose a new password
 				</h1>
-				<p className="mt-2 text-sm text-gray-500">
+				<p className="mt-2 text-sm text-ink-500">
 					You&apos;ll be signed out everywhere and can sign back in with the new
 					password.
 				</p>
@@ -124,7 +124,7 @@ const ResetPasswordPage: React.FC = () => {
 
 				<Link
 					to="/login"
-					className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-brand-600"
+					className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-ink-500 hover:text-brand-600"
 				>
 					<ArrowLeft className="h-4 w-4" />
 					Back to sign in

@@ -1,5 +1,6 @@
 import React, {lazy, Suspense, useEffect, useState} from "react";
-import {Routes, Route} from "react-router-dom";
+import {Routes, Route, useLocation} from "react-router-dom";
+import {PageTransition} from "@/components/motion";
 import HeaderTab from "./components/layouts/Header";
 import Sidebar from "./components/layouts/Sidebar";
 import LoginPage from "./components/Auth/LoginPage";
@@ -84,6 +85,7 @@ function App() {
 	 */
 	const isAuthenticated = useSession();
 	const dispatch = useAppDispatch();
+	const location = useLocation();
 
 	useNotificationSocket(isAuthenticated);
 	const counts = usePendingCounts(isAuthenticated);
@@ -96,7 +98,7 @@ function App() {
 	}, [isAuthenticated, dispatch]);
 
 	return (
-		<div className="min-h-screen bg-cream-100 font-sans text-[#2B2129]">
+		<div className="min-h-screen bg-cream-100 font-sans text-ink-800">
 			<Toaster position="top-right" richColors />
 
 			{isAuthenticated && (
@@ -120,157 +122,162 @@ function App() {
 				}`}
 			>
 				<main
-					className={`w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 ${
-						isAuthenticated ? "pt-24" : ""
+					className={`mx-auto w-full max-w-[1440px] px-4 py-6 sm:px-6 sm:py-8 lg:px-8 ${
+						isAuthenticated ? "pt-[5.5rem] sm:pt-24" : ""
 					}`}
 				>
 					<ErrorBoundary>
-						<Suspense
-							fallback={
-								<div className="flex min-h-[60vh] items-center justify-center text-sm text-gray-500">
-									Loading…
-								</div>
-							}
-						>
-							<Routes>
-								<Route
-									path="/"
-									element={
-										<AuthGuard requireAuth={true}>
-											<DashboardPage />
-										</AuthGuard>
-									}
-								/>
-								<Route
-									path="/dashboard"
-									element={
-										<AuthGuard requireAuth={true}>
-											<DashboardPage />
-										</AuthGuard>
-									}
-								/>
-								<Route
-									path="/employees"
-									element={
-										<AuthGuard requireAuth={true}>
-											<EmployeeTable />
-										</AuthGuard>
-									}
-								/>
-								<Route
-									path="/services"
-									element={
-										<AuthGuard requireAuth={true}>
-											<ServiceTable />
-										</AuthGuard>
-									}
-								/>
-								<Route
-									path="/booking"
-									element={
-										<AuthGuard requireAuth={true}>
-											<BookingPage />
-										</AuthGuard>
-									}
-								/>
-								<Route
-									path="/finance"
-									element={
-										<AuthGuard requireAuth={true}>
-											<FinancePage />
-										</AuthGuard>
-									}
-								/>
-								<Route
-									path="/login"
-									element={
-										<AuthGuard requireAuth={false}>
-											<LoginPage />
-										</AuthGuard>
-									}
-								/>
-								<Route path="/signup" element={<SignupPage />} />
-								<Route
-									path="/forgot-password"
-									element={<ForgotPasswordPage />}
-								/>
-								<Route path="/reset-password" element={<ResetPasswordPage />} />
-								<Route path="/auth/callback" element={<OAuthCallback />} />
-								<Route
-									path="/employee/:employeeId/details"
-									element={<EmployeeDetails />}
-								/>
-								<Route
-									path="/employee/:employeeId/service-history"
-									element={<EmployeeServiceHistory />}
-								/>
-								<Route
-									path="/profile"
-									element={
-										<AuthGuard requireAuth={true}>
-											<ProfilePage />
-										</AuthGuard>
-									}
-								/>
-								<Route
-									path="/calendar"
-									element={
-										<AuthGuard requireAuth={true}>
-											<CalendarPage />
-										</AuthGuard>
-									}
-								/>
-								<Route
-									path="/booking-requests"
-									element={
-										<AuthGuard requireAuth={true}>
-											<BookingRequestsPage />
-										</AuthGuard>
-									}
-								/>
-								<Route
-									path="/enquiries"
-									element={
-										<AuthGuard requireAuth={true}>
-											<ContactMessagesPage />
-										</AuthGuard>
-									}
-								/>
-								<Route
-									path="/conversations"
-									element={
-										<AuthGuard requireAuth={true}>
-											<ChatTranscriptsPage />
-										</AuthGuard>
-									}
-								/>
-								<Route
-									path="/gallery"
-									element={
-										<AuthGuard requireAuth={true}>
-											<GalleryPage />
-										</AuthGuard>
-									}
-								/>
-								<Route
-									path="/customers"
-									element={
-										<AuthGuard requireAuth={true}>
-											<CustomersPage />
-										</AuthGuard>
-									}
-								/>
-								<Route
-									path="/activity"
-									element={
-										<AuthGuard requireAuth={true}>
-											<ActivityPage />
-										</AuthGuard>
-									}
-								/>
-								<Route path="*" element={<NotFoundPage />} />
-							</Routes>
-						</Suspense>
+						<PageTransition key={location.pathname}>
+							<Suspense
+								fallback={
+									<div className="flex min-h-[60vh] items-center justify-center text-sm text-ink-500">
+										Loading…
+									</div>
+								}
+							>
+								<Routes>
+									<Route
+										path="/"
+										element={
+											<AuthGuard requireAuth={true}>
+												<DashboardPage />
+											</AuthGuard>
+										}
+									/>
+									<Route
+										path="/dashboard"
+										element={
+											<AuthGuard requireAuth={true}>
+												<DashboardPage />
+											</AuthGuard>
+										}
+									/>
+									<Route
+										path="/employees"
+										element={
+											<AuthGuard requireAuth={true}>
+												<EmployeeTable />
+											</AuthGuard>
+										}
+									/>
+									<Route
+										path="/services"
+										element={
+											<AuthGuard requireAuth={true}>
+												<ServiceTable />
+											</AuthGuard>
+										}
+									/>
+									<Route
+										path="/booking"
+										element={
+											<AuthGuard requireAuth={true}>
+												<BookingPage />
+											</AuthGuard>
+										}
+									/>
+									<Route
+										path="/finance"
+										element={
+											<AuthGuard requireAuth={true}>
+												<FinancePage />
+											</AuthGuard>
+										}
+									/>
+									<Route
+										path="/login"
+										element={
+											<AuthGuard requireAuth={false}>
+												<LoginPage />
+											</AuthGuard>
+										}
+									/>
+									<Route path="/signup" element={<SignupPage />} />
+									<Route
+										path="/forgot-password"
+										element={<ForgotPasswordPage />}
+									/>
+									<Route
+										path="/reset-password"
+										element={<ResetPasswordPage />}
+									/>
+									<Route path="/auth/callback" element={<OAuthCallback />} />
+									<Route
+										path="/employee/:employeeId/details"
+										element={<EmployeeDetails />}
+									/>
+									<Route
+										path="/employee/:employeeId/service-history"
+										element={<EmployeeServiceHistory />}
+									/>
+									<Route
+										path="/profile"
+										element={
+											<AuthGuard requireAuth={true}>
+												<ProfilePage />
+											</AuthGuard>
+										}
+									/>
+									<Route
+										path="/calendar"
+										element={
+											<AuthGuard requireAuth={true}>
+												<CalendarPage />
+											</AuthGuard>
+										}
+									/>
+									<Route
+										path="/booking-requests"
+										element={
+											<AuthGuard requireAuth={true}>
+												<BookingRequestsPage />
+											</AuthGuard>
+										}
+									/>
+									<Route
+										path="/enquiries"
+										element={
+											<AuthGuard requireAuth={true}>
+												<ContactMessagesPage />
+											</AuthGuard>
+										}
+									/>
+									<Route
+										path="/conversations"
+										element={
+											<AuthGuard requireAuth={true}>
+												<ChatTranscriptsPage />
+											</AuthGuard>
+										}
+									/>
+									<Route
+										path="/gallery"
+										element={
+											<AuthGuard requireAuth={true}>
+												<GalleryPage />
+											</AuthGuard>
+										}
+									/>
+									<Route
+										path="/customers"
+										element={
+											<AuthGuard requireAuth={true}>
+												<CustomersPage />
+											</AuthGuard>
+										}
+									/>
+									<Route
+										path="/activity"
+										element={
+											<AuthGuard requireAuth={true}>
+												<ActivityPage />
+											</AuthGuard>
+										}
+									/>
+									<Route path="*" element={<NotFoundPage />} />
+								</Routes>
+							</Suspense>
+						</PageTransition>
 					</ErrorBoundary>
 				</main>
 			</div>

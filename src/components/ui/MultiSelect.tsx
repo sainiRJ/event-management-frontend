@@ -57,7 +57,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
 	return (
 		<div className="w-full" ref={containerRef}>
 			{label && (
-				<label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">
+				<label className="block text-xs font-semibold text-ink-400 uppercase tracking-widest mb-2 ml-1">
 					{label}
 				</label>
 			)}
@@ -74,7 +74,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
 						selectedOptions.map((opt) => (
 							<span
 								key={opt.value}
-								className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-brand-50 text-brand-700 border border-brand-100"
+								className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-brand-50 text-brand-700 border border-ink-200"
 							>
 								{opt.label}
 								<button
@@ -87,11 +87,11 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
 							</span>
 						))
 					) : (
-						<span className="text-gray-400 text-sm ml-1">{placeholder}</span>
+						<span className="text-ink-400 text-sm ml-1">{placeholder}</span>
 					)}
 					<div className="ml-auto pr-1">
 						<ChevronDown
-							className={`h-4 w-4 text-gray-400 transition-transform ${
+							className={`h-4 w-4 text-ink-400 transition-transform ${
 								isOpen ? "rotate-180" : ""
 							}`}
 						/>
@@ -99,7 +99,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
 				</div>
 
 				{isOpen && (
-					<div className="absolute z-50 w-full mt-2 bg-white/95 backdrop-blur-xl rounded-2xl shadow-glass-lg border border-brand-100 max-h-60 overflow-auto py-1.5 animate-in fade-in slide-in-from-top-1 duration-150">
+					<div className="absolute z-50 w-full mt-2 bg-white/95 backdrop-blur-xl rounded-2xl shadow-glass-lg border border-ink-200 max-h-60 overflow-auto py-1.5 animate-in fade-in slide-in-from-top-1 duration-150">
 						{options.length > 0 ? (
 							options.map((opt) => (
 								<div
@@ -108,7 +108,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
 									className={`px-3 py-2 text-sm cursor-pointer flex items-center justify-between hover:bg-gray-50 ${
 										value.includes(opt.value)
 											? "bg-indigo-50 text-indigo-700 font-medium"
-											: "text-gray-700"
+											: "text-ink-700"
 									}`}
 								>
 									{opt.label}
@@ -116,7 +116,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
 								</div>
 							))
 						) : (
-							<div className="px-3 py-2 text-sm text-gray-500 text-center">
+							<div className="px-3 py-2 text-sm text-ink-500 text-center">
 								No options available
 							</div>
 						)}

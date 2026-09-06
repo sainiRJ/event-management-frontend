@@ -28,7 +28,7 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
 		ref,
 	) => {
 		const baseStyles =
-			"block w-full rounded-2xl border-brand-100 bg-white/70 backdrop-blur-sm px-4 py-3 text-sm font-medium text-[#2B2129] focus:border-brand-400 focus:ring-4 focus:ring-brand-50 transition-all duration-200 shadow-sm border appearance-none cursor-pointer outline-none";
+			"block w-full h-11 rounded-xl border-ink-200 bg-white px-4 text-sm text-ink-900 focus:border-brand-600 focus:ring-4 focus:ring-brand-600/10 transition-all duration-200 border appearance-none cursor-pointer outline-none";
 		const errorStyles = error
 			? "border-red-300 text-red-900 focus:border-red-500 focus:ring-red-50 animate-shake"
 			: "";
@@ -40,14 +40,14 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
 				{label && (
 					<label
 						htmlFor={selectId}
-						className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-1"
+						className="mb-1.5 block text-sm font-medium text-ink-700"
 					>
 						{label}
 					</label>
 				)}
 				<div className="relative">
 					{icon && (
-						<div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none transition-colors group-focus-within:text-brand-500">
+						<div className="absolute left-4 top-1/2 -translate-y-1/2 text-ink-400 pointer-events-none transition-colors group-focus-within:text-brand-500">
 							{icon}
 						</div>
 					)}
@@ -68,7 +68,7 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
 							</option>
 						))}
 					</select>
-					<div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+					<div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-ink-400">
 						<svg
 							className="w-4 h-4"
 							fill="none"
@@ -87,7 +87,7 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
 				{error && (
 					<p
 						role="alert"
-						className="mt-2 text-xs font-bold text-red-600 flex items-center gap-1.5 ml-1 animate-in fade-in slide-in-from-top-1 duration-200"
+						className="mt-1.5 flex items-center gap-1.5 text-xs font-medium text-rose-600 animate-in fade-in slide-in-from-top-1 duration-200"
 					>
 						<span className="w-1 h-1 bg-red-600 rounded-full flex-shrink-0" />
 						{error}

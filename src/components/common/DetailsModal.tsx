@@ -117,7 +117,7 @@ const DetailsModal = <T extends Record<string, any>>({
 		<div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
 			<div className="bg-white rounded-lg shadow-lg w-full max-w-lg mx-2 p-6 relative">
 				<button
-					className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl"
+					className="absolute top-2 right-2 text-ink-400 hover:text-ink-700 text-2xl"
 					onClick={onClose}
 				>
 					&times;
@@ -126,7 +126,7 @@ const DetailsModal = <T extends Record<string, any>>({
 				<div className="space-y-3">
 					{fields.map((field) => (
 						<div key={field.name as string}>
-							<label className="block text-sm font-semibold text-gray-600">
+							<label className="block text-sm font-semibold text-ink-600">
 								{field.label}
 							</label>
 							{renderField(field)}
@@ -136,7 +136,7 @@ const DetailsModal = <T extends Record<string, any>>({
 				<div className="flex justify-end gap-2 mt-6">
 					{externalEdit ? (
 						<button
-							className="bg-gradient-to-br from-brand-500 to-brand-700 text-white px-4 py-2 rounded hover:bg-indigo-700"
+							className="bg-brand-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
 							onClick={() => onSave(data)}
 						>
 							Edit
@@ -144,13 +144,13 @@ const DetailsModal = <T extends Record<string, any>>({
 					) : editMode ? (
 						<>
 							<button
-								className="bg-gradient-to-br from-brand-500 to-brand-700 text-white px-4 py-2 rounded hover:bg-indigo-700"
+								className="bg-brand-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
 								onClick={handleSave}
 							>
 								Save
 							</button>
 							<button
-								className="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300"
+								className="bg-gray-200 text-ink-700 px-4 py-2 rounded hover:bg-gray-300"
 								onClick={() => {
 									if (editModeProp) {
 										onClose();
@@ -164,7 +164,7 @@ const DetailsModal = <T extends Record<string, any>>({
 						</>
 					) : (
 						<button
-							className="bg-gradient-to-br from-brand-500 to-brand-700 text-white px-4 py-2 rounded hover:bg-indigo-700"
+							className="bg-brand-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
 							onClick={() => setEditMode(true)}
 						>
 							Edit

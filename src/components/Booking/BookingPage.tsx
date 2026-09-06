@@ -261,10 +261,10 @@ const BookingPage = () => {
 		<div className="space-y-8 animate-in fade-in duration-500">
 			<div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
 				<div>
-					<h1 className="text-3xl font-display font-semibold text-[#2B2129] tracking-tight">
+					<h1 className="text-3xl font-display font-semibold text-ink-900 tracking-tight">
 						Bookings
 					</h1>
-					<p className="text-gray-500 mt-1">
+					<p className="text-ink-500 mt-1">
 						Manage and track all your event bookings in one place
 					</p>
 				</div>
@@ -291,11 +291,11 @@ const BookingPage = () => {
 				</div>
 			</div>
 
-			<div className="bg-white rounded-3xl shadow-sm border border-brand-100/70 p-8">
+			<div className="bg-white rounded-3xl shadow-sm border border-ink-200/70 p-8">
 				{/* Filters Section */}
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
 					<div className="relative">
-						<Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+						<Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
 						<input
 							type="text"
 							placeholder="Search by customer name..."
@@ -306,7 +306,7 @@ const BookingPage = () => {
 					</div>
 
 					<div className="relative">
-						<Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+						<Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400 pointer-events-none" />
 						<select
 							value={selectedStatus}
 							onChange={(e) => setSelectedStatus(e.target.value)}
@@ -322,7 +322,7 @@ const BookingPage = () => {
 					</div>
 				</div>
 
-				<div className="rounded-2xl overflow-hidden border border-brand-100/50">
+				<div className="rounded-2xl overflow-hidden border border-ink-200/60">
 					<BookingTable
 						onViewDetails={handleViewDetails}
 						searchQuery={searchQuery}

@@ -117,9 +117,7 @@ const PaymentLedger: React.FC<iPaymentLedgerProps> = ({
 
 	if (isLoading && !ledger) {
 		return (
-			<p className="py-6 text-center text-sm text-gray-500">
-				Loading payments…
-			</p>
+			<p className="py-6 text-center text-sm text-ink-500">Loading payments…</p>
 		);
 	}
 
@@ -132,7 +130,7 @@ const PaymentLedger: React.FC<iPaymentLedgerProps> = ({
 					{
 						label: "Agreed price",
 						value: ledger?.totalCost,
-						tone: "text-[#2B2129]",
+						tone: "text-ink-900",
 					},
 					{
 						label: "Received",
@@ -146,18 +144,18 @@ const PaymentLedger: React.FC<iPaymentLedgerProps> = ({
 					},
 				].map((stat) => (
 					<div key={stat.label} className="rounded-2xl bg-cream-100 p-4">
-						<p className="text-xs font-bold uppercase tracking-wider text-gray-400">
+						<p className="text-xs font-bold uppercase tracking-wider text-ink-400">
 							{stat.label}
 						</p>
-						<p className={`mt-1 text-xl font-black ${stat.tone}`}>
+						<p className={`mt-1 text-xl font-semibold ${stat.tone}`}>
 							{currency.format(Number(stat.value ?? 0))}
 						</p>
 					</div>
 				))}
 			</div>
 
-			<div className="rounded-2xl border border-brand-100/70 p-4">
-				<h4 className="mb-3 flex items-center gap-2 text-sm font-bold text-[#2B2129]">
+			<div className="rounded-2xl border border-ink-200/70 p-4">
+				<h4 className="mb-3 flex items-center gap-2 text-sm font-bold text-ink-900">
 					<IndianRupee className="h-4 w-4 text-brand-500" />
 					Record a payment
 				</h4>
@@ -199,21 +197,21 @@ const PaymentLedger: React.FC<iPaymentLedgerProps> = ({
 			</div>
 
 			{ledger?.payments.length === 0 ? (
-				<p className="py-4 text-center text-sm text-gray-500">
+				<p className="py-4 text-center text-sm text-ink-500">
 					No payments recorded yet.
 				</p>
 			) : (
-				<ul className="divide-y divide-brand-100/70 rounded-2xl border border-brand-100/70">
+				<ul className="divide-y divide-brand-100/70 rounded-2xl border border-ink-200/70">
 					{ledger?.payments.map((payment) => (
 						<li
 							key={payment.id}
 							className="flex items-center justify-between gap-3 p-4"
 						>
 							<div className="min-w-0">
-								<p className="font-bold text-[#2B2129]">
+								<p className="font-bold text-ink-900">
 									{currency.format(Number(payment.amount))}
 								</p>
-								<p className="text-sm text-gray-500">
+								<p className="text-sm text-ink-500">
 									{formatDate(payment.paymentDate)}
 								</p>
 							</div>

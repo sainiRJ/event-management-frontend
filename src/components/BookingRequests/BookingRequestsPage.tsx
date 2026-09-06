@@ -230,18 +230,18 @@ const BookingRequestsPage: React.FC = () => {
 			/>
 
 			{isLoading && requests.length === 0 && (
-				<p className="py-12 text-center text-sm text-gray-500">
+				<p className="py-12 text-center text-sm text-ink-500">
 					Loading requests…
 				</p>
 			)}
 
 			{!isLoading && requests.length === 0 && (
-				<div className="rounded-3xl border border-brand-100/70 bg-white py-16 text-center">
+				<div className="rounded-3xl border border-ink-200/70 bg-white py-16 text-center">
 					<Inbox className="mx-auto mb-3 h-10 w-10 text-brand-300" />
-					<h2 className="font-display text-lg font-semibold text-[#2B2129]">
+					<h2 className="font-display text-lg font-semibold text-ink-900">
 						Nothing waiting
 					</h2>
-					<p className="mt-1 text-sm text-gray-500">
+					<p className="mt-1 text-sm text-ink-500">
 						New requests from your website and chat will appear here.
 					</p>
 				</div>
@@ -282,7 +282,7 @@ const BookingRequestsPage: React.FC = () => {
 					return (
 						<article
 							key={request.id}
-							className="rounded-3xl border border-brand-100/70 bg-white p-5 shadow-sm transition-shadow hover:shadow-md sm:p-6"
+							className="rounded-3xl border border-ink-200/70 bg-white p-5 shadow-sm transition-shadow hover:shadow-md sm:p-6"
 						>
 							<div className="mb-4 flex flex-wrap items-start justify-between gap-3">
 								<div className="flex min-w-0 items-start gap-3">
@@ -299,10 +299,10 @@ const BookingRequestsPage: React.FC = () => {
 									)}
 
 									<div className="min-w-0">
-										<h2 className="truncate font-display text-lg font-semibold text-[#2B2129]">
+										<h2 className="truncate font-display text-lg font-semibold text-ink-900">
 											{request.customerName}
 										</h2>
-										<p className="mt-0.5 text-sm text-gray-500">
+										<p className="mt-0.5 text-sm text-ink-500">
 											{request.serviceName} · {request.eventName}
 										</p>
 									</div>
@@ -310,7 +310,7 @@ const BookingRequestsPage: React.FC = () => {
 								<StatusBadge status={request.status} />
 							</div>
 
-							<dl className="grid gap-2 text-sm text-gray-600">
+							<dl className="grid gap-2 text-sm text-ink-600">
 								<div className="flex items-center gap-2">
 									<CalendarDays className="h-4 w-4 shrink-0 text-brand-400" />
 									<dt className="sr-only">Event date</dt>
@@ -340,12 +340,12 @@ const BookingRequestsPage: React.FC = () => {
 							</dl>
 
 							{request.notes && (
-								<p className="mt-4 rounded-2xl bg-cream-100 p-3 text-sm text-gray-600">
+								<p className="mt-4 rounded-2xl bg-cream-100 p-3 text-sm text-ink-600">
 									{request.notes}
 								</p>
 							)}
 
-							<p className="mt-4 text-xs text-gray-400">
+							<p className="mt-4 text-xs text-ink-400">
 								Requested {formatDate(request.requestedAt)}
 							</p>
 
@@ -380,7 +380,7 @@ const BookingRequestsPage: React.FC = () => {
 			>
 				{approving && (
 					<div className="space-y-4">
-						<p className="text-sm text-gray-600">
+						<p className="text-sm text-ink-600">
 							{approving.customerName} — {approving.serviceName} on{" "}
 							{formatDate(approving.eventDate)}
 						</p>
@@ -403,9 +403,9 @@ const BookingRequestsPage: React.FC = () => {
 						/>
 
 						{totalCost && Number(totalCost) > 0 && (
-							<p className="text-sm text-gray-500">
+							<p className="text-sm text-ink-500">
 								Outstanding after advance:{" "}
-								<span className="font-semibold text-[#2B2129]">
+								<span className="font-semibold text-ink-900">
 									{currency.format(
 										Math.max(
 											0,

@@ -91,9 +91,9 @@ const ChatTranscriptsPage: React.FC = () => {
 					}
 				/>
 
-				<div className="space-y-3 rounded-3xl border border-brand-100/70 bg-white p-4 shadow-sm sm:p-6">
+				<div className="space-y-3 rounded-3xl border border-ink-200/70 bg-white p-4 shadow-sm sm:p-6">
 					{transcript.messages.length === 0 && (
-						<p className="py-8 text-center text-sm text-gray-500">
+						<p className="py-8 text-center text-sm text-ink-500">
 							This conversation has no messages.
 						</p>
 					)}
@@ -111,7 +111,7 @@ const ChatTranscriptsPage: React.FC = () => {
 								<div
 									className={`max-w-[85%] rounded-2xl px-4 py-3 sm:max-w-[70%] ${
 										isCustomer
-											? "bg-cream-100 text-[#2B2129]"
+											? "bg-cream-100 text-ink-900"
 											: "bg-brand-500 text-white"
 									}`}
 								>
@@ -120,7 +120,7 @@ const ChatTranscriptsPage: React.FC = () => {
 									</p>
 									<p
 										className={`mt-1.5 text-[11px] ${
-											isCustomer ? "text-gray-400" : "text-brand-100"
+											isCustomer ? "text-ink-400" : "text-brand-100"
 										}`}
 									>
 										{isCustomer ? "Customer" : "Assistant"} ·{" "}
@@ -171,18 +171,18 @@ const ChatTranscriptsPage: React.FC = () => {
 			)}
 
 			{isLoading && sessions.length === 0 && !isUnavailable && (
-				<p className="py-12 text-center text-sm text-gray-500">
+				<p className="py-12 text-center text-sm text-ink-500">
 					Loading conversations…
 				</p>
 			)}
 
 			{!isLoading && !isUnavailable && sessions.length === 0 && (
-				<div className="rounded-3xl border border-brand-100/70 bg-white py-16 text-center">
+				<div className="rounded-3xl border border-ink-200/70 bg-white py-16 text-center">
 					<MessagesSquare className="mx-auto mb-3 h-10 w-10 text-brand-300" />
-					<h2 className="font-display text-lg font-semibold text-[#2B2129]">
+					<h2 className="font-display text-lg font-semibold text-ink-900">
 						No conversations yet
 					</h2>
-					<p className="mt-1 text-sm text-gray-500">
+					<p className="mt-1 text-sm text-ink-500">
 						Chats from your website assistant will appear here.
 					</p>
 				</div>
@@ -195,20 +195,20 @@ const ChatTranscriptsPage: React.FC = () => {
 						type="button"
 						onClick={() => openTranscript(session)}
 						disabled={isLoadingTranscript}
-						className="flex w-full flex-wrap items-center justify-between gap-3 rounded-3xl border border-brand-100/70 bg-white p-5 text-left shadow-sm transition-shadow hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 disabled:opacity-60 sm:p-6"
+						className="flex w-full flex-wrap items-center justify-between gap-3 rounded-3xl border border-ink-200/70 bg-white p-5 text-left shadow-sm transition-shadow hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 disabled:opacity-60 sm:p-6"
 					>
 						<div className="min-w-0">
-							<h2 className="truncate font-display text-base font-semibold text-[#2B2129]">
+							<h2 className="truncate font-display text-base font-semibold text-ink-900">
 								{session.title || "Conversation"}
 							</h2>
-							<p className="mt-0.5 text-sm text-gray-500">
+							<p className="mt-0.5 text-sm text-ink-500">
 								{session.messageCount} message
 								{session.messageCount === 1 ? "" : "s"} · last activity{" "}
 								{formatWhen(session.lastMessageAt)}
 							</p>
 						</div>
 
-						<span className="shrink-0 rounded-lg bg-cream-100 px-2.5 py-1 text-xs font-bold text-gray-500">
+						<span className="shrink-0 rounded-lg bg-cream-100 px-2.5 py-1 text-xs font-bold text-ink-500">
 							{formatWhen(session.startedAt)}
 						</span>
 					</button>

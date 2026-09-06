@@ -112,7 +112,7 @@ const EmployeeStatsTable: React.FC<EmployeeStatsTableProps> = ({
 		return (
 			<div className="flex flex-col items-center justify-center py-12">
 				<Loader2 className="w-8 h-8 text-brand-600 animate-spin mb-4" />
-				<p className="text-gray-500 font-medium">Loading statistics...</p>
+				<p className="text-ink-500 font-medium">Loading statistics...</p>
 			</div>
 		);
 	}
@@ -120,7 +120,7 @@ const EmployeeStatsTable: React.FC<EmployeeStatsTableProps> = ({
 	if (!stats || Object.keys(stats).length === 0) {
 		return (
 			<div className="text-center py-12 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
-				<p className="text-gray-500">
+				<p className="text-ink-500">
 					No employee statistics available for this period.
 				</p>
 			</div>
@@ -131,31 +131,31 @@ const EmployeeStatsTable: React.FC<EmployeeStatsTableProps> = ({
 		<div className="overflow-x-auto">
 			<table className="min-w-full">
 				<thead>
-					<tr className="border-b border-brand-100/70">
-						<th className="px-4 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">
+					<tr className="border-b border-ink-200/70">
+						<th className="px-4 py-4 text-left text-xs font-bold text-ink-400 uppercase tracking-wider">
 							Employee
 						</th>
 						{serviceNames.map((name) => (
 							<th
 								key={name}
-								className="px-4 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider"
+								className="px-4 py-4 text-left text-xs font-bold text-ink-400 uppercase tracking-wider"
 							>
 								{name}
 							</th>
 						))}
-						<th className="px-4 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">
+						<th className="px-4 py-4 text-left text-xs font-bold text-ink-400 uppercase tracking-wider">
 							Total
 						</th>
-						<th className="px-4 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">
+						<th className="px-4 py-4 text-left text-xs font-bold text-ink-400 uppercase tracking-wider">
 							Earnings
 						</th>
-						<th className="px-4 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">
+						<th className="px-4 py-4 text-left text-xs font-bold text-ink-400 uppercase tracking-wider">
 							Paid
 						</th>
-						<th className="px-4 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">
+						<th className="px-4 py-4 text-left text-xs font-bold text-ink-400 uppercase tracking-wider">
 							Remaining
 						</th>
-						<th className="px-4 py-4 text-right text-xs font-bold text-gray-400 uppercase tracking-wider">
+						<th className="px-4 py-4 text-right text-xs font-bold text-ink-400 uppercase tracking-wider">
 							Action
 						</th>
 					</tr>
@@ -167,7 +167,7 @@ const EmployeeStatsTable: React.FC<EmployeeStatsTableProps> = ({
 							className="group hover:bg-gray-50/50 transition-colors"
 						>
 							<td className="px-4 py-4 whitespace-nowrap">
-								<div className="font-semibold text-[#2B2129]">
+								<div className="font-semibold text-ink-900">
 									{employee.name}
 								</div>
 							</td>
@@ -181,7 +181,7 @@ const EmployeeStatsTable: React.FC<EmployeeStatsTableProps> = ({
 											className={`inline-flex items-center justify-center w-8 h-8 rounded-lg text-xs font-bold ${
 												stat && stat.count > 0
 													? "bg-brand-50 text-brand-600"
-													: "bg-gray-50 text-gray-300"
+													: "bg-gray-50 text-ink-300"
 											}`}
 										>
 											{stat ? stat.count : 0}
@@ -190,11 +190,11 @@ const EmployeeStatsTable: React.FC<EmployeeStatsTableProps> = ({
 								);
 							})}
 							<td className="px-4 py-4 whitespace-nowrap">
-								<span className="font-bold text-gray-700">
+								<span className="font-bold text-ink-700">
 									{employee.totalServices}
 								</span>
 							</td>
-							<td className="px-4 py-4 whitespace-nowrap font-medium text-[#2B2129]">
+							<td className="px-4 py-4 whitespace-nowrap font-medium text-ink-900">
 								{formatCurrency(employee.totalAmount)}
 							</td>
 							<td className="px-4 py-4 whitespace-nowrap text-emerald-600 font-medium">
@@ -282,10 +282,10 @@ const EmployeeStatsTable: React.FC<EmployeeStatsTableProps> = ({
 					/>
 
 					<div>
-						<label className="block text-sm font-medium text-gray-700 mb-2">
+						<label className="block text-sm font-medium text-ink-700 mb-2">
 							Assign to Specific Services (Optional)
 						</label>
-						<div className="max-h-48 overflow-y-auto border border-brand-100/70 rounded-xl bg-gray-50/50">
+						<div className="max-h-48 overflow-y-auto border border-ink-200/70 rounded-xl bg-gray-50/50">
 							{getSelectedEmployeeServices().length > 0 ? (
 								getSelectedEmployeeServices().map((service) => {
 									const isSelected = formData.assignedEmployeeIds?.includes(
@@ -309,7 +309,7 @@ const EmployeeStatsTable: React.FC<EmployeeStatsTableProps> = ({
 											className={`px-4 py-3 cursor-pointer flex items-center justify-between transition-colors border-b border-white last:border-0 ${
 												isSelected
 													? "bg-brand-100/50 text-brand-700"
-													: "text-gray-600 hover:bg-white"
+													: "text-ink-600 hover:bg-white"
 											}`}
 										>
 											<span className="text-sm font-medium">
@@ -320,7 +320,7 @@ const EmployeeStatsTable: React.FC<EmployeeStatsTableProps> = ({
 									);
 								})
 							) : (
-								<div className="px-4 py-6 text-center text-gray-400 text-sm italic">
+								<div className="px-4 py-6 text-center text-ink-400 text-sm italic">
 									No outstanding services found
 								</div>
 							)}
@@ -336,7 +336,7 @@ const EmployeeStatsTable: React.FC<EmployeeStatsTableProps> = ({
 							}
 							className="w-4 h-4 text-brand-600 rounded border-gray-300 focus:ring-brand-400"
 						/>
-						<span className="text-sm font-medium text-gray-700">
+						<span className="text-sm font-medium text-ink-700">
 							Auto-calculate from services
 						</span>
 					</label>

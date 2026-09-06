@@ -80,7 +80,7 @@ const EmployeeDetails: React.FC = () => {
 	};
 
 	const getStatusBadge = (status: string) => {
-		let color = "bg-gray-100 text-gray-700";
+		let color = "bg-gray-100 text-ink-700";
 		if (
 			status?.toLowerCase() === "active" ||
 			status?.toLowerCase() === "working"
@@ -104,7 +104,7 @@ const EmployeeDetails: React.FC = () => {
 		return (
 			<div className="flex flex-col items-center justify-center py-20">
 				<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-500 mx-auto"></div>
-				<p className="mt-4 text-gray-500 font-medium">
+				<p className="mt-4 text-ink-500 font-medium">
 					Loading employee records...
 				</p>
 			</div>
@@ -114,9 +114,9 @@ const EmployeeDetails: React.FC = () => {
 	if (!employee) {
 		return (
 			<div className="flex flex-col items-center justify-center py-20 text-center">
-				<AlertCircle className="w-16 h-16 text-gray-300 mb-4" />
-				<h3 className="text-xl font-bold text-[#2B2129]">Employee Not Found</h3>
-				<p className="text-gray-500 mt-1 mb-6">
+				<AlertCircle className="w-16 h-16 text-ink-300 mb-4" />
+				<h3 className="text-xl font-bold text-ink-900">Employee Not Found</h3>
+				<p className="text-ink-500 mt-1 mb-6">
 					We couldn&apos;t find the employee you&apos;re looking for.
 				</p>
 				<Button onClick={() => navigate("/employees")}>
@@ -129,26 +129,26 @@ const EmployeeDetails: React.FC = () => {
 	return (
 		<div className="space-y-8 animate-in fade-in duration-500">
 			{/* Header Card */}
-			<div className="bg-white rounded-[2rem] shadow-sm border border-brand-100/70 p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+			<div className="bg-white rounded-[2rem] shadow-sm border border-ink-200/70 p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
 				<div className="flex items-center gap-6">
 					<button
 						onClick={() => navigate("/employees")}
-						className="p-3 bg-gray-50 text-gray-400 hover:text-brand-600 hover:bg-brand-50 rounded-2xl transition-all"
+						className="p-3 bg-gray-50 text-ink-400 hover:text-brand-600 hover:bg-brand-50 rounded-2xl transition-all"
 					>
 						<ArrowLeft className="w-6 h-6" />
 					</button>
 					<div className="flex items-center gap-5">
-						<div className="w-20 h-20 bg-brand-50 rounded-3xl flex items-center justify-center text-brand-600 border border-brand-100 shadow-inner">
+						<div className="w-20 h-20 bg-brand-50 rounded-3xl flex items-center justify-center text-brand-600 border border-ink-200 shadow-inner">
 							<User className="w-10 h-10" />
 						</div>
 						<div>
 							<div className="flex items-center gap-3 mb-1">
-								<h1 className="text-3xl font-black text-[#2B2129] tracking-tight">
+								<h1 className="text-3xl font-semibold text-ink-900 tracking-tight">
 									{employee.name}
 								</h1>
 								{getStatusBadge((employee as any).status)}
 							</div>
-							<p className="text-gray-500 font-bold flex items-center gap-2">
+							<p className="text-ink-500 font-bold flex items-center gap-2">
 								<Briefcase className="w-4 h-4 text-indigo-400" />
 								{employee.designation}
 							</p>
@@ -175,12 +175,12 @@ const EmployeeDetails: React.FC = () => {
 							className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-bold transition-all ${
 								isActive
 									? "bg-white text-brand-600 shadow-sm ring-1 ring-black/5"
-									: "text-gray-500 hover:text-[#2B2129] hover:bg-white/50"
+									: "text-ink-500 hover:text-ink-900 hover:bg-white/50"
 							}`}
 						>
 							<Icon
 								className={`w-4 h-4 ${
-									isActive ? "text-brand-600" : "text-gray-400"
+									isActive ? "text-brand-600" : "text-ink-400"
 								}`}
 							/>
 							{tab.label}
@@ -190,7 +190,7 @@ const EmployeeDetails: React.FC = () => {
 			</div>
 
 			{/* Tab Content */}
-			<div className="bg-white rounded-[2rem] shadow-sm border border-brand-100/70 p-8 min-h-[400px]">
+			<div className="bg-white rounded-[2rem] shadow-sm border border-ink-200/70 p-8 min-h-[400px]">
 				{activeTab === "profile" && (
 					<EmployeeProfileTab employee={employee} formatDate={formatDate} />
 				)}
@@ -234,8 +234,8 @@ const EmployeeProfileTab: React.FC<{
 	return (
 		<div className="grid grid-cols-1 md:grid-cols-2 gap-12 animate-in slide-in-from-bottom-4 duration-500">
 			<div className="space-y-8">
-				<h3 className="text-xl font-black text-[#2B2129] flex items-center gap-3">
-					<div className="w-1 h-6 bg-gradient-to-br from-brand-500 to-brand-700 rounded-full"></div>
+				<h3 className="text-xl font-semibold text-ink-900 flex items-center gap-3">
+					<div className="w-1 h-6 bg-brand-600 rounded-full"></div>
 					Basic Information
 				</h3>
 
@@ -243,15 +243,15 @@ const EmployeeProfileTab: React.FC<{
 					{infoItems.map((item, idx) => (
 						<div
 							key={idx}
-							className="group p-6 bg-gray-50/50 rounded-3xl border border-brand-100/50 hover:bg-white hover:border-brand-100 hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-300"
+							className="group p-6 bg-gray-50/50 rounded-3xl border border-ink-200/60 hover:bg-white hover:border-ink-200 hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-300"
 						>
 							<div className="p-2.5 bg-white rounded-xl text-brand-600 w-fit mb-4 shadow-sm group-hover:scale-110 transition-transform">
 								<item.icon className="w-5 h-5" />
 							</div>
-							<p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+							<p className="text-[10px] font-bold text-ink-400 uppercase tracking-widest mb-1">
 								{item.label}
 							</p>
-							<p className="text-sm font-bold text-[#2B2129] truncate">
+							<p className="text-sm font-bold text-ink-900 truncate">
 								{item.value || "Not provided"}
 							</p>
 						</div>
@@ -260,7 +260,7 @@ const EmployeeProfileTab: React.FC<{
 			</div>
 
 			<div className="space-y-8">
-				<h3 className="text-xl font-black text-[#2B2129] flex items-center gap-3">
+				<h3 className="text-xl font-semibold text-ink-900 flex items-center gap-3">
 					<div className="w-1 h-6 bg-emerald-600 rounded-full"></div>
 					Activity Summary
 				</h3>
@@ -276,7 +276,7 @@ const EmployeeProfileTab: React.FC<{
 								Performance Score
 							</p>
 							<div className="flex items-end gap-3">
-								<span className="text-6xl font-black leading-none">94</span>
+								<span className="text-6xl font-semibold leading-none">94</span>
 								<span className="text-indigo-200 font-bold mb-2">/ 100</span>
 							</div>
 						</div>
@@ -290,13 +290,13 @@ const EmployeeProfileTab: React.FC<{
 								<p className="text-[10px] font-bold text-indigo-100 uppercase mb-1">
 									Reliability
 								</p>
-								<p className="text-lg font-black text-white">Excellent</p>
+								<p className="text-lg font-semibold text-white">Excellent</p>
 							</div>
 							<div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10">
 								<p className="text-[10px] font-bold text-indigo-100 uppercase mb-1">
 									Satisfaction
 								</p>
-								<p className="text-lg font-black text-white">4.8 / 5</p>
+								<p className="text-lg font-semibold text-white">4.8 / 5</p>
 							</div>
 						</div>
 					</div>
@@ -356,8 +356,8 @@ const EmployeeServiceHistoryTab: React.FC<{serviceHistory: any}> = ({
 	if (!serviceHistory) {
 		return (
 			<div className="flex flex-col items-center justify-center py-20 text-center">
-				<Clock className="w-12 h-12 text-gray-300 mb-4" />
-				<p className="text-gray-500 font-medium">
+				<Clock className="w-12 h-12 text-ink-300 mb-4" />
+				<p className="text-ink-500 font-medium">
 					No service history records found.
 				</p>
 			</div>
@@ -400,13 +400,13 @@ const EmployeeServiceHistoryTab: React.FC<{serviceHistory: any}> = ({
 				{stats.map((stat, idx) => (
 					<div
 						key={idx}
-						className={`p-6 rounded-3xl border border-brand-100/50 ${stat.bgColor} flex items-center justify-between`}
+						className={`p-6 rounded-3xl border border-ink-200/60 ${stat.bgColor} flex items-center justify-between`}
 					>
 						<div>
-							<p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">
+							<p className="text-[10px] font-semibold text-ink-400 uppercase tracking-widest mb-1">
 								{stat.label}
 							</p>
-							<p className={`text-2xl font-black ${stat.color}`}>
+							<p className={`text-2xl font-semibold ${stat.color}`}>
 								{stat.value}
 							</p>
 						</div>
@@ -421,7 +421,7 @@ const EmployeeServiceHistoryTab: React.FC<{serviceHistory: any}> = ({
 
 			<div className="flex flex-wrap gap-4 items-center">
 				<div className="relative flex-1 max-w-xs">
-					<Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+					<Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
 					<input
 						type="text"
 						placeholder="Search services..."
@@ -453,23 +453,23 @@ const EmployeeServiceHistoryTab: React.FC<{serviceHistory: any}> = ({
 				</div>
 			</div>
 
-			<div className="overflow-x-auto rounded-2xl border border-brand-100/70">
+			<div className="overflow-x-auto rounded-2xl border border-ink-200/70">
 				<table className="min-w-full">
 					<thead className="bg-gray-50/50">
 						<tr>
-							<th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+							<th className="px-6 py-4 text-left text-[11px] font-bold text-ink-400 uppercase tracking-widest">
 								Service Details
 							</th>
-							<th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+							<th className="px-6 py-4 text-left text-[11px] font-bold text-ink-400 uppercase tracking-widest">
 								Customer & Date
 							</th>
-							<th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+							<th className="px-6 py-4 text-left text-[11px] font-bold text-ink-400 uppercase tracking-widest">
 								Earnings
 							</th>
-							<th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+							<th className="px-6 py-4 text-left text-[11px] font-bold text-ink-400 uppercase tracking-widest">
 								Status
 							</th>
-							<th className="px-6 py-4 text-right text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+							<th className="px-6 py-4 text-right text-[11px] font-bold text-ink-400 uppercase tracking-widest">
 								Action
 							</th>
 						</tr>
@@ -481,29 +481,29 @@ const EmployeeServiceHistoryTab: React.FC<{serviceHistory: any}> = ({
 								className="group hover:bg-gray-50/50 transition-colors"
 							>
 								<td className="px-6 py-4">
-									<div className="font-bold text-[#2B2129]">
+									<div className="font-bold text-ink-900">
 										{service.serviceName}
 									</div>
-									<div className="text-xs text-gray-500 font-medium">
+									<div className="text-xs text-ink-500 font-medium">
 										{service.location}
 									</div>
 								</td>
 								<td className="px-6 py-4">
-									<div className="text-sm font-bold text-gray-700">
+									<div className="text-sm font-bold text-ink-700">
 										{service.customerName}
 									</div>
-									<div className="text-xs text-gray-400 font-bold">
+									<div className="text-xs text-ink-400 font-bold">
 										{new Date(service.eventDate).toLocaleDateString()}
 									</div>
 								</td>
 								<td className="px-6 py-4">
-									<div className="text-sm font-black text-brand-600">
+									<div className="text-sm font-semibold text-brand-600">
 										{formatCurrency(service.amount)}
 									</div>
 								</td>
 								<td className="px-6 py-4">
 									<span
-										className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
+										className={`px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider ${
 											service.isPaid
 												? "bg-emerald-50 text-emerald-600"
 												: "bg-rose-50 text-rose-600"
@@ -575,8 +575,8 @@ const EmployeePaymentHistoryTab: React.FC<{serviceHistory: any}> = ({
 	if (!serviceHistory?.paymentHistory?.length) {
 		return (
 			<div className="flex flex-col items-center justify-center py-20 text-center">
-				<CreditCard className="w-12 h-12 text-gray-300 mb-4" />
-				<p className="text-gray-500 font-medium">
+				<CreditCard className="w-12 h-12 text-ink-300 mb-4" />
+				<p className="text-ink-500 font-medium">
 					No payment history records found.
 				</p>
 			</div>
@@ -590,32 +590,32 @@ const EmployeePaymentHistoryTab: React.FC<{serviceHistory: any}> = ({
 
 	return (
 		<div className="space-y-8 animate-in slide-in-from-bottom-4 duration-500">
-			<div className="bg-gradient-to-br from-brand-500 to-brand-700 rounded-[2rem] p-8 text-white flex items-center justify-between shadow-xl shadow-indigo-200">
+			<div className="bg-brand-600 rounded-[2rem] p-8 text-white flex items-center justify-between shadow-xl shadow-indigo-200">
 				<div>
 					<p className="text-indigo-100 text-xs font-bold uppercase tracking-[0.2em] mb-1">
 						Lifetime Total Paid
 					</p>
-					<p className="text-4xl font-black">{formatCurrency(totalPaid)}</p>
+					<p className="text-4xl font-semibold">{formatCurrency(totalPaid)}</p>
 				</div>
 				<div className="p-4 bg-white/10 backdrop-blur-md rounded-3xl border border-white/10">
 					<Wallet className="w-10 h-10 text-white" />
 				</div>
 			</div>
 
-			<div className="overflow-x-auto rounded-2xl border border-brand-100/70">
+			<div className="overflow-x-auto rounded-2xl border border-ink-200/70">
 				<table className="min-w-full">
 					<thead className="bg-gray-50/50">
 						<tr>
-							<th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+							<th className="px-6 py-4 text-left text-[11px] font-bold text-ink-400 uppercase tracking-widest">
 								Transaction ID
 							</th>
-							<th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+							<th className="px-6 py-4 text-left text-[11px] font-bold text-ink-400 uppercase tracking-widest">
 								Amount
 							</th>
-							<th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+							<th className="px-6 py-4 text-left text-[11px] font-bold text-ink-400 uppercase tracking-widest">
 								Date
 							</th>
-							<th className="px-6 py-4 text-right text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+							<th className="px-6 py-4 text-right text-[11px] font-bold text-ink-400 uppercase tracking-widest">
 								Status
 							</th>
 						</tr>
@@ -627,22 +627,22 @@ const EmployeePaymentHistoryTab: React.FC<{serviceHistory: any}> = ({
 								className="hover:bg-gray-50/50 transition-colors"
 							>
 								<td className="px-6 py-4">
-									<div className="text-xs font-bold text-gray-400 font-mono">
+									<div className="text-xs font-bold text-ink-400 font-mono">
 										#{payment.id.slice(-8).toUpperCase()}
 									</div>
 								</td>
 								<td className="px-6 py-4">
-									<div className="text-sm font-black text-[#2B2129]">
+									<div className="text-sm font-semibold text-ink-900">
 										{formatCurrency(parseFloat(payment.amount))}
 									</div>
 								</td>
 								<td className="px-6 py-4">
-									<div className="text-sm font-bold text-gray-600">
+									<div className="text-sm font-bold text-ink-600">
 										{new Date(payment.paidAt).toLocaleDateString()}
 									</div>
 								</td>
 								<td className="px-6 py-4 text-right">
-									<span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-600">
+									<span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-emerald-50 text-emerald-600">
 										<CheckCircle2 className="w-3 h-3" />
 										Successful
 									</span>

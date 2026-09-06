@@ -181,10 +181,10 @@ const ProfilePage: React.FC = () => {
 	return (
 		<div className="max-w-3xl mx-auto space-y-6 animate-in fade-in duration-300">
 			<div>
-				<h1 className="text-3xl font-display font-semibold text-[#2B2129]">
+				<h1 className="text-3xl font-display font-semibold text-ink-900">
 					Account Settings
 				</h1>
-				<p className="text-sm text-gray-500 mt-1">
+				<p className="text-sm text-ink-500 mt-1">
 					Manage your profile photo, details, and password
 				</p>
 			</div>
@@ -197,10 +197,10 @@ const ProfilePage: React.FC = () => {
 							<img
 								src={profile.photoUrl}
 								alt="Profile"
-								className="w-20 h-20 rounded-2xl object-cover border border-brand-100"
+								className="w-20 h-20 rounded-2xl object-cover border border-ink-200"
 							/>
 						) : (
-							<div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 text-white flex items-center justify-center text-xl font-black">
+							<div className="w-20 h-20 rounded-2xl bg-brand-600 text-white flex items-center justify-center text-xl font-semibold">
 								{initials}
 							</div>
 						)}
@@ -209,7 +209,7 @@ const ProfilePage: React.FC = () => {
 							onClick={handlePhotoClick}
 							disabled={uploadingPhoto}
 							aria-label="Change profile photo"
-							className="absolute -bottom-2 -right-2 w-8 h-8 rounded-xl bg-white border border-brand-100 shadow-sm flex items-center justify-center text-brand-600 hover:bg-brand-50 transition-colors disabled:opacity-50"
+							className="absolute -bottom-2 -right-2 w-8 h-8 rounded-xl bg-white border border-ink-200 shadow-sm flex items-center justify-center text-brand-600 hover:bg-brand-50 transition-colors disabled:opacity-50"
 						>
 							<Camera className="w-4 h-4" />
 						</button>
@@ -222,10 +222,10 @@ const ProfilePage: React.FC = () => {
 						/>
 					</div>
 					<div>
-						<p className="font-black text-lg text-[#2B2129]">
+						<p className="font-semibold text-lg text-ink-900">
 							{profileForm.name || "Admin"}
 						</p>
-						<p className="text-sm text-gray-500">{profileForm.email}</p>
+						<p className="text-sm text-ink-500">{profileForm.email}</p>
 						{uploadingPhoto && (
 							<p className="text-xs text-brand-600 mt-1 font-bold">
 								Uploading photo...
@@ -269,7 +269,7 @@ const ProfilePage: React.FC = () => {
 			<div className="glass-card p-8">
 				<div className="flex items-center gap-2 mb-6">
 					<Lock className="w-4 h-4 text-brand-600" />
-					<h2 className="text-lg font-display font-semibold text-[#2B2129]">
+					<h2 className="text-lg font-display font-semibold text-ink-900">
 						Change Password
 					</h2>
 				</div>

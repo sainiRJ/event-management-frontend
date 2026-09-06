@@ -134,7 +134,7 @@ const PhotoUploadModal: React.FC<PhotoUploadModalProps> = ({open, onClose}) => {
 
 				<div className="space-y-4">
 					<div className="flex items-center justify-between">
-						<label className="block text-sm font-medium text-gray-700">
+						<label className="block text-sm font-medium text-ink-700">
 							Photo Attachments
 						</label>
 						{files.length > 0 && (
@@ -152,13 +152,13 @@ const PhotoUploadModal: React.FC<PhotoUploadModalProps> = ({open, onClose}) => {
 							onClick={() => fileInputRef.current?.click()}
 							className="border-2 border-dashed border-gray-200 rounded-[2rem] p-12 flex flex-col items-center justify-center bg-gray-50/50 hover:bg-brand-50/30 hover:border-indigo-200 transition-all cursor-pointer group"
 						>
-							<div className="p-4 bg-white/70 backdrop-blur-xl rounded-2xl shadow-sm text-gray-400 group-hover:text-brand-600 group-hover:scale-110 transition-all mb-4">
+							<div className="p-4 bg-white/85 backdrop-blur-xl rounded-2xl shadow-sm text-ink-400 group-hover:text-brand-600 group-hover:scale-110 transition-all mb-4">
 								<Upload className="w-8 h-8" />
 							</div>
-							<p className="text-sm font-bold text-[#2B2129] mb-1">
+							<p className="text-sm font-bold text-ink-900 mb-1">
 								Click to select photos
 							</p>
-							<p className="text-xs text-gray-400 font-medium">
+							<p className="text-xs text-ink-400 font-medium">
 								PNG, JPG or WEBP (Max 5MB each)
 							</p>
 							<input
@@ -175,7 +175,7 @@ const PhotoUploadModal: React.FC<PhotoUploadModalProps> = ({open, onClose}) => {
 							{previews.map((preview, index) => (
 								<div
 									key={index}
-									className="relative group rounded-2xl overflow-hidden border border-brand-100/70 shadow-sm h-40"
+									className="relative group rounded-2xl overflow-hidden border border-ink-200/70 shadow-sm h-40"
 								>
 									<img
 										src={preview}
@@ -191,7 +191,7 @@ const PhotoUploadModal: React.FC<PhotoUploadModalProps> = ({open, onClose}) => {
 										</button>
 									</div>
 									<div className="absolute bottom-2 left-2 right-2 p-2 bg-white/90 backdrop-blur-md rounded-lg flex items-center gap-2">
-										<span className="text-[10px] font-bold text-[#2B2129] truncate flex-1">
+										<span className="text-[10px] font-bold text-ink-900 truncate flex-1">
 											{files[index]?.name}
 										</span>
 									</div>
@@ -201,8 +201,8 @@ const PhotoUploadModal: React.FC<PhotoUploadModalProps> = ({open, onClose}) => {
 								onClick={() => fileInputRef.current?.click()}
 								className="border-2 border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center bg-gray-50/50 hover:bg-brand-50/30 hover:border-indigo-200 transition-all cursor-pointer group h-40"
 							>
-								<Upload className="w-6 h-6 text-gray-400 group-hover:text-brand-600 transition-colors" />
-								<span className="text-[10px] font-bold text-gray-500 mt-2">
+								<Upload className="w-6 h-6 text-ink-400 group-hover:text-brand-600 transition-colors" />
+								<span className="text-[10px] font-bold text-ink-500 mt-2">
 									Add More
 								</span>
 								<input

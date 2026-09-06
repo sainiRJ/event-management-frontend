@@ -140,20 +140,20 @@ const EmployeeServiceHistory: React.FC = () => {
 
 	return (
 		<div className="space-y-8 animate-in fade-in duration-500">
-			<div className="bg-white rounded-[2rem] shadow-sm border border-brand-100/70 p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+			<div className="bg-white rounded-[2rem] shadow-sm border border-ink-200/70 p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
 				<div className="flex items-center gap-6">
 					<button
 						onClick={() => navigate(-1)}
-						className="p-3 bg-gray-50 text-gray-400 hover:text-brand-600 hover:bg-brand-50 rounded-2xl transition-all"
+						className="p-3 bg-gray-50 text-ink-400 hover:text-brand-600 hover:bg-brand-50 rounded-2xl transition-all"
 					>
 						<ArrowLeft className="w-6 h-6" />
 					</button>
 					<div>
-						<h1 className="text-3xl font-black text-[#2B2129] tracking-tight flex items-center gap-3">
+						<h1 className="text-3xl font-semibold text-ink-900 tracking-tight flex items-center gap-3">
 							<History className="w-8 h-8 text-brand-600" />
 							Service History
 						</h1>
-						<p className="text-gray-500 font-bold mt-1">
+						<p className="text-ink-500 font-bold mt-1">
 							{serviceHistory?.employeeName || "Employee Record"}
 						</p>
 					</div>
@@ -175,10 +175,10 @@ const EmployeeServiceHistory: React.FC = () => {
 				</div>
 			</div>
 
-			<div className="bg-white rounded-[2rem] shadow-sm border border-brand-100/70 p-8">
+			<div className="bg-white rounded-[2rem] shadow-sm border border-ink-200/70 p-8">
 				<div className="flex flex-wrap gap-4 items-center mb-8">
 					<div className="relative flex-1 max-w-xs">
-						<Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+						<Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
 						<input
 							type="text"
 							placeholder="Search services..."
@@ -220,23 +220,23 @@ const EmployeeServiceHistory: React.FC = () => {
 					</div>
 				</div>
 
-				<div className="overflow-x-auto rounded-2xl border border-brand-100/70">
+				<div className="overflow-x-auto rounded-2xl border border-ink-200/70">
 					<table className="min-w-full">
 						<thead className="bg-gray-50/50">
 							<tr>
-								<th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+								<th className="px-6 py-4 text-left text-[11px] font-bold text-ink-400 uppercase tracking-widest">
 									Service Info
 								</th>
-								<th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+								<th className="px-6 py-4 text-left text-[11px] font-bold text-ink-400 uppercase tracking-widest">
 									Customer & Date
 								</th>
-								<th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+								<th className="px-6 py-4 text-left text-[11px] font-bold text-ink-400 uppercase tracking-widest">
 									Earnings
 								</th>
-								<th className="px-6 py-4 text-left text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+								<th className="px-6 py-4 text-left text-[11px] font-bold text-ink-400 uppercase tracking-widest">
 									Status
 								</th>
-								<th className="px-6 py-4 text-right text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+								<th className="px-6 py-4 text-right text-[11px] font-bold text-ink-400 uppercase tracking-widest">
 									Action
 								</th>
 							</tr>
@@ -246,7 +246,7 @@ const EmployeeServiceHistory: React.FC = () => {
 								<tr>
 									<td colSpan={5} className="px-6 py-20 text-center">
 										<Loader2 className="w-8 h-8 text-brand-600 animate-spin mx-auto mb-4" />
-										<p className="text-gray-500 font-medium">
+										<p className="text-ink-500 font-medium">
 											Loading history...
 										</p>
 									</td>
@@ -258,29 +258,29 @@ const EmployeeServiceHistory: React.FC = () => {
 										className="group hover:bg-gray-50/50 transition-colors"
 									>
 										<td className="px-6 py-4">
-											<div className="font-bold text-[#2B2129]">
+											<div className="font-bold text-ink-900">
 												{service.serviceName}
 											</div>
-											<div className="text-xs text-gray-500 font-medium">
+											<div className="text-xs text-ink-500 font-medium">
 												{service.location}
 											</div>
 										</td>
 										<td className="px-6 py-4">
-											<div className="text-sm font-bold text-gray-700">
+											<div className="text-sm font-bold text-ink-700">
 												{service.customerName}
 											</div>
-											<div className="text-xs text-gray-400 font-bold">
+											<div className="text-xs text-ink-400 font-bold">
 												{new Date(service.eventDate).toLocaleDateString()}
 											</div>
 										</td>
 										<td className="px-6 py-4">
-											<div className="text-sm font-black text-brand-600">
+											<div className="text-sm font-semibold text-brand-600">
 												{formatCurrency(service.amount)}
 											</div>
 										</td>
 										<td className="px-6 py-4">
 											<span
-												className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
+												className={`px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider ${
 													service.isPaid
 														? "bg-emerald-50 text-emerald-600"
 														: "bg-rose-50 text-rose-600"
@@ -307,7 +307,7 @@ const EmployeeServiceHistory: React.FC = () => {
 								<tr>
 									<td
 										colSpan={5}
-										className="px-6 py-20 text-center text-gray-500"
+										className="px-6 py-20 text-center text-ink-500"
 									>
 										<Clock className="w-12 h-12 text-gray-200 mx-auto mb-4" />
 										No service records found.
@@ -335,7 +335,7 @@ const EmployeeServiceHistory: React.FC = () => {
 				<div className="space-y-6">
 					<div className="bg-brand-50 rounded-2xl p-4 flex justify-between items-center">
 						<span className="text-sm font-bold text-brand-600">Total Due:</span>
-						<span className="text-lg font-black text-indigo-900">
+						<span className="text-lg font-semibold text-indigo-900">
 							{formatCurrency(formData.amount)}
 						</span>
 					</div>
@@ -362,10 +362,10 @@ const EmployeeServiceHistory: React.FC = () => {
 					/>
 
 					<div>
-						<label className="block text-sm font-bold text-gray-700 mb-2">
+						<label className="block text-sm font-bold text-ink-700 mb-2">
 							Selected Services
 						</label>
-						<div className="max-h-48 overflow-y-auto border border-brand-100/70 rounded-2xl bg-gray-50/50 p-2">
+						<div className="max-h-48 overflow-y-auto border border-ink-200/70 rounded-2xl bg-gray-50/50 p-2">
 							{getSelectedEmployeeServices().map((service) => (
 								<div
 									key={service.assignedEmployeeId}
@@ -376,8 +376,8 @@ const EmployeeServiceHistory: React.FC = () => {
 										formData.assignedEmployeeIds?.includes(
 											service.assignedEmployeeId,
 										)
-											? "bg-gradient-to-br from-brand-500 to-brand-700 text-white shadow-lg shadow-indigo-200"
-											: "bg-white text-gray-600 hover:bg-gray-100"
+											? "bg-brand-600 text-white shadow-lg shadow-indigo-200"
+											: "bg-white text-ink-600 hover:bg-gray-100"
 									}`}
 								>
 									<span className="text-xs font-bold">
@@ -389,7 +389,7 @@ const EmployeeServiceHistory: React.FC = () => {
 						</div>
 					</div>
 
-					<label className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl cursor-pointer hover:bg-gray-100 transition-colors border border-brand-100/70">
+					<label className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl cursor-pointer hover:bg-gray-100 transition-colors border border-ink-200/70">
 						<input
 							type="checkbox"
 							checked={formData.autoPaid}
@@ -399,10 +399,10 @@ const EmployeeServiceHistory: React.FC = () => {
 							className="w-5 h-5 text-brand-600 rounded-lg border-gray-300 focus:ring-brand-400"
 						/>
 						<div>
-							<p className="text-sm font-bold text-[#2B2129]">
+							<p className="text-sm font-bold text-ink-900">
 								Auto-calculate total
 							</p>
-							<p className="text-[10px] text-gray-500 font-medium">
+							<p className="text-[10px] text-ink-500 font-medium">
 								Includes all unpaid services automatically
 							</p>
 						</div>

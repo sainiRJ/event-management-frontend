@@ -60,7 +60,7 @@ const MoneyCard: React.FC = () => {
 
 	if (isLoading) {
 		return (
-			<div className="glass-card flex items-center justify-center gap-3 p-8 text-gray-500">
+			<div className="glass-card flex items-center justify-center gap-3 p-8 text-ink-500">
 				<Loader2 className="h-5 w-5 animate-spin" />
 				Working out this month&apos;s figures…
 			</div>
@@ -69,7 +69,7 @@ const MoneyCard: React.FC = () => {
 
 	if (hasFailed || !summary) {
 		return (
-			<div className="glass-card p-8 text-sm text-gray-500">
+			<div className="glass-card p-8 text-sm text-ink-500">
 				This month&apos;s figures could not be loaded. The{" "}
 				<Link to="/finance" className="font-semibold text-brand-600">
 					Finance page
@@ -85,13 +85,13 @@ const MoneyCard: React.FC = () => {
 		<div className="glass-card p-8">
 			<div className="mb-6 flex items-center justify-between">
 				<h3 className="flex items-center text-lg font-semibold text-brand-600">
-					<span className="mr-2 h-2 w-2 rounded-full bg-gradient-to-br from-brand-500 to-brand-700" />
+					<span className="mr-2 h-2 w-2 rounded-full bg-brand-600" />
 					This month
 				</h3>
 
 				<Link
 					to="/finance"
-					className="text-sm font-semibold text-gray-400 transition-colors hover:text-brand-600"
+					className="text-sm font-semibold text-ink-400 transition-colors hover:text-brand-600"
 				>
 					Full breakdown
 				</Link>
@@ -99,27 +99,27 @@ const MoneyCard: React.FC = () => {
 
 			<div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
 				<div className="rounded-2xl bg-brand-50/50 p-5">
-					<p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+					<p className="text-xs font-medium uppercase tracking-wide text-ink-400">
 						Booked
 					</p>
-					<p className="mt-1 flex items-center text-2xl font-bold text-[#2B2129]">
+					<p className="mt-1 flex items-center text-2xl font-bold text-ink-900">
 						<IndianRupee className="mr-0.5 h-5 w-5" />
 						{formatCurrency(Number(summary.totalBooked)).replace("₹", "")}
 					</p>
-					<p className="mt-1 text-xs text-gray-400">
+					<p className="mt-1 text-xs text-ink-400">
 						{summary.upcomingCount} still to come
 					</p>
 				</div>
 
 				<div className="rounded-2xl bg-emerald-50/60 p-5">
-					<p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+					<p className="text-xs font-medium uppercase tracking-wide text-ink-400">
 						Received
 					</p>
 					<p className="mt-1 flex items-center text-2xl font-bold text-emerald-700">
 						<IndianRupee className="mr-0.5 h-5 w-5" />
 						{formatCurrency(Number(summary.totalReceived)).replace("₹", "")}
 					</p>
-					<p className="mt-1 flex items-center gap-1 text-xs text-gray-400">
+					<p className="mt-1 flex items-center gap-1 text-xs text-ink-400">
 						<TrendingUp className="h-3 w-3" />
 						From the payment ledger
 					</p>
@@ -130,7 +130,7 @@ const MoneyCard: React.FC = () => {
 						hasOverdue ? "bg-rose-50/70" : "bg-amber-50/60"
 					}`}
 				>
-					<p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+					<p className="text-xs font-medium uppercase tracking-wide text-ink-400">
 						Outstanding
 					</p>
 					<p
@@ -155,7 +155,7 @@ const MoneyCard: React.FC = () => {
 							{summary.overdueCount === 1 ? "event" : "events"}
 						</p>
 					) : (
-						<p className="mt-1 text-xs text-gray-400">
+						<p className="mt-1 text-xs text-ink-400">
 							Nothing overdue — all past events are settled
 						</p>
 					)}
