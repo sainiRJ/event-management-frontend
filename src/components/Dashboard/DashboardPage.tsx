@@ -29,11 +29,17 @@ const DashboardPage: React.FC = () => {
 				booking.bookingStatus !== "cancelled",
 		).length;
 
+		/**
+		 * There is no "completed" status - a booking is either pending, booked
+		 * or cancelled - so this counted a status nothing ever sets and the
+		 * tile was always 0. A completed event is a confirmed booking whose
+		 * date has passed.
+		 */
 		const completed = bookingList.filter(
 			(booking) =>
 				booking.eventDate !== null &&
 				new Date(booking.eventDate) < now &&
-				booking.bookingStatus === "completed",
+				booking.bookingStatus === "booked",
 		).length;
 
 		const cancelled = bookingList.filter(
