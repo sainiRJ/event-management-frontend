@@ -8,7 +8,11 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({status}) => {
 	const getStatusColor = (status: string) => {
 		const statusLower = status?.toLowerCase();
 		switch (statusLower) {
+			// The statuses table holds "booked"; "confirmed" is kept for any
+			// older row that still carries it.
+			case "booked":
 			case "confirmed":
+			case "paid":
 				return "bg-green-100 text-green-800 border-green-200";
 			case "pending":
 				return "bg-yellow-100 text-yellow-800 border-yellow-200";
