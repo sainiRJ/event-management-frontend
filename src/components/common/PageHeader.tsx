@@ -1,28 +1,37 @@
 import React, {ReactNode} from "react";
+import {Reveal} from "@/components/motion";
 
 interface iPageHeaderProps {
 	title: string;
 	subtitle?: string;
+	/** Small label above the title, e.g. the section the screen belongs to. */
+	eyebrow?: string;
 	/** Buttons, filters — anything that belongs beside the title. */
 	actions?: ReactNode;
 }
 
 /**
- * The heading block every admin screen opens with.
- *
- * Exists so the pages stay visually identical and, more usefully, so the
- * title/actions row stacks the same way on a phone: actions drop below the
- * title and go full width rather than being squeezed beside it.
+ * The heading block every admin screen opens with. Same shape everywhere,
+ * and on a phone the actions drop under the title at full width.
  */
-const PageHeader: React.FC<iPageHeaderProps> = ({title, subtitle, actions}) => {
+const PageHeader: React.FC<iPageHeaderProps> = ({
+	title,
+	subtitle,
+	eyebrow,
+	actions,
+}) => {
 	return (
-		<div className="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-start sm:justify-between">
+		<Reveal
+			onMount
+			className="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-end sm:justify-between"
+		>
 			<div className="min-w-0">
-				<h1 className="font-display text-2xl font-semibold tracking-tight text-[#2B2129] sm:text-3xl">
+				{eyebrow && <p className="eyebrow mb-1.5">{eyebrow}</p>}
+				<h1 className="font-display text-2xl font-semibold tracking-tight text-ink-900 sm:text-[2rem] sm:leading-tight">
 					{title}
 				</h1>
 				{subtitle && (
-					<p className="mt-1 text-sm text-gray-500 sm:text-base">{subtitle}</p>
+					<p className="mt-1.5 text-sm text-ink-500 sm:text-base">{subtitle}</p>
 				)}
 			</div>
 
@@ -31,7 +40,7 @@ const PageHeader: React.FC<iPageHeaderProps> = ({title, subtitle, actions}) => {
 					{actions}
 				</div>
 			)}
-		</div>
+		</Reveal>
 	);
 };
 

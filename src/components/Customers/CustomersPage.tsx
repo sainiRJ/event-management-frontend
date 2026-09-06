@@ -93,7 +93,7 @@ const CustomersPage: React.FC = () => {
 						{row.phoneNumber}
 					</a>
 				) : (
-					<span className="text-gray-400">—</span>
+					<span className="text-ink-400">—</span>
 				);
 			},
 		},
@@ -110,7 +110,7 @@ const CustomersPage: React.FC = () => {
 						className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ${
 							isRepeat
 								? "bg-emerald-50 text-emerald-700"
-								: "bg-gray-100 text-gray-600"
+								: "bg-gray-100 text-ink-600"
 						}`}
 					>
 						{row.bookingCount}
@@ -147,9 +147,7 @@ const CustomersPage: React.FC = () => {
 
 				return (
 					<span
-						className={
-							due > 0 ? "font-semibold text-rose-600" : "text-gray-400"
-						}
+						className={due > 0 ? "font-semibold text-rose-600" : "text-ink-400"}
 					>
 						{due > 0 ? formatCurrency(due) : "—"}
 					</span>
@@ -167,7 +165,7 @@ const CustomersPage: React.FC = () => {
 
 			<div className="glass-card p-4">
 				<div className="relative">
-					<Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+					<Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-400" />
 					<input
 						type="search"
 						value={search}
@@ -175,14 +173,14 @@ const CustomersPage: React.FC = () => {
 							return setSearch(event.target.value);
 						}}
 						placeholder="Search by name or phone number…"
-						className="w-full rounded-xl border border-brand-100 bg-white py-2.5 pl-10 pr-4 text-sm outline-none transition focus:border-brand-300 focus:ring-2 focus:ring-brand-100"
+						className="w-full rounded-xl border border-ink-200 bg-white py-2.5 pl-10 pr-4 text-sm outline-none transition focus:border-brand-300 focus:ring-2 focus:ring-brand-100"
 					/>
 				</div>
 			</div>
 
 			{hasFailed ? (
 				<div className="glass-card p-12 text-center">
-					<p className="text-gray-600">
+					<p className="text-ink-600">
 						We couldn&apos;t load your customers just now.
 					</p>
 					<Button
@@ -199,10 +197,10 @@ const CustomersPage: React.FC = () => {
 			) : !isLoading && customers.length === 0 ? (
 				<div className="glass-card p-12 text-center">
 					<Users className="mx-auto mb-3 h-10 w-10 text-brand-200" />
-					<p className="font-semibold text-[#2B2129]">
+					<p className="font-semibold text-ink-900">
 						{search ? "Nobody matches that search" : "No customers yet"}
 					</p>
-					<p className="mx-auto mt-1 max-w-sm text-sm text-gray-500">
+					<p className="mx-auto mt-1 max-w-sm text-sm text-ink-500">
 						{search
 							? "Try just the phone number, or part of the name."
 							: "Customers appear here as soon as their first booking is recorded."}
@@ -211,7 +209,7 @@ const CustomersPage: React.FC = () => {
 			) : (
 				<div className="glass-card p-4">
 					{isLoading && customers.length === 0 ? (
-						<div className="flex items-center justify-center gap-3 py-16 text-gray-500">
+						<div className="flex items-center justify-center gap-3 py-16 text-ink-500">
 							<Loader2 className="h-5 w-5 animate-spin" />
 							Loading customers…
 						</div>

@@ -1,12 +1,7 @@
 import React from "react";
-import {
-	CalendarCheck,
-	CalendarX,
-	CalendarDays,
-	TrendingUp,
-	Sparkles,
-} from "lucide-react";
+import {CalendarCheck, CalendarX, CalendarDays, Sparkles} from "lucide-react";
 import DashboardCard from "../common/DashboardCard";
+import {Stagger, StaggerItem} from "@/components/motion";
 
 interface BookingStatsProps {
 	upcoming: number;
@@ -22,44 +17,44 @@ const BookingStats: React.FC<BookingStatsProps> = ({
 	const total = upcoming + completed + cancelled;
 
 	return (
-		<div className="space-y-6">
-			{/* Overview Header */}
-			<div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+		<Stagger className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
+			<StaggerItem>
 				<DashboardCard
-					title="Total Bookings"
+					title="All bookings"
 					value={total}
-					icon={<Sparkles className="w-6 h-6" />}
-					color="indigo"
-					className="lg:col-span-1"
+					icon={<Sparkles className="h-5 w-5" />}
+					color="gold"
+					hint="Everything on the books"
 				/>
-
+			</StaggerItem>
+			<StaggerItem>
 				<DashboardCard
 					title="Upcoming"
 					value={upcoming}
-					icon={<CalendarDays className="w-6 h-6" />}
-					color="blue"
-					className="lg:col-span-1"
+					icon={<CalendarDays className="h-5 w-5" />}
+					color="indigo"
+					hint="Confirmed, dates still ahead"
 				/>
-
+			</StaggerItem>
+			<StaggerItem>
 				<DashboardCard
 					title="Completed"
 					value={completed}
-					icon={<CalendarCheck className="w-6 h-6" />}
+					icon={<CalendarCheck className="h-5 w-5" />}
 					color="emerald"
-					className="lg:col-span-1"
+					hint="Booked events already held"
 				/>
-
+			</StaggerItem>
+			<StaggerItem>
 				<DashboardCard
 					title="Cancelled"
 					value={cancelled}
-					icon={<CalendarX className="w-6 h-6" />}
+					icon={<CalendarX className="h-5 w-5" />}
 					color="rose"
-					className="lg:col-span-1"
+					hint="Dates released again"
 				/>
-			</div>
-
-			{/* Detailed Stats could go here */}
-		</div>
+			</StaggerItem>
+		</Stagger>
 	);
 };
 

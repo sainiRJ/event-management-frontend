@@ -260,7 +260,7 @@ const BookingTable: React.FC<BookingTableProps> = ({
 				size="sm"
 			>
 				<div className="space-y-4">
-					<p className="text-sm text-gray-600">
+					<p className="text-sm text-ink-600">
 						This removes the bookings and their events, along with any payments
 						recorded against them. It cannot be undone.
 					</p>

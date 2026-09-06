@@ -2,53 +2,102 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-	--foreground-rgb: 43, 33, 41;
-	--background-start-rgb: 250, 246, 241;
-	--background-end-rgb: 255, 255, 255;
+/*
+  Global look for the dashboard. Fonts and colours come from the customer
+  site's brand (logo maroon, gold accent, warm neutrals) so the two read as
+  one product; everything here is the working, denser version of it.
+*/
+@layer base {
+	body {
+		@apply bg-cream-100 text-ink-800 antialiased selection:bg-gold-200 selection:text-ink-900;
+		font-family: "Manrope", system-ui, sans-serif;
+		text-rendering: optimizeLegibility;
+	}
+
+	h1,
+	h2,
+	h3,
+	.font-display {
+		font-family: "Playfair Display", Georgia, serif;
+	}
+
+	/* Custom scrollbar */
+	::-webkit-scrollbar {
+		width: 6px;
+		height: 6px;
+	}
+	::-webkit-scrollbar-track {
+		@apply bg-transparent;
+	}
+	::-webkit-scrollbar-thumb {
+		@apply rounded-full bg-ink-200 transition-colors hover:bg-ink-300;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		*,
+		*::before,
+		*::after {
+			animation-duration: 0.01ms !important;
+			animation-iteration-count: 1 !important;
+			transition-duration: 0.01ms !important;
+		}
+	}
 }
 
-body {
-	@apply bg-cream-100 text-[#2B2129] antialiased selection:bg-brand-100 selection:text-brand-800;
-	font-family: "Manrope", system-ui, sans-serif;
+@layer components {
+	/* Cards */
+	.glass-card {
+		@apply rounded-3xl border border-ink-200/70 bg-white/80 shadow-soft backdrop-blur-xl;
+	}
+	.glass-panel {
+		@apply border border-ink-200/70 bg-white/60 backdrop-blur-md;
+	}
+	.card-hover {
+		@apply transition-all duration-300 ease-premium hover:-translate-y-0.5 hover:shadow-lift;
+	}
+
+	/* Small caps label above a heading or a stat. */
+	.eyebrow {
+		@apply text-[11px] font-semibold uppercase tracking-[0.22em] text-ink-400;
+	}
+
+	/* Skeleton shimmer for loading states. */
+	.skeleton {
+		@apply animate-shimmer rounded-2xl bg-[linear-gradient(110deg,#efe7e2_30%,#f8f3f0_50%,#efe7e2_70%)] bg-[length:200%_100%];
+	}
+
+	/* Gold hairline divider. */
+	.hairline {
+		@apply h-px w-full bg-gradient-to-r from-transparent via-gold-400/70 to-transparent;
+	}
 }
 
-h1, h2, h3, .font-display {
-	font-family: "Fraunces", Georgia, serif;
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-	width: 6px;
-	height: 6px;
-}
-
-::-webkit-scrollbar-track {
-	@apply bg-transparent;
-}
-
-::-webkit-scrollbar-thumb {
-	@apply bg-brand-200 rounded-full hover:bg-brand-300 transition-colors;
-}
-
-/* Reusable glass card utility */
-.glass-card {
-	@apply bg-white/65 backdrop-blur-xl border border-brand-100 shadow-glass rounded-2xl;
-}
-
-.glass-panel {
-	@apply bg-white/50 backdrop-blur-md border border-brand-100/70;
-}
-
-/* Card hover effect */
-.card-hover {
-	@apply transition-all duration-300 hover:shadow-glass-lg hover:-translate-y-0.5;
+@layer utilities {
+	.pb-safe {
+		padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+	}
+	.no-scrollbar::-webkit-scrollbar {
+		display: none;
+	}
+	.no-scrollbar {
+		-ms-overflow-style: none;
+		scrollbar-width: none;
+	}
 }
 
 @keyframes shake {
-	0%, 100% { transform: translateX(0); }
-	20%, 60% { transform: translateX(-4px); }
-	40%, 80% { transform: translateX(4px); }
+	0%,
+	100% {
+		transform: translateX(0);
+	}
+	20%,
+	60% {
+		transform: translateX(-4px);
+	}
+	40%,
+	80% {
+		transform: translateX(4px);
+	}
 }
 
 .animate-shake {

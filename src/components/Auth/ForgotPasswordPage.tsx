@@ -45,21 +45,21 @@ const ForgotPasswordPage: React.FC = () => {
 
 	return (
 		<div className="mx-auto w-full max-w-md px-4 py-12">
-			<div className="rounded-3xl border border-brand-100/70 bg-white p-6 shadow-sm sm:p-8">
+			<div className="rounded-3xl border border-ink-200/70 bg-white p-6 shadow-sm sm:p-8">
 				{isSent ? (
 					<div className="text-center">
 						<div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-50 text-brand-600">
 							<MailCheck className="h-6 w-6" />
 						</div>
-						<h1 className="font-display text-2xl font-semibold text-[#2B2129]">
+						<h1 className="font-display text-2xl font-semibold text-ink-900">
 							Check your email
 						</h1>
-						<p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-gray-500">
+						<p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-ink-500">
 							If <span className="font-semibold">{email}</span> has an account,
 							a link to choose a new password is on its way. It works once and
 							expires in 30 minutes.
 						</p>
-						<p className="mt-4 text-sm text-gray-400">
+						<p className="mt-4 text-sm text-ink-400">
 							Nothing arrived? Check spam, or{" "}
 							<button
 								type="button"
@@ -73,10 +73,10 @@ const ForgotPasswordPage: React.FC = () => {
 					</div>
 				) : (
 					<>
-						<h1 className="font-display text-2xl font-semibold text-[#2B2129]">
+						<h1 className="font-display text-2xl font-semibold text-ink-900">
 							Forgot your password?
 						</h1>
-						<p className="mt-2 text-sm text-gray-500">
+						<p className="mt-2 text-sm text-ink-500">
 							Enter the email on your account and we&apos;ll send you a link to
 							set a new password.
 						</p>
@@ -106,7 +106,7 @@ const ForgotPasswordPage: React.FC = () => {
 
 				<Link
 					to="/login"
-					className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-brand-600"
+					className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-ink-500 hover:text-brand-600"
 				>
 					<ArrowLeft className="h-4 w-4" />
 					Back to sign in

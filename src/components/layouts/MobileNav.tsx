@@ -1,10 +1,13 @@
 import React, {useEffect} from "react";
-import {LogOut, Sparkles, X} from "lucide-react";
+import {AnimatePresence, motion, useReducedMotion} from "framer-motion";
+import {LogOut, X} from "lucide-react";
 
 import NavLinks from "./NavLinks";
+import BrandLogo from "./BrandLogo";
 import {iPendingCounts} from "@/hooks/usePendingCounts";
 import {useAppDispatch} from "@/store/Hooks";
 import {logout} from "@/store/auth/authSlice";
+import {EASE} from "@/components/motion";
 
 interface iMobileNavProps {
 	isOpen: boolean;
@@ -13,19 +16,16 @@ interface iMobileNavProps {
 }
 
 /**
- * Navigation drawer for phones and tablets.
- *
- * The sidebar is `hidden lg:flex`, so below that breakpoint the admin had no
- * navigation at all — every screen was reachable only by typing a URL.
+ * Navigation drawer for phones and tablets. Same list as the desktop rail.
  */
 const MobileNav: React.FC<iMobileNavProps> = ({isOpen, onClose, counts}) => {
 	const dispatch = useAppDispatch();
+	const prefersReduced = useReducedMotion();
 
-	// Escape closes, and the page behind must not scroll while it is open.
 	useEffect(() => {
 		if (!isOpen) return;
 
-		const onKeyDown = (event: KeyboardEvent) => {
+		const onKeyDown = (event: KeyboardEvent): void => {
 			if (event.key === "Escape") onClose();
 		};
 
@@ -39,65 +39,65 @@ const MobileNav: React.FC<iMobileNavProps> = ({isOpen, onClose, counts}) => {
 		};
 	}, [isOpen, onClose]);
 
-	if (!isOpen) {
-		return null;
-	}
-
-	const signOut = () => {
+	const signOut = (): void => {
 		dispatch(logout());
 		window.location.href = "/login";
 	};
 
 	return (
-		<div className="fixed inset-0 z-[60] lg:hidden">
-			<button
-				type="button"
-				aria-label="Close navigation"
-				onClick={onClose}
-				className="absolute inset-0 bg-[#2B2129]/40 backdrop-blur-sm"
-			/>
-
-			<div
-				role="dialog"
-				aria-modal="true"
-				aria-label="Main navigation"
-				className="absolute inset-y-0 left-0 flex w-[80%] max-w-xs flex-col border-r border-brand-100/70 bg-white shadow-2xl duration-200 animate-in slide-in-from-left"
-			>
-				<div className="flex h-16 items-center justify-between border-b border-brand-100/50 px-4">
-					<span className="flex items-center gap-2.5">
-						<span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 text-white">
-							<Sparkles className="h-5 w-5" />
-						</span>
-						<span className="font-display text-lg font-semibold text-[#2B2129]">
-							Saini <span className="text-brand-600">Events</span>
-						</span>
-					</span>
-
-					<button
+		<AnimatePresence>
+			{isOpen && (
+				<div className="fixed inset-0 z-[60] lg:hidden">
+					<motion.button
 						type="button"
-						onClick={onClose}
 						aria-label="Close navigation"
-						className="rounded-xl p-2 text-gray-400 hover:bg-brand-50 hover:text-brand-600"
-					>
-						<X className="h-5 w-5" />
-					</button>
-				</div>
+						onClick={onClose}
+						className="absolute inset-0 bg-ink-900/40 backdrop-blur-sm"
+						initial={{opacity: 0}}
+						animate={{opacity: 1}}
+						exit={{opacity: 0}}
+						transition={{duration: 0.2}}
+					/>
 
-				<nav className="flex-1 overflow-y-auto px-3 py-5">
-					<NavLinks counts={counts} onNavigate={onClose} />
-				</nav>
-
-				<div className="border-t border-brand-100/50 p-4">
-					<button
-						onClick={signOut}
-						className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-red-500 transition-all hover:bg-red-50"
+					<motion.div
+						role="dialog"
+						aria-modal="true"
+						aria-label="Main navigation"
+						className="absolute inset-y-0 left-0 flex w-[82%] max-w-xs flex-col bg-white shadow-lift"
+						initial={prefersReduced ? {x: 0} : {x: "-100%"}}
+						animate={{x: 0}}
+						exit={prefersReduced ? {x: 0, opacity: 0} : {x: "-100%"}}
+						transition={{duration: 0.32, ease: EASE}}
 					>
-						<LogOut className="h-5 w-5 shrink-0" />
-						<span className="text-sm font-bold">Logout</span>
-					</button>
+						<div className="flex h-16 items-center justify-between border-b border-ink-200/60 px-4">
+							<BrandLogo />
+							<button
+								type="button"
+								onClick={onClose}
+								aria-label="Close navigation"
+								className="rounded-xl p-2 text-ink-500 hover:bg-ink-100"
+							>
+								<X className="h-5 w-5" />
+							</button>
+						</div>
+
+						<nav className="flex-1 overflow-y-auto px-3 py-4">
+							<NavLinks counts={counts} onNavigate={onClose} />
+						</nav>
+
+						<div className="border-t border-ink-200/60 p-3 pb-safe">
+							<button
+								onClick={signOut}
+								className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-brand-700 transition-colors hover:bg-brand-50"
+							>
+								<LogOut className="h-5 w-5 shrink-0" />
+								Log out
+							</button>
+						</div>
+					</motion.div>
 				</div>
-			</div>
-		</div>
+			)}
+		</AnimatePresence>
 	);
 };
 

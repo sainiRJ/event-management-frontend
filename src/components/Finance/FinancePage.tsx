@@ -129,10 +129,10 @@ const FinancePage: React.FC = () => {
 		<div className="space-y-6 duration-500 animate-in fade-in sm:space-y-8">
 			<div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
 				<div>
-					<h1 className="text-3xl font-display font-semibold text-[#2B2129] tracking-tight">
+					<h1 className="text-3xl font-display font-semibold text-ink-900 tracking-tight">
 						Financial Overview
 					</h1>
-					<p className="text-gray-500 mt-1">
+					<p className="text-ink-500 mt-1">
 						Monitor revenue, payments, and service performance
 					</p>
 				</div>
@@ -158,7 +158,7 @@ const FinancePage: React.FC = () => {
 				{stats.map((stat, idx) => (
 					<div
 						key={idx}
-						className="bg-white p-8 rounded-3xl shadow-sm border border-brand-100/70 transition-all hover:shadow-md"
+						className="bg-white p-8 rounded-3xl shadow-sm border border-ink-200/70 transition-all hover:shadow-md"
 					>
 						{/* No trend badge: there is no comparison period to compute
 						    one from, and a hardcoded arrow is worse than none. */}
@@ -169,10 +169,10 @@ const FinancePage: React.FC = () => {
 								<stat.icon className="w-6 h-6" />
 							</div>
 						</div>
-						<h3 className="text-gray-500 text-sm font-semibold uppercase tracking-wider">
+						<h3 className="text-ink-500 text-sm font-semibold uppercase tracking-wider">
 							{stat.label}
 						</h3>
-						<div className="text-3xl font-black text-[#2B2129] mt-1">
+						<div className="text-3xl font-semibold text-ink-900 mt-1">
 							{formatCurrency(stat.value)}
 						</div>
 					</div>
@@ -182,12 +182,12 @@ const FinancePage: React.FC = () => {
 			{/* Filters sit below the numbers and start collapsed: the figures
 			    are what this page is for, and refining them is the second
 			    step, not the first thing that fills the screen. */}
-			<div className="rounded-3xl border border-brand-100/70 bg-white shadow-sm">
+			<div className="rounded-3xl border border-ink-200/70 bg-white shadow-sm">
 				<button
 					type="button"
 					onClick={() => setIsFiltersOpen((open) => !open)}
 					aria-expanded={isFiltersOpen}
-					className="flex w-full items-center justify-between gap-2 p-5 text-left font-bold text-[#2B2129] sm:p-6"
+					className="flex w-full items-center justify-between gap-2 p-5 text-left font-bold text-ink-900 sm:p-6"
 				>
 					<span className="flex items-center gap-2">
 						<Filter className="h-5 w-5 text-brand-600" />
@@ -199,7 +199,7 @@ const FinancePage: React.FC = () => {
 						)}
 					</span>
 					<ChevronDown
-						className={`h-5 w-5 shrink-0 text-gray-400 transition-transform ${
+						className={`h-5 w-5 shrink-0 text-ink-400 transition-transform ${
 							isFiltersOpen ? "rotate-180" : ""
 						}`}
 					/>
@@ -260,9 +260,9 @@ const FinancePage: React.FC = () => {
 			{/* Charts Section */}
 			<div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 				{/* Service-wise Breakdown */}
-				<div className="bg-white p-8 rounded-3xl shadow-sm border border-brand-100/70">
+				<div className="bg-white p-8 rounded-3xl shadow-sm border border-ink-200/70">
 					<div className="flex items-center justify-between mb-8">
-						<h3 className="text-lg font-bold text-[#2B2129] flex items-center gap-2">
+						<h3 className="text-lg font-bold text-ink-900 flex items-center gap-2">
 							<BarChart3 className="w-5 h-5 text-brand-600" />
 							Service Revenue
 						</h3>
@@ -315,7 +315,7 @@ const FinancePage: React.FC = () => {
 								</BarChart>
 							</ResponsiveContainer>
 						) : (
-							<div className="h-full flex items-center justify-center text-gray-400 italic">
+							<div className="h-full flex items-center justify-center text-ink-400 italic">
 								No data available for this selection
 							</div>
 						)}
@@ -323,9 +323,9 @@ const FinancePage: React.FC = () => {
 				</div>
 
 				{/* Pie Chart Breakdown */}
-				<div className="bg-white p-8 rounded-3xl shadow-sm border border-brand-100/70">
+				<div className="bg-white p-8 rounded-3xl shadow-sm border border-ink-200/70">
 					<div className="flex items-center justify-between mb-8">
-						<h3 className="text-lg font-bold text-[#2B2129] flex items-center gap-2">
+						<h3 className="text-lg font-bold text-ink-900 flex items-center gap-2">
 							<PieChartIcon className="w-5 h-5 text-brand-600" />
 							Revenue Distribution
 						</h3>
@@ -364,7 +364,7 @@ const FinancePage: React.FC = () => {
 								</PieChart>
 							</ResponsiveContainer>
 						) : (
-							<div className="h-full flex items-center justify-center text-gray-400 italic">
+							<div className="h-full flex items-center justify-center text-ink-400 italic">
 								No data available for this selection
 							</div>
 						)}
@@ -372,7 +372,7 @@ const FinancePage: React.FC = () => {
 				</div>
 			</div>
 
-			<div className="bg-brand-50 p-6 rounded-3xl text-brand-800 border border-brand-100 flex items-start gap-4">
+			<div className="bg-brand-50 p-6 rounded-3xl text-brand-800 border border-ink-200 flex items-start gap-4">
 				<div className="p-2 bg-white rounded-xl text-brand-600 shadow-sm">
 					<TrendingUp className="w-5 h-5" />
 				</div>

@@ -46,7 +46,7 @@ function toneFor(action: string): string {
 		return "bg-rose-50 text-rose-700";
 	}
 
-	return "bg-gray-100 text-gray-600";
+	return "bg-gray-100 text-ink-600";
 }
 
 function formatWhen(iso: string): string {
@@ -100,10 +100,10 @@ const ActivityPage: React.FC = () => {
 
 			{hasFailed ? (
 				<div className="glass-card p-12 text-center">
-					<p className="text-gray-600">
+					<p className="text-ink-600">
 						The activity trail could not be loaded.
 					</p>
-					<p className="mx-auto mt-2 max-w-md text-sm text-gray-400">
+					<p className="mx-auto mt-2 max-w-md text-sm text-ink-400">
 						If this service was deployed recently, the trail starts once the
 						database migration has been applied.
 					</p>
@@ -119,15 +119,15 @@ const ActivityPage: React.FC = () => {
 					</Button>
 				</div>
 			) : isLoading && entries.length === 0 ? (
-				<div className="glass-card flex items-center justify-center gap-3 p-16 text-gray-500">
+				<div className="glass-card flex items-center justify-center gap-3 p-16 text-ink-500">
 					<Loader2 className="h-5 w-5 animate-spin" />
 					Loading activity…
 				</div>
 			) : entries.length === 0 ? (
 				<div className="glass-card p-12 text-center">
 					<History className="mx-auto mb-3 h-10 w-10 text-brand-200" />
-					<p className="font-semibold text-[#2B2129]">Nothing recorded yet</p>
-					<p className="mx-auto mt-1 max-w-sm text-sm text-gray-500">
+					<p className="font-semibold text-ink-900">Nothing recorded yet</p>
+					<p className="mx-auto mt-1 max-w-sm text-sm text-ink-500">
 						Edits to bookings and payment entries will appear here as they
 						happen.
 					</p>
@@ -148,17 +148,17 @@ const ActivityPage: React.FC = () => {
 									{ACTION_LABELS[entry.action] ?? entry.action}
 								</span>
 
-								<span className="font-semibold text-[#2B2129]">
+								<span className="font-semibold text-ink-900">
 									{entry.actorName ?? "Someone"}
 								</span>
 
 								{entry.summary && (
-									<span className="text-sm text-gray-500">
+									<span className="text-sm text-ink-500">
 										— {entry.summary}
 									</span>
 								)}
 
-								<span className="ml-auto text-xs tabular-nums text-gray-400">
+								<span className="ml-auto text-xs tabular-nums text-ink-400">
 									{formatWhen(entry.createdAt)}
 								</span>
 							</li>

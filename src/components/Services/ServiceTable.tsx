@@ -165,14 +165,14 @@ const ServiceTable = () => {
 			key: "serviceName",
 			label: "Service Name",
 			render: (row: iService) => (
-				<div className="font-semibold text-[#2B2129]">{row.serviceName}</div>
+				<div className="font-semibold text-ink-900">{row.serviceName}</div>
 			),
 		},
 		{
 			key: "description",
 			label: "Description",
 			render: (row: iService) => (
-				<div className="text-gray-500 max-w-md truncate">
+				<div className="text-ink-500 max-w-md truncate">
 					{row.description || "-"}
 				</div>
 			),
@@ -208,11 +208,11 @@ const ServiceTable = () => {
 		<div className="space-y-8 animate-in fade-in duration-500">
 			<div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
 				<div>
-					<h1 className="text-3xl font-display font-semibold text-[#2B2129] tracking-tight flex items-center gap-3">
+					<h1 className="text-3xl font-display font-semibold text-ink-900 tracking-tight flex items-center gap-3">
 						<Settings2 className="w-8 h-8 text-brand-600" />
 						Services
 					</h1>
-					<p className="text-gray-500 mt-1">
+					<p className="text-ink-500 mt-1">
 						Manage the decoration services you offer to clients
 					</p>
 				</div>
@@ -239,9 +239,9 @@ const ServiceTable = () => {
 				</div>
 			</div>
 
-			<div className="bg-white rounded-3xl shadow-sm border border-brand-100/70 p-8">
+			<div className="bg-white rounded-3xl shadow-sm border border-ink-200/70 p-8">
 				<div className="relative max-w-md mb-8">
-					<Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+					<Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400" />
 					<input
 						type="text"
 						placeholder="Search services..."
@@ -251,7 +251,7 @@ const ServiceTable = () => {
 					/>
 				</div>
 
-				<div className="rounded-2xl overflow-hidden border border-brand-100/50">
+				<div className="rounded-2xl overflow-hidden border border-ink-200/60">
 					<CustomTable
 						data={filteredData}
 						loading={loading}
@@ -316,7 +316,7 @@ const ServiceTable = () => {
 						/>
 						<label
 							htmlFor="available-add"
-							className="text-sm font-medium text-gray-700"
+							className="text-sm font-medium text-ink-700"
 						>
 							Available for Booking
 						</label>
@@ -391,7 +391,7 @@ const ServiceTable = () => {
 							/>
 							<label
 								htmlFor="available-edit"
-								className="text-sm font-medium text-gray-700"
+								className="text-sm font-medium text-ink-700"
 							>
 								Available for Booking
 							</label>

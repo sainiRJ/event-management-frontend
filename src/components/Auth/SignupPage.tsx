@@ -113,17 +113,17 @@ const SignupPage: React.FC = () => {
 
 	return (
 		<div className="min-h-screen flex items-center justify-center bg-cream-100 p-4 sm:p-6 lg:p-8">
-			<div className="w-full max-w-5xl bg-white rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:flex-row-reverse min-h-[600px] border border-brand-100/70">
+			<div className="w-full max-w-5xl bg-white rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:flex-row-reverse min-h-[600px] border border-ink-200/70">
 				{/* Right: Signup Form */}
 				<div className="flex-1 p-8 sm:p-12 lg:p-16 flex flex-col justify-center">
 					<div className="mb-10">
 						<div className="inline-flex items-center justify-center p-3 bg-brand-50 rounded-2xl mb-6">
 							<UserPlus className="w-8 h-8 text-brand-600" />
 						</div>
-						<h2 className="text-4xl font-black text-[#2B2129] tracking-tight mb-3">
+						<h2 className="text-4xl font-semibold text-ink-900 tracking-tight mb-3">
 							Create Account
 						</h2>
-						<p className="text-gray-500 font-medium">
+						<p className="text-ink-500 font-medium">
 							Join our community of professional event planners.
 						</p>
 					</div>
@@ -182,7 +182,7 @@ const SignupPage: React.FC = () => {
 												style={{width: `${passwordStrength}%`}}
 											></div>
 										</div>
-										<p className="text-[10px] font-bold mt-1 text-gray-400 uppercase tracking-wider text-right">
+										<p className="text-[10px] font-bold mt-1 text-ink-400 uppercase tracking-wider text-right">
 											Strength:{" "}
 											{passwordStrength === 100
 												? "Excellent"
@@ -216,10 +216,10 @@ const SignupPage: React.FC = () => {
 
 					<div className="relative my-8">
 						<div className="absolute inset-0 flex items-center">
-							<div className="w-full border-t border-brand-100/70"></div>
+							<div className="w-full border-t border-ink-200/70"></div>
 						</div>
 						<div className="relative flex justify-center text-sm font-bold uppercase tracking-widest">
-							<span className="px-4 bg-white text-gray-400">
+							<span className="px-4 bg-white text-ink-400">
 								or sign up with
 							</span>
 						</div>
@@ -228,7 +228,7 @@ const SignupPage: React.FC = () => {
 					<button
 						type="button"
 						onClick={() => (window.location.href = GOOGLE_AUTH_URL)}
-						className="w-full h-14 flex items-center justify-center gap-4 bg-white border-2 border-brand-100/70 rounded-2xl font-bold text-gray-700 hover:bg-brand-50 hover:border-brand-200 transition-all active:scale-[0.98]"
+						className="w-full h-14 flex items-center justify-center gap-4 bg-white border-2 border-ink-200/70 rounded-2xl font-bold text-ink-700 hover:bg-brand-50 hover:border-brand-200 transition-all active:scale-[0.98]"
 					>
 						<img
 							src="https://www.svgrepo.com/show/475656/google-color.svg"
@@ -238,11 +238,11 @@ const SignupPage: React.FC = () => {
 						Google Account
 					</button>
 
-					<p className="mt-8 text-center text-gray-500 font-medium">
+					<p className="mt-8 text-center text-ink-500 font-medium">
 						Already have an account?{" "}
 						<Link
 							to="/login"
-							className="text-brand-600 font-black hover:underline underline-offset-4"
+							className="text-brand-600 font-semibold hover:underline underline-offset-4"
 						>
 							Sign In
 						</Link>
@@ -250,7 +250,7 @@ const SignupPage: React.FC = () => {
 				</div>
 
 				{/* Left: Brand Section */}
-				<div className="hidden md:flex flex-1 bg-gradient-to-br from-brand-500 to-brand-700 p-12 lg:p-16 flex-col justify-between relative overflow-hidden">
+				<div className="hidden md:flex flex-1 bg-brand-600 p-12 lg:p-16 flex-col justify-between relative overflow-hidden">
 					<div className="absolute top-0 left-0 w-64 h-64 bg-brand-500 rounded-full -ml-32 -mt-32 opacity-20"></div>
 					<div className="absolute bottom-0 right-0 w-96 h-96 bg-brand-700 rounded-full -mr-48 -mb-48 opacity-20"></div>
 
@@ -259,12 +259,12 @@ const SignupPage: React.FC = () => {
 							<div className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center">
 								<Sparkles className="w-6 h-6 text-white" />
 							</div>
-							<span className="text-white font-black text-xl tracking-tighter">
+							<span className="text-white font-semibold text-xl tracking-tighter">
 								Saini Events
 							</span>
 						</div>
 
-						<h1 className="text-5xl font-black text-white leading-tight mb-8">
+						<h1 className="text-5xl font-semibold text-white leading-tight mb-8">
 							Empower Your <br />
 							<span className="text-brand-100">Creative Vision.</span>
 						</h1>
@@ -291,7 +291,7 @@ const SignupPage: React.FC = () => {
 
 					<div className="relative z-10">
 						<div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8">
-							<p className="text-white font-black text-xl mb-4 italic leading-relaxed">
+							<p className="text-white font-semibold text-xl mb-4 italic leading-relaxed">
 								&quot;The most intuitive platform for event management I&apos;ve
 								ever used.&quot;
 							</p>

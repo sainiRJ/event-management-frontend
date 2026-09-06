@@ -34,7 +34,7 @@ const formatDate = (dateString: string) => {
 };
 
 const StatusBadge = ({status}: {status: string}) => {
-	let color = "bg-gray-100 text-gray-700";
+	let color = "bg-gray-100 text-ink-700";
 	if (status?.toLowerCase() === "active" || status?.toLowerCase() === "working")
 		color = "bg-emerald-100 text-emerald-700";
 	if (status?.toLowerCase() === "inactive")
@@ -320,10 +320,10 @@ const EmployeeTable = () => {
 		<div className="space-y-8 animate-in fade-in duration-500">
 			<div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
 				<div>
-					<h1 className="text-3xl font-display font-semibold text-[#2B2129]">
+					<h1 className="text-3xl font-display font-semibold text-ink-900">
 						Employees
 					</h1>
-					<p className="text-gray-500 font-medium mt-1">
+					<p className="text-ink-500 font-medium mt-1">
 						Manage your workforce and monitor performance
 					</p>
 				</div>
@@ -354,7 +354,7 @@ const EmployeeTable = () => {
 			</div>
 
 			{/* Filters Section */}
-			<div className="bg-white rounded-3xl p-6 border border-brand-100/70 shadow-sm space-y-6">
+			<div className="bg-white rounded-3xl p-6 border border-ink-200/70 shadow-sm space-y-6">
 				<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 					<Input
 						placeholder="Search by name..."
@@ -381,7 +381,7 @@ const EmployeeTable = () => {
 				</div>
 			</div>
 
-			<div className="rounded-2xl overflow-hidden border border-brand-100/50">
+			<div className="rounded-2xl overflow-hidden border border-ink-200/60">
 				<CustomTable
 					data={filteredData}
 					loading={loading}
@@ -392,8 +392,8 @@ const EmployeeTable = () => {
 			</div>
 
 			{Object.keys(employeeStats).length > 0 && (
-				<div className="bg-white rounded-3xl shadow-sm border border-brand-100/70 p-8">
-					<h2 className="text-xl font-bold text-[#2B2129] mb-6">
+				<div className="bg-white rounded-3xl shadow-sm border border-ink-200/70 p-8">
+					<h2 className="text-xl font-bold text-ink-900 mb-6">
 						Employee Statistics
 					</h2>
 					<EmployeeStatsTable stats={employeeStats} onRefresh={handleRefresh} />

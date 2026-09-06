@@ -117,18 +117,18 @@ const ContactMessagesPage: React.FC = () => {
 			/>
 
 			{isLoading && messages.length === 0 && (
-				<p className="py-12 text-center text-sm text-gray-500">
+				<p className="py-12 text-center text-sm text-ink-500">
 					Loading enquiries…
 				</p>
 			)}
 
 			{!isLoading && messages.length === 0 && (
-				<div className="rounded-3xl border border-brand-100/70 bg-white py-16 text-center">
+				<div className="rounded-3xl border border-ink-200/70 bg-white py-16 text-center">
 					<MessageSquare className="mx-auto mb-3 h-10 w-10 text-brand-300" />
-					<h2 className="font-display text-lg font-semibold text-[#2B2129]">
+					<h2 className="font-display text-lg font-semibold text-ink-900">
 						{isUnreadOnly ? "Everything answered" : "No enquiries yet"}
 					</h2>
-					<p className="mt-1 text-sm text-gray-500">
+					<p className="mt-1 text-sm text-ink-500">
 						Messages from your website contact form land here.
 					</p>
 				</div>
@@ -141,13 +141,13 @@ const ContactMessagesPage: React.FC = () => {
 							key={message.id}
 							className={`rounded-3xl border bg-white p-5 shadow-sm transition-shadow hover:shadow-md sm:p-6 ${
 								message.isRead
-									? "border-brand-100/70"
+									? "border-ink-200/70"
 									: "border-brand-300 bg-brand-50/40"
 							}`}
 						>
 							<div className="mb-3 flex flex-wrap items-start justify-between gap-3">
 								<div className="min-w-0">
-									<h2 className="flex items-center gap-2 font-display text-lg font-semibold text-[#2B2129]">
+									<h2 className="flex items-center gap-2 font-display text-lg font-semibold text-ink-900">
 										{!message.isRead && (
 											<span
 												className="h-2 w-2 shrink-0 rounded-full bg-brand-500"
@@ -157,7 +157,7 @@ const ContactMessagesPage: React.FC = () => {
 										<span className="truncate">{message.name}</span>
 									</h2>
 									<a
-										className="mt-1 inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-brand-600"
+										className="mt-1 inline-flex items-center gap-1.5 text-sm text-ink-500 hover:text-brand-600"
 										href={`tel:${message.mobile}`}
 									>
 										<Phone className="h-3.5 w-3.5" />
@@ -165,12 +165,12 @@ const ContactMessagesPage: React.FC = () => {
 									</a>
 								</div>
 
-								<time className="text-xs text-gray-400">
+								<time className="text-xs text-ink-400">
 									{formatWhen(message.createdAt)}
 								</time>
 							</div>
 
-							<p className="whitespace-pre-wrap text-sm leading-relaxed text-gray-700">
+							<p className="whitespace-pre-wrap text-sm leading-relaxed text-ink-700">
 								{message.message}
 							</p>
 

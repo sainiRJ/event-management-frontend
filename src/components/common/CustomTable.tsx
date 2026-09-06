@@ -48,29 +48,29 @@ const CustomTable = <T extends Record<string, any>>({
 
 	if (loading) {
 		return (
-			<div className="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-brand-100/70 shadow-sm">
+			<div className="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-ink-200/70 shadow-sm">
 				<div className="relative">
 					<div className="w-16 h-16 border-4 border-brand-50 border-t-brand-600 rounded-full animate-spin" />
 					<Loader2 className="w-6 h-6 text-brand-600 animate-spin absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
 				</div>
-				<p className="text-[#2B2129] font-black text-sm uppercase tracking-widest mt-6">
+				<p className="mt-6 text-sm font-semibold text-ink-800">
 					Fetching records
 				</p>
-				<p className="text-gray-400 text-xs mt-1">Please wait a moment...</p>
+				<p className="text-ink-400 text-xs mt-1">Please wait a moment...</p>
 			</div>
 		);
 	}
 
 	if (!data || data.length === 0) {
 		return (
-			<div className="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-brand-100/70 shadow-sm">
+			<div className="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-ink-200/70 shadow-sm">
 				<div className="p-5 bg-brand-50/50 rounded-3xl mb-6">
-					<Inbox className="w-12 h-12 text-gray-300" />
+					<Inbox className="w-12 h-12 text-ink-300" />
 				</div>
-				<h3 className="text-[#2B2129] font-black text-xl mb-2">
+				<h3 className="mb-2 font-display text-xl text-ink-900">
 					No Records Found
 				</h3>
-				<p className="text-gray-400 text-sm max-w-[280px] text-center font-medium leading-relaxed">
+				<p className="text-ink-400 text-sm max-w-[280px] text-center font-medium leading-relaxed">
 					We couldn&apos;t find any data matching your current filters or
 					criteria.
 				</p>
@@ -80,7 +80,7 @@ const CustomTable = <T extends Record<string, any>>({
 
 	return (
 		<div
-			className={`w-full overflow-hidden rounded-3xl border border-brand-100/70 bg-white shadow-sm ${className}`}
+			className={`w-full overflow-hidden rounded-3xl border border-ink-200/70 bg-white shadow-soft ${className}`}
 		>
 			{/* Desktop: a real table. Below `md` the card list below takes
 			    over — a seven-column table on a phone means scrolling
@@ -88,9 +88,9 @@ const CustomTable = <T extends Record<string, any>>({
 			<div className="hidden overflow-x-auto md:block">
 				<table className="w-full border-separate border-spacing-0">
 					<thead>
-						<tr className="bg-brand-50/30">
+						<tr className="bg-cream-100/70">
 							{selectable && (
-								<th className="px-6 py-5 text-left border-b border-brand-100/70 w-12 first:rounded-tl-3xl">
+								<th className="px-6 py-5 text-left border-b border-ink-200/70 w-12 first:rounded-tl-3xl">
 									<input
 										type="checkbox"
 										className="w-5 h-5 text-brand-600 rounded-lg border-gray-200 focus:ring-brand-400/20 transition-all cursor-pointer"
@@ -113,7 +113,7 @@ const CustomTable = <T extends Record<string, any>>({
 							{columns.map((col) => (
 								<th
 									key={col.key}
-									className={`px-6 py-5 text-left text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] border-b border-brand-100/70 whitespace-nowrap ${
+									className={`px-6 py-5 text-left text-[11px] font-semibold text-ink-400 uppercase tracking-[0.18em] border-b border-ink-200/70 whitespace-nowrap ${
 										col.className || ""
 									}`}
 									style={col.width ? {width: col.width} : {}}
@@ -122,7 +122,7 @@ const CustomTable = <T extends Record<string, any>>({
 								</th>
 							))}
 							{actions.length > 0 && (
-								<th className="px-6 py-5 text-right text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] border-b border-brand-100/70 last:rounded-tr-3xl">
+								<th className="px-6 py-5 text-right text-[11px] font-semibold text-ink-400 uppercase tracking-[0.18em] border-b border-ink-200/70 last:rounded-tr-3xl">
 									Actions
 								</th>
 							)}
@@ -165,7 +165,7 @@ const CustomTable = <T extends Record<string, any>>({
 								{columns.map((col) => (
 									<td
 										key={col.key}
-										className={`px-6 py-5 whitespace-nowrap text-sm font-bold text-gray-700 ${
+										className={`px-6 py-5 whitespace-nowrap text-sm font-medium text-ink-700 ${
 											col.className || ""
 										}`}
 									>
@@ -180,9 +180,9 @@ const CustomTable = <T extends Record<string, any>>({
 											{actions.map((action, i) => (
 												<button
 													key={i}
-													className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black transition-all hover:scale-105 active:scale-95 ${
+													className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold transition-all active:scale-95 ${
 														action.className ||
-														"bg-white text-brand-600 border border-brand-100 hover:bg-gradient-to-br from-brand-500 to-brand-700 hover:text-white shadow-sm"
+														"border border-ink-200 bg-white text-brand-700 hover:border-brand-300 hover:bg-brand-50"
 													}`}
 													onClick={(e) => {
 														e.stopPropagation();
@@ -238,7 +238,7 @@ const CustomTable = <T extends Record<string, any>>({
 										disabled={!onRowClick}
 										className="block w-full text-left"
 									>
-										<p className="truncate text-base font-bold text-[#2B2129]">
+										<p className="truncate text-base font-semibold text-ink-900">
 											{titleColumn?.render
 												? titleColumn.render(row)
 												: (row[titleColumn?.key] as React.ReactNode) ?? "-"}
@@ -247,10 +247,10 @@ const CustomTable = <T extends Record<string, any>>({
 										<dl className="mt-2 grid grid-cols-2 gap-x-3 gap-y-2">
 											{restColumns.map((col) => (
 												<div key={col.key} className="min-w-0">
-													<dt className="text-[10px] font-bold uppercase tracking-wider text-gray-400">
+													<dt className="text-[10px] font-bold uppercase tracking-wider text-ink-400">
 														{col.label}
 													</dt>
-													<dd className="truncate text-sm font-bold text-gray-700">
+													<dd className="truncate text-sm font-medium text-ink-700">
 														{col.render
 															? col.render(row)
 															: (row[col.key] as React.ReactNode) || "-"}
@@ -265,9 +265,9 @@ const CustomTable = <T extends Record<string, any>>({
 											{actions.map((action, i) => (
 												<button
 													key={i}
-													className={`inline-flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-black transition-all active:scale-95 ${
+													className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-semibold transition-all active:scale-95 ${
 														action.className ||
-														"border border-brand-100 bg-white text-brand-600 shadow-sm"
+														"border border-ink-200 bg-white text-brand-600 shadow-sm"
 													}`}
 													onClick={(e) => {
 														e.stopPropagation();

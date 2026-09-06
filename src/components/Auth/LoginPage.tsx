@@ -1,6 +1,8 @@
-import React, {useState, useEffect} from "react";
+import React, {useState} from "react";
 import {useNavigate, Link} from "react-router-dom";
 import {useSelector} from "react-redux";
+import {motion, useReducedMotion} from "framer-motion";
+import {Lock, Mail} from "lucide-react";
 import {login} from "../../store/auth/ThunkActions";
 import {RootState} from "../../store/RootReducer";
 import {iLoginCredentials} from "../../store/auth/Types";
@@ -8,12 +10,26 @@ import {useAppDispatch} from "../../store/Hooks";
 import {showToast} from "../../utils/showToatify";
 import Button from "../ui/Button";
 import Input from "../ui/Input";
-import {LogIn, Sparkles, Star} from "lucide-react";
+import BrandLogo from "../layouts/BrandLogo";
 import {GOOGLE_AUTH_URL} from "@/config/oauth";
+import {EASE} from "@/components/motion";
+
+/** Optional photo behind the brand panel: public/media/auth/login-bg.jpg */
+const LOGIN_PHOTO = "/media/auth/login-bg.jpg";
+
+const GoogleMark: React.FC = () => (
+	<svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
+		<path
+			fill="#EA4335"
+			d="M12 10.2v3.9h5.4c-.2 1.3-1.6 3.9-5.4 3.9-3.3 0-5.9-2.7-5.9-6s2.6-6 5.9-6c1.9 0 3.1.8 3.8 1.5l2.6-2.5C16.8 3.4 14.6 2.4 12 2.4 6.7 2.4 2.4 6.7 2.4 12s4.3 9.6 9.6 9.6c5.5 0 9.2-3.9 9.2-9.4 0-.6-.1-1.1-.2-1.6H12z"
+		/>
+	</svg>
+);
 
 const Login: React.FC = () => {
 	const navigate = useNavigate();
 	const dispatch = useAppDispatch();
+	const prefersReduced = useReducedMotion();
 	const {isLoading, message} = useSelector(
 		(state: RootState) => state.authReducer,
 	);
@@ -23,18 +39,19 @@ const Login: React.FC = () => {
 		password: "",
 	});
 
-	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
 		const {name, value} = e.target;
 		setFormData((prev) => ({...prev, [name]: value}));
 	};
 
-	const handleSubmit = async (e: React.FormEvent) => {
+	const handleSubmit = async (e: React.FormEvent): Promise<void> => {
 		e.preventDefault();
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		const response: any = await dispatch(login(formData));
 		showToast({
 			response,
-			successMessage: "Login successful",
-			errorMessage: "Login failed",
+			successMessage: "Signed in",
+			errorMessage: "Sign in failed",
 		});
 
 		if (response.payload?.data?.token?.accessToken) {
@@ -42,179 +59,142 @@ const Login: React.FC = () => {
 		}
 	};
 
-	const handleGoogleLogin = () => {
-		window.location.href = GOOGLE_AUTH_URL;
-	};
-
 	return (
-		<div className="min-h-screen flex items-center justify-center bg-cream-100 p-4 sm:p-6 lg:p-8">
-			<div className="w-full max-w-5xl bg-white rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:flex-row min-h-[600px] border border-brand-100/70">
-				{/* Left: Login Form */}
-				<div className="flex-1 p-8 sm:p-12 lg:p-16 flex flex-col justify-center">
-					<div className="mb-10">
-						<div className="inline-flex items-center justify-center p-3 bg-brand-50 rounded-2xl mb-6">
-							<LogIn className="w-8 h-8 text-brand-600" />
-						</div>
-						<h2 className="text-4xl font-black text-[#2B2129] tracking-tight mb-3">
-							Welcome Back
-						</h2>
-						<p className="text-gray-500 font-medium">
-							Sign in to manage your decoration events and team.
+		<div className="grid min-h-screen bg-cream-100 lg:grid-cols-2">
+			{/* Brand panel */}
+			<div className="relative hidden overflow-hidden bg-brand-900 lg:block">
+				<img
+					src={LOGIN_PHOTO}
+					alt=""
+					aria-hidden="true"
+					className="absolute inset-0 h-full w-full object-cover opacity-60"
+					onError={(e) => {
+						(e.currentTarget as HTMLImageElement).style.display = "none";
+					}}
+				/>
+				<div className="absolute inset-0 bg-gradient-to-t from-brand-900 via-brand-900/50 to-brand-900/10" />
+				<div className="relative flex h-full flex-col justify-between p-10 text-white">
+					<BrandLogo isOnDark />
+					<div className="max-w-md">
+						<p className="eyebrow !text-gold-300">Vendor console</p>
+						<p className="mt-3 font-display text-4xl leading-tight">
+							Bookings, dates and money, in one place.
+						</p>
+						<p className="mt-3 text-white/70">
+							Requests from the website land here. Confirm the date, record the
+							advance, and the customer sees it on their side.
 						</p>
 					</div>
+				</div>
+			</div>
+
+			{/* Form */}
+			<div className="flex flex-col px-5 py-6 sm:px-10 lg:px-16 lg:py-10">
+				<div className="lg:hidden">
+					<BrandLogo />
+				</div>
+
+				<motion.div
+					className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center py-10"
+					initial={prefersReduced ? false : {opacity: 0, y: 16}}
+					animate={{opacity: 1, y: 0}}
+					transition={{duration: 0.5, ease: EASE}}
+				>
+					<p className="eyebrow">Sign in</p>
+					<h1 className="mt-2 font-display text-3xl text-ink-900 sm:text-4xl">
+						Welcome back
+					</h1>
+					<p className="mt-2 text-ink-500">
+						Manage bookings, payments and your team.
+					</p>
 
 					{message && (
-						<div className="mb-6 p-4 bg-rose-50 border border-rose-100 rounded-2xl text-rose-600 text-sm font-medium flex items-center gap-3">
-							<div className="w-2 h-2 bg-rose-600 rounded-full animate-pulse"></div>
+						<p
+							role="alert"
+							className="mt-6 rounded-xl bg-rose-50 p-3 text-sm text-rose-700"
+						>
 							{message}
-						</div>
+						</p>
 					)}
 
-					<form onSubmit={handleSubmit} className="space-y-6">
+					<form onSubmit={handleSubmit} className="mt-8 space-y-5">
 						<Input
-							label="Email or Phone"
+							label="Email or phone"
 							name="emailOrPhone"
 							type="text"
-							placeholder="admin@example.com"
+							inputMode="email"
+							autoComplete="username"
+							placeholder="you@example.com"
+							icon={<Mail className="h-4 w-4" />}
 							value={formData.emailOrPhone}
 							onChange={handleChange}
 							required
-							className="h-12"
 						/>
 
-						<div className="space-y-1">
-							<div className="flex justify-between items-center">
-								<label className="block text-sm font-bold text-gray-700">
+						<div>
+							<div className="mb-1.5 flex items-center justify-between">
+								<label
+									htmlFor="password"
+									className="text-sm font-medium text-ink-700"
+								>
 									Password
 								</label>
-							</div>
-							<div className="flex items-center justify-end">
 								<Link
 									to="/forgot-password"
-									className="text-xs font-bold text-brand-600 hover:text-brand-700"
+									className="text-sm font-medium text-brand-600 hover:underline"
 								>
-									Forgot Password?
+									Forgot password?
 								</Link>
 							</div>
 							<Input
 								name="password"
+								id="password"
 								type="password"
-								placeholder="••••••••"
+								autoComplete="current-password"
+								placeholder="Your password"
+								icon={<Lock className="h-4 w-4" />}
 								value={formData.password}
 								onChange={handleChange}
 								required
-								className="h-12"
 							/>
 						</div>
 
 						<Button
 							type="submit"
-							className="w-full h-14 text-lg font-bold shadow-xl shadow-brand-200/50 hover:shadow-brand-300/50 transition-all active:scale-[0.98]"
+							size="lg"
+							className="w-full"
 							isLoading={isLoading}
 						>
-							Log In
+							Sign in
 						</Button>
 					</form>
 
-					<div className="relative my-10">
-						<div className="absolute inset-0 flex items-center">
-							<div className="w-full border-t border-brand-100/70"></div>
-						</div>
-						<div className="relative flex justify-center text-sm font-bold uppercase tracking-widest">
-							<span className="px-4 bg-white text-gray-400">
-								or continue with
-							</span>
-						</div>
+					<div className="my-6 flex items-center gap-4">
+						<div className="h-px flex-1 bg-ink-200" />
+						<span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-ink-400">
+							or
+						</span>
+						<div className="h-px flex-1 bg-ink-200" />
 					</div>
 
-					<button
-						type="button"
-						onClick={handleGoogleLogin}
-						className="w-full h-14 flex items-center justify-center gap-4 bg-white border-2 border-brand-100/70 rounded-2xl font-bold text-gray-700 hover:bg-brand-50 hover:border-brand-200 transition-all active:scale-[0.98]"
+					<a
+						href={GOOGLE_AUTH_URL}
+						className="inline-flex h-12 w-full items-center justify-center gap-3 rounded-full border border-ink-200 bg-white text-sm font-semibold text-ink-800 transition-colors hover:bg-ink-50"
 					>
-						<img
-							src="https://www.svgrepo.com/show/475656/google-color.svg"
-							alt="Google logo"
-							className="w-6 h-6"
-						/>
-						Google Account
-					</button>
+						<GoogleMark />
+						Continue with Google
+					</a>
 
-					<p className="mt-10 text-center text-gray-500 font-medium">
+					<p className="mt-8 text-center text-sm text-ink-500">
 						Don&apos;t have an account?{" "}
 						<Link
 							to="/signup"
-							className="text-brand-600 font-black hover:underline underline-offset-4"
+							className="font-semibold text-brand-600 hover:underline"
 						>
-							Create Account
+							Create one
 						</Link>
 					</p>
-				</div>
-
-				{/* Right: Brand Section */}
-				<div className="hidden md:flex flex-1 bg-gradient-to-br from-brand-500 to-brand-700 p-12 lg:p-16 flex-col justify-between relative overflow-hidden">
-					{/* Decorative background elements */}
-					<div className="absolute top-0 right-0 w-64 h-64 bg-brand-500 rounded-full -mr-32 -mt-32 opacity-20"></div>
-					<div className="absolute bottom-0 left-0 w-96 h-96 bg-brand-700 rounded-full -ml-48 -mb-48 opacity-20"></div>
-
-					<div className="relative z-10">
-						<div className="flex items-center gap-3 mb-12">
-							<div className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center">
-								<Sparkles className="w-6 h-6 text-white" />
-							</div>
-							<span className="text-white font-black text-xl tracking-tighter">
-								Saini Events
-							</span>
-						</div>
-
-						<h1 className="text-5xl font-black text-white leading-tight mb-8">
-							Crafting Memories, <br />
-							<span className="text-brand-100">One Event at a Time.</span>
-						</h1>
-
-						<div className="space-y-6">
-							<div className="flex items-start gap-4">
-								<div className="p-2 bg-brand-500 rounded-lg text-brand-50">
-									<Star className="w-5 h-5" />
-								</div>
-								<div>
-									<h4 className="text-white font-bold mb-1">
-										Elite Decoration
-									</h4>
-									<p className="text-brand-50 text-sm font-medium opacity-80 leading-relaxed">
-										Professional-grade management tools for your creative
-										decoration business.
-									</p>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<div className="relative z-10">
-						<div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-6">
-							<div className="flex -space-x-3 mb-4">
-								{[1, 2, 3, 4].map((i) => (
-									<div
-										key={i}
-										className="w-10 h-10 rounded-full border-2 border-brand-500 bg-brand-400 overflow-hidden shadow-lg"
-									>
-										<img
-											src={`https://i.pravatar.cc/100?img=${i + 10}`}
-											alt="User avatar"
-										/>
-									</div>
-								))}
-								<div className="w-10 h-10 rounded-full border-2 border-brand-500 bg-white/20 backdrop-blur-md flex items-center justify-center text-xs font-bold text-white shadow-lg">
-									+50
-								</div>
-							</div>
-							<p className="text-white font-bold text-sm">
-								Join 50+ event planners managing their business with Saini
-								Events.
-							</p>
-						</div>
-					</div>
-				</div>
+				</motion.div>
 			</div>
 		</div>
 	);

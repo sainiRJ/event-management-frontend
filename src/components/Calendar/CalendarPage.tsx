@@ -35,7 +35,7 @@ function mondayIndex(date: Date): number {
 function statusTone(status: string): string {
 	switch (status?.toLowerCase()) {
 		case "cancelled":
-			return "bg-gray-100 text-gray-500 line-through";
+			return "bg-gray-100 text-ink-500 line-through";
 		case "pending":
 			return "bg-amber-100 text-amber-800";
 		case "completed":
@@ -143,7 +143,7 @@ const CalendarPage: React.FC = () => {
 						>
 							<ChevronLeft className="h-4 w-4" />
 						</Button>
-						<span className="flex-1 whitespace-nowrap text-center text-sm font-bold text-[#2B2129] sm:flex-none sm:px-2">
+						<span className="flex-1 whitespace-nowrap text-center text-sm font-bold text-ink-900 sm:flex-none sm:px-2">
 							{monthLabel}
 						</span>
 						<Button
@@ -161,12 +161,12 @@ const CalendarPage: React.FC = () => {
 				}
 			/>
 
-			<div className="overflow-hidden rounded-3xl border border-brand-100/70 bg-white shadow-sm">
-				<div className="grid grid-cols-7 border-b border-brand-100/70 bg-cream-100">
+			<div className="overflow-hidden rounded-3xl border border-ink-200/70 bg-white shadow-sm">
+				<div className="grid grid-cols-7 border-b border-ink-200/70 bg-cream-100">
 					{WEEKDAYS.map((day) => (
 						<div
 							key={day}
-							className="px-1 py-2 text-center text-[10px] font-bold uppercase tracking-wider text-gray-400 sm:px-2 sm:text-xs"
+							className="px-1 py-2 text-center text-[10px] font-bold uppercase tracking-wider text-ink-400 sm:px-2 sm:text-xs"
 						>
 							<span className="sm:hidden">{day[0]}</span>
 							<span className="hidden sm:inline">{day}</span>
@@ -180,7 +180,7 @@ const CalendarPage: React.FC = () => {
 							return (
 								<div
 									key={`pad-${index}`}
-									className="min-h-[72px] border-b border-r border-brand-100/40 bg-cream-50/40 sm:min-h-[104px]"
+									className="min-h-[72px] border-b border-r border-ink-200/40 bg-cream-50/40 sm:min-h-[104px]"
 								/>
 							);
 						}
@@ -197,7 +197,7 @@ const CalendarPage: React.FC = () => {
 								key={key}
 								type="button"
 								onClick={() => setSelected(key)}
-								className={`min-h-[72px] border-b border-r border-brand-100/40 p-1.5 text-left transition-colors hover:bg-brand-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 sm:min-h-[104px] sm:p-2 ${
+								className={`min-h-[72px] border-b border-r border-ink-200/40 p-1.5 text-left transition-colors hover:bg-brand-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 sm:min-h-[104px] sm:p-2 ${
 									selected === key ? "bg-brand-50" : ""
 								}`}
 							>
@@ -206,8 +206,8 @@ const CalendarPage: React.FC = () => {
 										isToday
 											? "bg-brand-500 text-white"
 											: live.length > 0
-											? "text-[#2B2129]"
-											: "text-gray-400"
+											? "text-ink-900"
+											: "text-ink-400"
 									}`}
 								>
 									{date.getDate()}
@@ -225,7 +225,7 @@ const CalendarPage: React.FC = () => {
 										</span>
 									))}
 									{live.length > 2 && (
-										<span className="block text-[10px] font-semibold text-gray-400">
+										<span className="block text-[10px] font-semibold text-ink-400">
 											+{live.length - 2} more
 										</span>
 									)}
@@ -237,14 +237,14 @@ const CalendarPage: React.FC = () => {
 			</div>
 
 			{isLoading && (
-				<p className="py-6 text-center text-sm text-gray-500">
+				<p className="py-6 text-center text-sm text-ink-500">
 					Loading calendar…
 				</p>
 			)}
 
 			{selected && (
-				<section className="mt-6 rounded-3xl border border-brand-100/70 bg-white p-5 shadow-sm sm:p-6">
-					<h2 className="mb-4 font-display text-lg font-semibold text-[#2B2129]">
+				<section className="mt-6 rounded-3xl border border-ink-200/70 bg-white p-5 shadow-sm sm:p-6">
+					<h2 className="mb-4 font-display text-lg font-semibold text-ink-900">
 						{new Date(`${selected}T00:00:00`).toLocaleDateString("en-IN", {
 							weekday: "long",
 							day: "numeric",
@@ -254,7 +254,7 @@ const CalendarPage: React.FC = () => {
 					</h2>
 
 					{selectedEntries.length === 0 ? (
-						<p className="text-sm text-gray-500">
+						<p className="text-sm text-ink-500">
 							Nothing booked — this date is free.
 						</p>
 					) : (
@@ -265,7 +265,7 @@ const CalendarPage: React.FC = () => {
 									className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-cream-100 p-3"
 								>
 									<div className="min-w-0">
-										<p className="flex items-center gap-2 font-semibold text-[#2B2129]">
+										<p className="flex items-center gap-2 font-semibold text-ink-900">
 											<span className="truncate">{entry.serviceName}</span>
 											{entry.isOnlineBooking && (
 												<Globe
@@ -274,7 +274,7 @@ const CalendarPage: React.FC = () => {
 												/>
 											)}
 										</p>
-										<p className="truncate text-sm text-gray-500">
+										<p className="truncate text-sm text-ink-500">
 											{entry.customerName} · {entry.eventName}
 										</p>
 									</div>
@@ -286,7 +286,7 @@ const CalendarPage: React.FC = () => {
 										>
 											{entry.status}
 										</span>
-										<span className="text-sm font-bold text-[#2B2129]">
+										<span className="text-sm font-bold text-ink-900">
 											{currency.format(Number(entry.totalCost))}
 										</span>
 									</div>

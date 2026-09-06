@@ -44,18 +44,18 @@ const Pagination: React.FC<iPaginationProps> = ({
 	const canGoForward = page < totalPages && !isLoading;
 
 	const buttonClass =
-		"inline-flex items-center gap-1 rounded-xl border border-brand-100 bg-white px-3 py-2 text-sm font-medium text-gray-600 transition hover:border-brand-200 hover:text-brand-600 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-brand-100 disabled:hover:text-gray-600";
+		"inline-flex items-center gap-1 rounded-xl border border-ink-200 bg-white px-3 py-2 text-sm font-medium text-ink-600 transition hover:border-brand-200 hover:text-brand-600 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-ink-200 disabled:hover:text-ink-600";
 
 	return (
 		<nav
 			aria-label="Pagination"
 			className="mt-4 flex flex-col items-center justify-between gap-3 sm:flex-row"
 		>
-			<p className="text-sm text-gray-500" aria-live="polite">
+			<p className="text-sm text-ink-500" aria-live="polite">
 				Showing{" "}
-				<span className="font-semibold text-gray-700">{firstOnPage}</span>–
-				<span className="font-semibold text-gray-700">{lastOnPage}</span> of{" "}
-				<span className="font-semibold text-gray-700">{total}</span>
+				<span className="font-semibold text-ink-700">{firstOnPage}</span>–
+				<span className="font-semibold text-ink-700">{lastOnPage}</span> of{" "}
+				<span className="font-semibold text-ink-700">{total}</span>
 			</p>
 
 			<div className="flex items-center gap-2">
@@ -71,7 +71,7 @@ const Pagination: React.FC<iPaginationProps> = ({
 					Previous
 				</button>
 
-				<span className="px-2 text-sm text-gray-500">
+				<span className="px-2 text-sm text-ink-500">
 					Page {page} of {totalPages}
 				</span>
 

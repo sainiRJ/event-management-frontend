@@ -111,18 +111,18 @@ const GalleryPage: React.FC = () => {
 			/>
 
 			{isLoading && photos.length === 0 && (
-				<p className="py-12 text-center text-sm text-gray-500">
+				<p className="py-12 text-center text-sm text-ink-500">
 					Loading gallery…
 				</p>
 			)}
 
 			{!isLoading && photos.length === 0 && (
-				<div className="rounded-3xl border border-brand-100/70 bg-white py-16 text-center">
+				<div className="rounded-3xl border border-ink-200/70 bg-white py-16 text-center">
 					<Images className="mx-auto mb-3 h-10 w-10 text-brand-300" />
-					<h2 className="font-display text-lg font-semibold text-[#2B2129]">
+					<h2 className="font-display text-lg font-semibold text-ink-900">
 						No photos yet
 					</h2>
-					<p className="mx-auto mt-1 max-w-sm text-sm text-gray-500">
+					<p className="mx-auto mt-1 max-w-sm text-sm text-ink-500">
 						Photos you add here appear in the gallery on your customer website.
 					</p>
 				</div>
@@ -131,9 +131,9 @@ const GalleryPage: React.FC = () => {
 			<div className="space-y-8">
 				{Object.entries(grouped).map(([serviceName, items]) => (
 					<section key={serviceName}>
-						<h2 className="mb-3 font-display text-lg font-semibold text-[#2B2129]">
+						<h2 className="mb-3 font-display text-lg font-semibold text-ink-900">
 							{serviceName}
-							<span className="ml-2 text-sm font-normal text-gray-400">
+							<span className="ml-2 text-sm font-normal text-ink-400">
 								{items.length}
 							</span>
 						</h2>
@@ -142,7 +142,7 @@ const GalleryPage: React.FC = () => {
 							{items.map((photo) => (
 								<figure
 									key={photo.photoId}
-									className="group relative overflow-hidden rounded-2xl border border-brand-100/70 bg-white shadow-sm"
+									className="group relative overflow-hidden rounded-2xl border border-ink-200/70 bg-white shadow-sm"
 								>
 									<img
 										src={photo.photoUrl}
@@ -196,7 +196,7 @@ const GalleryPage: React.FC = () => {
 				size="sm"
 			>
 				<div className="space-y-4">
-					<p className="text-sm text-gray-600">
+					<p className="text-sm text-ink-600">
 						It will stop appearing in the gallery on your customer website. The
 						file itself is kept in storage.
 					</p>
