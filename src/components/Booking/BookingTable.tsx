@@ -19,12 +19,18 @@ interface BookingTableProps {
 	onViewDetails: (booking: iBooking) => void;
 	searchQuery?: string;
 	selectedStatus?: string | null;
+	selectedService?: string | null;
+	fromDate?: string;
+	toDate?: string;
 }
 
 const BookingTable: React.FC<BookingTableProps> = ({
 	onViewDetails,
 	searchQuery = "",
 	selectedStatus = null,
+	selectedService = null,
+	fromDate = "",
+	toDate = "",
 }) => {
 	const [loading, setLoading] = useState(true);
 	const [filteredData, setFilteredData] = useState<iBooking[]>([]);
@@ -57,12 +63,22 @@ const BookingTable: React.FC<BookingTableProps> = ({
 					page: 1,
 					search: searchQuery || undefined,
 					statusId: selectedStatus || undefined,
+					serviceId: selectedService || undefined,
+					fromDate: fromDate || undefined,
+					toDate: toDate || undefined,
 				}),
 			);
 		}, 300);
 
 		return () => clearTimeout(timer);
-	}, [dispatch, searchQuery, selectedStatus]);
+	}, [
+		dispatch,
+		searchQuery,
+		selectedStatus,
+		selectedService,
+		fromDate,
+		toDate,
+	]);
 
 	useEffect(() => {
 		if (bookingList) {
@@ -78,6 +94,9 @@ const BookingTable: React.FC<BookingTableProps> = ({
 				page: nextPage,
 				search: searchQuery || undefined,
 				statusId: selectedStatus || undefined,
+				serviceId: selectedService || undefined,
+				fromDate: fromDate || undefined,
+				toDate: toDate || undefined,
 			}),
 		);
 	};
@@ -88,6 +107,17 @@ const BookingTable: React.FC<BookingTableProps> = ({
 			label: "Customer Name",
 			width: 200,
 			resizable: true,
+		},
+		{
+			key: "serviceName",
+			label: "Service",
+			width: 150,
+			resizable: true,
+			render: (rowData: iBooking) => (
+				<span className="inline-flex rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-semibold text-brand-700">
+					{rowData.serviceName || "-"}
+				</span>
+			),
 		},
 		{
 			key: "eventName",
