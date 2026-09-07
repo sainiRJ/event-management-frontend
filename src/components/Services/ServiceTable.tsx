@@ -7,7 +7,15 @@ import {
 	deleteService,
 } from "../../store/services/ThunkActions";
 import {RootState} from "../../store";
-import {Plus, Search, Edit2, Trash2, Settings2, RefreshCw} from "lucide-react";
+import {
+	Plus,
+	Search,
+	Edit2,
+	Trash2,
+	Settings2,
+	RefreshCw,
+	ClipboardList,
+} from "lucide-react";
 import CustomTable from "../common/CustomTable";
 import {iService} from "../../customTypes/appDataTypes/serviceTypes";
 import {serviceValidationSchema} from "@/validations/ServiceValidationSchema";
@@ -15,7 +23,12 @@ import Joi from "joi";
 import Button from "../ui/Button";
 import Input from "../ui/Input";
 import Modal from "../ui/Modal";
+import ServiceMaterialsModal from "./ServiceMaterialsModal";
 import {toast} from "sonner";
+
+/** Customer site origin, for "open on the site" links. */
+const CLIENT_SITE_URL =
+	import.meta.env.VITE_CLIENT_SITE_URL || "https://sainievents.in";
 
 const ServiceTable = () => {
 	const [loading, setLoading] = useState(true);
@@ -23,6 +36,9 @@ const ServiceTable = () => {
 	const [showAddModal, setShowAddModal] = useState(false);
 	const [showEditModal, setShowEditModal] = useState(false);
 	const [editingService, setEditingService] = useState<iService | null>(null);
+	const [materialsService, setMaterialsService] = useState<iService | null>(
+		null,
+	);
 	const [formData, setFormData] = useState({
 		serviceName: "",
 		description: "",
@@ -177,7 +193,21 @@ const ServiceTable = () => {
 			key: "serviceName",
 			label: "Service Name",
 			render: (row: iService) => (
-				<div className="font-semibold text-ink-900">{row.serviceName}</div>
+				<div>
+					<div className="font-semibold text-ink-900">{row.serviceName}</div>
+					{row.slug && (
+						<a
+							href={`${CLIENT_SITE_URL}/services/${row.slug}`}
+							target="_blank"
+							rel="noopener noreferrer"
+							onClick={(e) => e.stopPropagation()}
+							className="text-xs text-ink-400 hover:text-brand-600"
+							title="Open on the customer site"
+						>
+							/services/{row.slug}
+						</a>
+					)}
+				</div>
 			),
 		},
 		{
@@ -201,6 +231,14 @@ const ServiceTable = () => {
 						onClick={() => handleEditService(row)}
 					>
 						Edit
+					</Button>
+					<Button
+						variant="ghost"
+						size="sm"
+						icon={<ClipboardList className="w-3.5 h-3.5" />}
+						onClick={() => setMaterialsService(row)}
+					>
+						Materials
 					</Button>
 					<Button
 						variant="ghost"
@@ -417,6 +455,11 @@ const ServiceTable = () => {
 					</div>
 				)}
 			</Modal>
+
+			<ServiceMaterialsModal
+				service={materialsService}
+				onClose={() => setMaterialsService(null)}
+			/>
 		</div>
 	);
 };

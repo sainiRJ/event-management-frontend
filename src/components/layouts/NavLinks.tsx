@@ -1,13 +1,20 @@
 import React from "react";
 import {Link, useLocation} from "react-router-dom";
-import {motion, useReducedMotion} from "framer-motion";
+import {LayoutGroup, motion, useReducedMotion} from "framer-motion";
 
-import {navigation} from "@/config/navigation";
+import {navigationForRole} from "@/config/navigation";
+import {getCurrentUserRole} from "@/utils/tokenUtils";
 import {iPendingCounts} from "@/hooks/usePendingCounts";
 import {EASE} from "@/components/motion";
 
 interface iNavLinksProps {
 	counts: iPendingCounts;
+	/**
+	 * Namespace for the sliding active pill. The desktop rail and the mobile
+	 * drawer both mount this list, and two elements sharing one `layoutId`
+	 * would animate between each other.
+	 */
+	groupId: string;
 	/** Collapsed rail: icons only, labels become hover tooltips. */
 	isCollapsed?: boolean;
 	onNavigate?: () => void;
@@ -20,14 +27,16 @@ interface iNavLinksProps {
  */
 const NavLinks: React.FC<iNavLinksProps> = ({
 	counts,
+	groupId,
 	isCollapsed = false,
 	onNavigate,
 }) => {
 	const location = useLocation();
 	const prefersReduced = useReducedMotion();
+	const navigation = navigationForRole(getCurrentUserRole());
 
 	return (
-		<>
+		<LayoutGroup id={groupId}>
 			{navigation.map((group, groupIndex) => (
 				<div key={group.heading ?? `group-${groupIndex}`} className="mb-3">
 					{group.heading && !isCollapsed && (
@@ -58,9 +67,7 @@ const NavLinks: React.FC<iNavLinksProps> = ({
 								>
 									{isActive && (
 										<motion.span
-											layoutId={
-												isCollapsed ? "nav-active-rail" : "nav-active-full"
-											}
+											layoutId="nav-active"
 											className="absolute inset-0 rounded-xl border border-ink-200 bg-brand-50"
 											transition={
 												prefersReduced
@@ -112,7 +119,7 @@ const NavLinks: React.FC<iNavLinksProps> = ({
 					</div>
 				</div>
 			))}
-		</>
+		</LayoutGroup>
 	);
 };
 

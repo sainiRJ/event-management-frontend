@@ -47,7 +47,7 @@ const Sidebar: React.FC<iSidebarProps> = ({
 			</div>
 
 			<nav className="flex-1 overflow-y-auto px-3 py-5 no-scrollbar">
-				<NavLinks counts={counts} isCollapsed={isCollapsed} />
+				<NavLinks groupId="sidebar" counts={counts} isCollapsed={isCollapsed} />
 			</nav>
 
 			<div className="border-t border-ink-200/60 p-3">

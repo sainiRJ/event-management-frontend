@@ -26,6 +26,35 @@ const GalleryPage: React.FC = () => {
 		null,
 	);
 	const [isDeleting, setIsDeleting] = useState(false);
+	const [captionDraft, setCaptionDraft] = useState<Record<string, string>>({});
+	const [savingCaptionId, setSavingCaptionId] = useState<string | null>(null);
+
+	/**
+	 * Captions double as the photo's alt text on the customer site, which is
+	 * what search engines index a photo by. Saved on blur or Enter.
+	 */
+	const saveCaption = async (photo: iGalleryPhoto) => {
+		const next = (captionDraft[photo.photoId] ?? photo.caption ?? "").trim();
+		if (next === (photo.caption ?? "")) return;
+
+		setSavingCaptionId(photo.photoId);
+		const response = await operationsService.updatePhotoCaption(
+			photo.photoId,
+			next,
+		);
+		setSavingCaptionId(null);
+
+		if (response?.httpStatusCode === httpStatusCodes.SUCCESS_OK) {
+			setPhotos((current) =>
+				current.map((p) =>
+					p.photoId === photo.photoId ? {...p, caption: next || null} : p,
+				),
+			);
+			toast.success(next ? "Caption saved" : "Caption removed");
+			return;
+		}
+		toast.error("Couldn't save that caption");
+	};
 	const [pagination, setPagination] = useState<iPagination | null>(null);
 
 	/**
@@ -149,6 +178,27 @@ const GalleryPage: React.FC = () => {
 										alt={`${serviceName} decoration`}
 										loading="lazy"
 										className="aspect-square w-full object-cover"
+									/>
+
+									<input
+										type="text"
+										value={captionDraft[photo.photoId] ?? photo.caption ?? ""}
+										onChange={(e) =>
+											setCaptionDraft((d) => ({
+												...d,
+												[photo.photoId]: e.target.value,
+											}))
+										}
+										onBlur={() => void saveCaption(photo)}
+										onKeyDown={(e) => {
+											if (e.key === "Enter")
+												(e.target as HTMLInputElement).blur();
+										}}
+										placeholder="Add a caption…"
+										maxLength={100}
+										disabled={savingCaptionId === photo.photoId}
+										aria-label="Photo caption"
+										className="block w-full border-t border-ink-100 bg-white px-3 py-2 text-xs text-ink-700 outline-none placeholder:text-ink-300 focus:bg-cream-100 disabled:opacity-60"
 									/>
 
 									<button

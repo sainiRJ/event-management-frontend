@@ -13,8 +13,15 @@ import {
 	MessageSquare,
 	Printer,
 } from "lucide-react";
-import {IndianRupee} from "lucide-react";
+import {IndianRupee, Star} from "lucide-react";
 import PaymentLedger from "./PaymentLedger";
+import QuoteEditor from "./QuoteEditor";
+import MaterialChecklist from "./MaterialChecklist";
+import AttachmentStrip from "./AttachmentStrip";
+import {toast} from "sonner";
+import {operationsService} from "@/services/api/eventManagementServer";
+import {httpStatusCodes} from "@/customTypes/NetworkTypes";
+import {reviewRequestMessage, whatsappLink} from "@/utils/whatsapp";
 import BookingReceipt from "./BookingReceipt";
 
 interface BookingDetailsModalProps {
@@ -46,6 +53,57 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
 	onEdit,
 	onPaymentChange,
 }) => {
+	const [isRequestingReview, setIsRequestingReview] = React.useState(false);
+
+	/**
+	 * Sends the one-time review link. Email goes automatically when the
+	 * booking has an address; the toast offers WhatsApp as well, which is
+	 * the channel most customers actually read.
+	 */
+	const requestReview = async (): Promise<void> => {
+		if (!booking) return;
+		setIsRequestingReview(true);
+		const response = await operationsService.requestReview(booking.id);
+		setIsRequestingReview(false);
+
+		if (
+			response?.httpStatusCode === httpStatusCodes.SUCCESS_OK &&
+			response.data?.data
+		) {
+			const {reviewUrl, wasEmailed} = response.data.data;
+			toast.success(
+				wasEmailed
+					? "Review link emailed to the customer"
+					: "Review link ready - no email on file, send it on WhatsApp",
+				{
+					duration: 12000,
+					action: booking.phoneNumber
+						? {
+								label: "Send on WhatsApp",
+								onClick: () =>
+									window.open(
+										whatsappLink(
+											booking.phoneNumber,
+											reviewRequestMessage({
+												customerName: booking.customerName,
+												serviceName: booking.serviceName,
+												eventDate: booking.eventDate ?? new Date(),
+												reviewUrl,
+											}),
+										),
+										"_blank",
+										"noopener",
+									),
+						  }
+						: undefined,
+				},
+			);
+			return;
+		}
+		toast.error(
+			response?.data?.error?.message ?? "Couldn't create the review link",
+		);
+	};
 	if (!booking) return null;
 
 	const sections: Section[] = [
@@ -111,6 +169,16 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
 						<Printer className="mr-2 h-4 w-4" />
 						Print receipt
 					</Button>
+					{booking.bookingStatus?.toLowerCase() === "booked" && (
+						<Button
+							variant="outline"
+							isLoading={isRequestingReview}
+							onClick={() => void requestReview()}
+						>
+							<Star className="mr-2 h-4 w-4" />
+							Ask for a review
+						</Button>
+					)}
 					<Button variant="ghost" onClick={onClose}>
 						Close
 					</Button>
@@ -147,6 +215,12 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
 					</div>
 				))}
 			</div>
+
+			<AttachmentStrip bookingId={booking.id} />
+
+			<QuoteEditor booking={booking} />
+
+			<MaterialChecklist bookingId={booking.id} />
 
 			{/* The payment ledger: every receipt against this booking. The
 			    booking's advance is derived from these, not typed in. */}

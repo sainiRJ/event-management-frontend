@@ -82,7 +82,11 @@ const MobileNav: React.FC<iMobileNavProps> = ({isOpen, onClose, counts}) => {
 						</div>
 
 						<nav className="flex-1 overflow-y-auto px-3 py-4">
-							<NavLinks counts={counts} onNavigate={onClose} />
+							<NavLinks
+								groupId="mobile-nav"
+								counts={counts}
+								onNavigate={onClose}
+							/>
 						</nav>
 
 						<div className="border-t border-ink-200/60 p-3 pb-safe">

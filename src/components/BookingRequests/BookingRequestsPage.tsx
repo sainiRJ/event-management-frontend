@@ -8,17 +8,25 @@ import {
 	Phone,
 	RefreshCw,
 	X,
+	MessageCircle,
 } from "lucide-react";
 
 import {operationsService} from "@/services/api/eventManagementServer";
 import {iBookingRequest} from "@/customTypes/appDataTypes/operationsTypes";
 import {httpStatusCodes, iPagination} from "@/customTypes/NetworkTypes";
 import PageHeader from "@/components/common/PageHeader";
+import {
+	bookingConfirmedMessage,
+	bookingDeclinedMessage,
+	requestReceivedMessage,
+	whatsappLink,
+} from "@/utils/whatsapp";
 import StatusBadge from "@/components/common/StatusBadge";
 import Button from "@/components/ui/Button";
 import Pagination from "@/components/common/Pagination";
 import Input from "@/components/ui/Input";
 import Modal from "@/components/ui/Modal";
+import AttachmentStrip from "@/components/Booking/AttachmentStrip";
 
 const currency = new Intl.NumberFormat("en-IN", {
 	style: "currency",
@@ -117,7 +125,33 @@ const BookingRequestsPage: React.FC = () => {
 		setIsSaving(false);
 
 		if (response?.httpStatusCode === httpStatusCodes.SUCCESS_OK) {
-			toast.success(`Booking confirmed for ${approving.customerName}`);
+			const confirmed = approving;
+			toast.success(`Booking confirmed for ${confirmed.customerName}`, {
+				// The customer also gets an email automatically; WhatsApp is
+				// the channel they actually read, and this is one tap.
+				action: confirmed.phoneNumber
+					? {
+							label: "Send on WhatsApp",
+							onClick: () => {
+								window.open(
+									whatsappLink(
+										confirmed.phoneNumber!,
+										bookingConfirmedMessage({
+											customerName: confirmed.customerName,
+											serviceName: confirmed.serviceName,
+											eventDate: confirmed.eventDate,
+											totalCost: cost,
+											advancePayment: advance,
+										}),
+									),
+									"_blank",
+									"noopener",
+								);
+							},
+					  }
+					: undefined,
+				duration: 12000,
+			});
 			setApproving(null);
 			load();
 			return;
@@ -312,7 +346,17 @@ const BookingRequestsPage: React.FC = () => {
 										</p>
 									</div>
 								</div>
-								<StatusBadge status={request.status} />
+								<div className="flex items-center gap-2">
+									{request.source && (
+										<span
+											className="rounded-full bg-ink-100 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider text-ink-500"
+											title="Where this request came from"
+										>
+											{request.source}
+										</span>
+									)}
+									<StatusBadge status={request.status} />
+								</div>
 							</div>
 
 							<dl className="grid gap-2 text-sm text-ink-600">
@@ -331,12 +375,37 @@ const BookingRequestsPage: React.FC = () => {
 									<dt className="sr-only">Phone</dt>
 									<dd>
 										{request.phoneNumber ? (
-											<a
-												className="hover:text-brand-600"
-												href={`tel:${request.phoneNumber}`}
-											>
-												{request.phoneNumber}
-											</a>
+											<span className="inline-flex flex-wrap items-center gap-2">
+												<a
+													className="hover:text-brand-600"
+													href={`tel:${request.phoneNumber}`}
+												>
+													{request.phoneNumber}
+												</a>
+												<a
+													href={whatsappLink(
+														request.phoneNumber,
+														request.status?.toLowerCase() === "booked"
+															? bookingConfirmedMessage({
+																	customerName: request.customerName,
+																	serviceName: request.serviceName,
+																	eventDate: request.eventDate,
+																	totalCost: 0,
+																	advancePayment: 0,
+															  })
+															: request.status?.toLowerCase() === "cancelled"
+															? bookingDeclinedMessage(request)
+															: requestReceivedMessage(request),
+													)}
+													target="_blank"
+													rel="noopener noreferrer"
+													className="inline-flex items-center gap-1 rounded-full bg-[#25D366]/10 px-2.5 py-0.5 text-xs font-semibold text-[#128C7E] hover:bg-[#25D366]/20"
+													title="Open WhatsApp with a ready message"
+												>
+													<MessageCircle className="h-3.5 w-3.5" />
+													WhatsApp
+												</a>
+											</span>
 										) : (
 											"—"
 										)}
@@ -349,6 +418,10 @@ const BookingRequestsPage: React.FC = () => {
 									{request.notes}
 								</p>
 							)}
+
+							<div className="mt-3">
+								<AttachmentStrip bookingId={request.id} isCompact />
+							</div>
 
 							<p className="mt-4 text-xs text-ink-400">
 								Requested {formatDate(request.requestedAt)}
