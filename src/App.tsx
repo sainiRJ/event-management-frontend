@@ -6,6 +6,7 @@ import Sidebar from "./components/layouts/Sidebar";
 import LoginPage from "./components/Auth/LoginPage";
 import DashboardPage from "./components/Dashboard/DashboardPage";
 import AuthGuard from "./Authguard";
+import {VENDOR_ROLES} from "./config/roles";
 import ErrorBoundary from "./components/common/ErrorBoundary";
 /**
  * Screens are loaded when they are opened.
@@ -42,6 +43,12 @@ const BookingRequestsPage = lazy(
 	() => import("./components/BookingRequests/BookingRequestsPage"),
 );
 const CalendarPage = lazy(() => import("./components/Calendar/CalendarPage"));
+const ReviewsPage = lazy(() => import("./components/Reviews/ReviewsPage"));
+const TodayPage = lazy(() => import("./components/Today/TodayPage"));
+const PackagesPage = lazy(() => import("./components/Packages/PackagesPage"));
+const AttendancePage = lazy(
+	() => import("./components/Attendance/AttendancePage"),
+);
 const ForgotPasswordPage = lazy(
 	() => import("./components/Auth/ForgotPasswordPage"),
 );
@@ -139,7 +146,7 @@ function App() {
 									<Route
 										path="/"
 										element={
-											<AuthGuard requireAuth={true}>
+											<AuthGuard requireAuth={true} roles={VENDOR_ROLES}>
 												<DashboardPage />
 											</AuthGuard>
 										}
@@ -147,7 +154,7 @@ function App() {
 									<Route
 										path="/dashboard"
 										element={
-											<AuthGuard requireAuth={true}>
+											<AuthGuard requireAuth={true} roles={VENDOR_ROLES}>
 												<DashboardPage />
 											</AuthGuard>
 										}
@@ -155,7 +162,7 @@ function App() {
 									<Route
 										path="/employees"
 										element={
-											<AuthGuard requireAuth={true}>
+											<AuthGuard requireAuth={true} roles={VENDOR_ROLES}>
 												<EmployeeTable />
 											</AuthGuard>
 										}
@@ -163,7 +170,7 @@ function App() {
 									<Route
 										path="/services"
 										element={
-											<AuthGuard requireAuth={true}>
+											<AuthGuard requireAuth={true} roles={VENDOR_ROLES}>
 												<ServiceTable />
 											</AuthGuard>
 										}
@@ -179,7 +186,7 @@ function App() {
 									<Route
 										path="/finance"
 										element={
-											<AuthGuard requireAuth={true}>
+											<AuthGuard requireAuth={true} roles={VENDOR_ROLES}>
 												<FinancePage />
 											</AuthGuard>
 										}
@@ -204,7 +211,11 @@ function App() {
 									<Route path="/auth/callback" element={<OAuthCallback />} />
 									<Route
 										path="/employee/:employeeId/details"
-										element={<EmployeeDetails />}
+										element={
+											<AuthGuard requireAuth={true} roles={VENDOR_ROLES}>
+												<EmployeeDetails />
+											</AuthGuard>
+										}
 									/>
 									<Route
 										path="/employee/:employeeId/service-history"
@@ -229,7 +240,7 @@ function App() {
 									<Route
 										path="/booking-requests"
 										element={
-											<AuthGuard requireAuth={true}>
+											<AuthGuard requireAuth={true} roles={VENDOR_ROLES}>
 												<BookingRequestsPage />
 											</AuthGuard>
 										}
@@ -237,7 +248,7 @@ function App() {
 									<Route
 										path="/enquiries"
 										element={
-											<AuthGuard requireAuth={true}>
+											<AuthGuard requireAuth={true} roles={VENDOR_ROLES}>
 												<ContactMessagesPage />
 											</AuthGuard>
 										}
@@ -245,7 +256,7 @@ function App() {
 									<Route
 										path="/conversations"
 										element={
-											<AuthGuard requireAuth={true}>
+											<AuthGuard requireAuth={true} roles={VENDOR_ROLES}>
 												<ChatTranscriptsPage />
 											</AuthGuard>
 										}
@@ -253,7 +264,7 @@ function App() {
 									<Route
 										path="/gallery"
 										element={
-											<AuthGuard requireAuth={true}>
+											<AuthGuard requireAuth={true} roles={VENDOR_ROLES}>
 												<GalleryPage />
 											</AuthGuard>
 										}
@@ -261,15 +272,47 @@ function App() {
 									<Route
 										path="/customers"
 										element={
-											<AuthGuard requireAuth={true}>
+											<AuthGuard requireAuth={true} roles={VENDOR_ROLES}>
 												<CustomersPage />
+											</AuthGuard>
+										}
+									/>
+									<Route
+										path="/reviews"
+										element={
+											<AuthGuard requireAuth={true} roles={VENDOR_ROLES}>
+												<ReviewsPage />
+											</AuthGuard>
+										}
+									/>
+									<Route
+										path="/packages"
+										element={
+											<AuthGuard requireAuth={true} roles={VENDOR_ROLES}>
+												<PackagesPage />
+											</AuthGuard>
+										}
+									/>
+									<Route
+										path="/today"
+										element={
+											<AuthGuard requireAuth={true}>
+												<TodayPage />
+											</AuthGuard>
+										}
+									/>
+									<Route
+										path="/attendance"
+										element={
+											<AuthGuard requireAuth={true}>
+												<AttendancePage />
 											</AuthGuard>
 										}
 									/>
 									<Route
 										path="/activity"
 										element={
-											<AuthGuard requireAuth={true}>
+											<AuthGuard requireAuth={true} roles={VENDOR_ROLES}>
 												<ActivityPage />
 											</AuthGuard>
 										}

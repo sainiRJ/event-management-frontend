@@ -12,6 +12,8 @@ export interface iCreateBookingDTO {
 	paymentStatusId: string;
 	bookingStatusId: string;
 	assignedEmployeeIds?: string[];
+	/** phone | admin - website and chat stamp their own */
+	source?: string;
 }
 
 export interface iBookingRequest {

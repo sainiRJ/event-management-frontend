@@ -33,6 +33,7 @@ export const bookingValidationSchema = Joi.object({
 	notes: Joi.string().max(500).allow("").messages({
 		"string.max": "Notes cannot exceed 500 characters",
 	}),
+	source: Joi.string().valid("admin", "phone").optional(),
 	serviceId: Joi.string().required().messages({
 		"string.empty": "Service is required",
 	}),

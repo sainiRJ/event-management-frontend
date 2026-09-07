@@ -6,6 +6,7 @@ import {
 	Camera,
 	Inbox,
 	MapPin,
+	Sunrise,
 	User,
 } from "lucide-react";
 import {useAppDispatch, useAppSelector} from "../../store/Hooks";
@@ -99,8 +100,13 @@ const DashboardPage: React.FC = () => {
 						>
 							Add photos
 						</Button>
+						<Link to="/today">
+							<Button icon={<Sunrise className="h-4 w-4" />}>Today</Button>
+						</Link>
 						<Link to="/booking-requests">
-							<Button icon={<Inbox className="h-4 w-4" />}>Requests</Button>
+							<Button variant="outline" icon={<Inbox className="h-4 w-4" />}>
+								Requests
+							</Button>
 						</Link>
 					</>
 				}

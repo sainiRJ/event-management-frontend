@@ -12,6 +12,7 @@ import {
 } from "@/store/user/ThunkActions";
 import Input from "../ui/Input";
 import Button from "../ui/Button";
+import TelegramCard from "./TelegramCard";
 
 const ProfilePage: React.FC = () => {
 	const dispatch = useAppDispatch();
@@ -264,6 +265,9 @@ const ProfilePage: React.FC = () => {
 					</div>
 				</form>
 			</div>
+
+			{/* Free phone alerts */}
+			<TelegramCard />
 
 			{/* Password change */}
 			<div className="glass-card p-8">

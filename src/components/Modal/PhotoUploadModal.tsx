@@ -1,232 +1,378 @@
-import React, {useState, useRef} from "react";
+import React, {useEffect, useMemo, useRef, useState} from "react";
 import {useSelector} from "react-redux";
+import {toast} from "sonner";
+import {ImagePlus, UploadCloud, X} from "lucide-react";
+
 import {RootState} from "@/store/RootReducer";
 import {iService} from "@/store/services/Types";
+import {operationsService} from "@/services/api/eventManagementServer";
+import {httpStatusCodes} from "@/customTypes/NetworkTypes";
 import Modal from "../ui/Modal";
 import Button from "../ui/Button";
 import Select from "../ui/Select";
-import {toast} from "sonner";
-import {Upload, X} from "lucide-react";
-import config from "@/config/index";
 
-interface PhotoUploadModalProps {
+interface iPhotoUploadModalProps {
 	open: boolean;
 	onClose: () => void;
+	/** Called after at least one photo landed, so the gallery can refresh. */
+	onUploaded?: () => void;
 }
 
-const PhotoUploadModal: React.FC<PhotoUploadModalProps> = ({open, onClose}) => {
-	const [selectedService, setSelectedService] = useState<string>("");
-	const [files, setFiles] = useState<File[]>([]);
-	const [previews, setPreviews] = useState<string[]>([]);
+interface iQueued {
+	id: string;
+	file: File;
+	preview: string;
+	serviceId: string;
+	/** True when the service came from the filename, not a click. */
+	isGuessed: boolean;
+}
+
+const MAX_BYTES = 5 * 1024 * 1024;
+const MAX_FILES = 10;
+
+/**
+ * Best-effort service from a filename: "mandap_03.jpg" -> Mandap. Matches
+ * the longest service name that appears in the name, so "car" does not
+ * steal "carnival stage" if such a service ever exists.
+ */
+function guessService(fileName: string, services: iService[]): string {
+	const haystack = fileName.toLowerCase().replace(/[^a-z0-9]+/g, " ");
+	const ranked = [...services].sort((a, b) => {
+		return b.serviceName.length - a.serviceName.length;
+	});
+	for (const service of ranked) {
+		const needle = service.serviceName
+			.toLowerCase()
+			.replace(/[^a-z0-9]+/g, " ");
+		if (needle && haystack.includes(needle)) {
+			return service.id;
+		}
+	}
+	return "";
+}
+
+/**
+ * Drop a folder of photos, sort them into services, upload. Files are
+ * grouped by service and sent in batches of up to ten, which is what the
+ * API accepts per request.
+ */
+const PhotoUploadModal: React.FC<iPhotoUploadModalProps> = ({
+	open,
+	onClose,
+	onUploaded,
+}) => {
+	const services = useSelector((state: RootState) => {
+		return state.serviceReducer.serviceList;
+	});
+	const [queue, setQueue] = useState<iQueued[]>([]);
+	const [defaultService, setDefaultService] = useState("");
+	const [isDragging, setIsDragging] = useState(false);
 	const [isUploading, setIsUploading] = useState(false);
-	const fileInputRef = useRef<HTMLInputElement>(null);
+	const [progress, setProgress] = useState({done: 0, total: 0});
+	const inputRef = useRef<HTMLInputElement>(null);
 
-	const services = useSelector(
-		(state: RootState) => state.serviceReducer.serviceList,
-	);
-	const serviceOptions = services.map((service: iService) => ({
-		value: service.id,
-		label: service.serviceName,
-	}));
+	const serviceOptions = useMemo(() => {
+		return [
+			{value: "", label: "Choose a service"},
+			...services.map((service: iService) => {
+				return {value: service.id, label: service.serviceName};
+			}),
+		];
+	}, [services]);
 
-	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const selectedFiles = Array.from(e.target.files || []);
-		const validFiles: File[] = [];
+	/* Previews are object URLs; release them when the modal unmounts. */
+	const queueRef = useRef<iQueued[]>([]);
+	queueRef.current = queue;
+	useEffect(() => {
+		return () => {
+			queueRef.current.forEach((item) => {
+				URL.revokeObjectURL(item.preview);
+			});
+		};
+	}, []);
 
-		selectedFiles.forEach((file) => {
-			// if (file.size > 5 * 1024 * 1024) {
-			// 	toast.error(`${file.name} is too large (max 5MB)`);
-			// 	return;
-			// }
-			validFiles.push(file);
-			const reader = new FileReader();
-			reader.onloadend = () => {
-				setPreviews((prev) => [...prev, reader.result as string]);
-			};
-			reader.readAsDataURL(file);
+	const addFiles = (list: FileList | File[] | null) => {
+		if (!list) return;
+		const incoming = Array.from(list).filter((file) => {
+			if (!file.type.startsWith("image/")) {
+				toast.error(`${file.name} is not an image`);
+				return false;
+			}
+			if (file.size > MAX_BYTES) {
+				toast.error(`${file.name} is over 5 MB`);
+				return false;
+			}
+			return true;
 		});
-
-		setFiles((prev) => [...prev, ...validFiles]);
+		setQueue((current) => {
+			const room = Math.max(0, 50 - current.length);
+			return [
+				...current,
+				...incoming.slice(0, room).map((file) => {
+					const guessed = guessService(file.name, services);
+					return {
+						id: `${file.name}-${file.size}-${Math.random()
+							.toString(36)
+							.slice(2)}`,
+						file,
+						preview: URL.createObjectURL(file),
+						serviceId: guessed || defaultService,
+						isGuessed: Boolean(guessed),
+					};
+				}),
+			];
+		});
 	};
 
-	const removeFile = (index: number) => {
-		setFiles((prev) => prev.filter((_, i) => i !== index));
-		setPreviews((prev) => prev.filter((_, i) => i !== index));
-		if (fileInputRef.current) fileInputRef.current.value = "";
+	const applyDefault = (serviceId: string) => {
+		setDefaultService(serviceId);
+		setQueue((current) => {
+			return current.map((item) => {
+				return item.serviceId && item.isGuessed
+					? item
+					: {...item, serviceId, isGuessed: false};
+			});
+		});
 	};
 
-	const resetForm = () => {
-		setFiles([]);
-		setPreviews([]);
-		setSelectedService("");
-		if (fileInputRef.current) fileInputRef.current.value = "";
+	const setItemService = (id: string, serviceId: string) => {
+		setQueue((current) => {
+			return current.map((item) => {
+				return item.id === id ? {...item, serviceId, isGuessed: false} : item;
+			});
+		});
 	};
 
-	const handleUpload = async () => {
-		if (!selectedService) {
-			toast.error("Please select a service");
+	const remove = (id: string) => {
+		setQueue((current) => {
+			const target = current.find((item) => {
+				return item.id === id;
+			});
+			if (target) URL.revokeObjectURL(target.preview);
+			return current.filter((item) => {
+				return item.id !== id;
+			});
+		});
+	};
+
+	const reset = () => {
+		queue.forEach((item) => {
+			URL.revokeObjectURL(item.preview);
+		});
+		setQueue([]);
+		setDefaultService("");
+		setProgress({done: 0, total: 0});
+		if (inputRef.current) inputRef.current.value = "";
+	};
+
+	const unassigned = queue.filter((item) => {
+		return !item.serviceId;
+	}).length;
+
+	const upload = async () => {
+		if (queue.length === 0) {
+			toast.error("Add some photos first");
+			return;
+		}
+		if (unassigned > 0) {
+			toast.error(
+				`${unassigned} photo${
+					unassigned === 1 ? "" : "s"
+				} still need a service`,
+			);
 			return;
 		}
 
-		if (files.length === 0) {
-			toast.error("Please select at least one photo to upload");
-			return;
-		}
+		const groups = new Map<string, iQueued[]>();
+		queue.forEach((item) => {
+			groups.set(item.serviceId, [...(groups.get(item.serviceId) ?? []), item]);
+		});
 
 		setIsUploading(true);
-		const formData = new FormData();
-		formData.append("serviceId", selectedService);
-		files.forEach((file) => {
-			formData.append("photos", file);
-		});
+		setProgress({done: 0, total: queue.length});
+		let uploaded = 0;
+		let failed = 0;
 
-		try {
-			const response = await fetch(
-				`${config.EVENT_MANAGEMENT_BASE_URL}/photo/upload`,
-				{
-					method: "POST",
-					body: formData,
-				},
-			);
-
-			if (response.ok) {
-				toast.success("Photos uploaded successfully");
-				resetForm();
-				onClose();
-			} else {
-				throw new Error("Upload failed");
+		for (const [serviceId, items] of groups) {
+			for (let start = 0; start < items.length; start += MAX_FILES) {
+				const batch = items.slice(start, start + MAX_FILES);
+				const response = await operationsService.uploadPhotos(
+					serviceId,
+					batch.map((item) => {
+						return item.file;
+					}),
+				);
+				if (response?.httpStatusCode === httpStatusCodes.SUCCESS_OK) {
+					uploaded += batch.length;
+				} else {
+					failed += batch.length;
+				}
+				setProgress({done: uploaded + failed, total: queue.length});
 			}
-		} catch (error) {
-			toast.error("Failed to upload photos. Please try again.");
-		} finally {
-			setIsUploading(false);
 		}
+
+		setIsUploading(false);
+
+		if (uploaded > 0) {
+			toast.success(
+				`${uploaded} photo${uploaded === 1 ? "" : "s"} uploaded and resized`,
+			);
+			onUploaded?.();
+		}
+		if (failed > 0) {
+			// Leave the queue in place so the same selection can be retried.
+			toast.error(
+				`${failed} photo${failed === 1 ? "" : "s"} failed. Try again.`,
+			);
+			return;
+		}
+		reset();
+		onClose();
+	};
+
+	const serviceName = (serviceId: string): string => {
+		return (
+			services.find((service: iService) => {
+				return service.id === serviceId;
+			})?.serviceName ?? ""
+		);
 	};
 
 	return (
 		<Modal
 			isOpen={open}
-			onClose={onClose}
-			title="Upload Service Photos"
+			onClose={() => {
+				if (isUploading) return;
+				onClose();
+			}}
+			title="Add photos"
+			size="lg"
 			footer={
 				<>
 					<Button variant="ghost" onClick={onClose} disabled={isUploading}>
 						Cancel
 					</Button>
 					<Button
-						onClick={handleUpload}
+						onClick={() => void upload()}
 						isLoading={isUploading}
-						disabled={files.length === 0 || !selectedService}
+						disabled={queue.length === 0 || unassigned > 0}
 					>
-						Start Upload ({files.length})
+						{isUploading
+							? `Uploading ${progress.done}/${progress.total}`
+							: `Upload ${queue.length || ""}`.trim()}
 					</Button>
 				</>
 			}
 		>
-			<div className="space-y-6">
-				<Select
-					label="Target Service"
-					options={serviceOptions}
-					value={selectedService}
-					onChange={(e) => setSelectedService(e.target.value)}
-					placeholder="Which service is this for?"
-				/>
+			<div className="space-y-5">
+				<div
+					onDragOver={(e) => {
+						e.preventDefault();
+						setIsDragging(true);
+					}}
+					onDragLeave={() => setIsDragging(false)}
+					onDrop={(e) => {
+						e.preventDefault();
+						setIsDragging(false);
+						addFiles(e.dataTransfer.files);
+					}}
+					onClick={() => inputRef.current?.click()}
+					role="button"
+					tabIndex={0}
+					onKeyDown={(e) => {
+						if (e.key === "Enter" || e.key === " ") inputRef.current?.click();
+					}}
+					className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed p-8 text-center transition-colors ${
+						isDragging
+							? "border-brand-600 bg-brand-50"
+							: "border-ink-300 bg-gray-50 hover:border-brand-400"
+					}`}
+				>
+					<UploadCloud className="h-8 w-8 text-brand-600" />
+					<p className="text-sm font-semibold text-ink-900">
+						Drop photos here, or tap to choose
+					</p>
+					<p className="text-xs text-ink-500">
+						JPG, PNG or WebP up to 5 MB each. Name files after the service
+						(&quot;mandap-01.jpg&quot;) and they sort themselves.
+					</p>
+					<input
+						ref={inputRef}
+						type="file"
+						accept="image/*"
+						multiple
+						className="hidden"
+						onChange={(e) => {
+							addFiles(e.target.files);
+							e.target.value = "";
+						}}
+					/>
+				</div>
 
-				<div className="space-y-4">
-					<div className="flex items-center justify-between">
-						<label className="block text-sm font-medium text-ink-700">
-							Photo Attachments
-						</label>
-						{files.length > 0 && (
-							<button
-								onClick={() => fileInputRef.current?.click()}
-								className="text-xs font-bold text-brand-600 hover:text-brand-700 transition-colors"
-							>
-								Add More
-							</button>
-						)}
-					</div>
+				{queue.length > 0 && (
+					<>
+						<Select
+							label="Service for photos that didn't sort themselves"
+							options={serviceOptions}
+							value={defaultService}
+							onChange={(e) => applyDefault(e.target.value)}
+						/>
 
-					{previews.length === 0 ? (
-						<div
-							onClick={() => fileInputRef.current?.click()}
-							className="border-2 border-dashed border-gray-200 rounded-[2rem] p-12 flex flex-col items-center justify-center bg-gray-50/50 hover:bg-brand-50/30 hover:border-indigo-200 transition-all cursor-pointer group"
-						>
-							<div className="p-4 bg-white/85 backdrop-blur-xl rounded-2xl shadow-sm text-ink-400 group-hover:text-brand-600 group-hover:scale-110 transition-all mb-4">
-								<Upload className="w-8 h-8" />
-							</div>
-							<p className="text-sm font-bold text-ink-900 mb-1">
-								Click to select photos
-							</p>
-							<p className="text-xs text-ink-400 font-medium">
-								PNG, JPG or WEBP (Max 5MB each)
-							</p>
-							<input
-								ref={fileInputRef}
-								type="file"
-								className="hidden"
-								accept="image/*"
-								multiple
-								onChange={handleFileChange}
-							/>
-						</div>
-					) : (
-						<div className="grid grid-cols-2 gap-4">
-							{previews.map((preview, index) => (
+						<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+							{queue.map((item) => (
 								<div
-									key={index}
-									className="relative group rounded-2xl overflow-hidden border border-ink-200/70 shadow-sm h-40"
+									key={item.id}
+									className={`overflow-hidden rounded-xl border ${
+										item.serviceId ? "border-ink-200" : "border-amber-400"
+									}`}
 								>
-									<img
-										src={preview}
-										alt={`Preview ${index}`}
-										className="w-full h-full object-cover"
-									/>
-									<div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+									<div className="relative aspect-square bg-ink-100">
+										<img
+											src={item.preview}
+											alt=""
+											className="h-full w-full object-cover"
+										/>
 										<button
-											onClick={() => removeFile(index)}
-											className="p-2 bg-rose-600 text-white rounded-xl shadow-lg hover:bg-rose-700 active:scale-95 transition-all"
+											type="button"
+											aria-label="Remove"
+											onClick={() => remove(item.id)}
+											disabled={isUploading}
+											className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-ink-900/70 text-white hover:bg-ink-900"
 										>
-											<X className="w-4 h-4" />
+											<X className="h-3 w-3" />
 										</button>
+										{item.isGuessed && item.serviceId && (
+											<span className="absolute bottom-1.5 left-1.5 rounded-full bg-emerald-600 px-2 py-0.5 text-[10px] font-semibold text-white">
+												{serviceName(item.serviceId)}
+											</span>
+										)}
 									</div>
-									<div className="absolute bottom-2 left-2 right-2 p-2 bg-white/90 backdrop-blur-md rounded-lg flex items-center gap-2">
-										<span className="text-[10px] font-bold text-ink-900 truncate flex-1">
-											{files[index]?.name}
-										</span>
-									</div>
+									<select
+										value={item.serviceId}
+										onChange={(e) => setItemService(item.id, e.target.value)}
+										disabled={isUploading}
+										aria-label={`Service for ${item.file.name}`}
+										className="h-9 w-full border-t border-ink-200 bg-white px-2 text-xs outline-none"
+									>
+										{serviceOptions.map((option) => (
+											<option key={option.value} value={option.value}>
+												{option.label}
+											</option>
+										))}
+									</select>
 								</div>
 							))}
-							<div
-								onClick={() => fileInputRef.current?.click()}
-								className="border-2 border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center bg-gray-50/50 hover:bg-brand-50/30 hover:border-indigo-200 transition-all cursor-pointer group h-40"
-							>
-								<Upload className="w-6 h-6 text-ink-400 group-hover:text-brand-600 transition-colors" />
-								<span className="text-[10px] font-bold text-ink-500 mt-2">
-									Add More
-								</span>
-								<input
-									ref={fileInputRef}
-									type="file"
-									className="hidden"
-									accept="image/*"
-									multiple
-									onChange={handleFileChange}
-								/>
-							</div>
 						</div>
-					)}
-				</div>
 
-				<div className="bg-amber-50 p-4 rounded-2xl border border-amber-100 flex gap-3">
-					<div className="p-1 bg-white rounded-lg text-amber-600 h-fit shadow-sm">
-						<Upload className="w-4 h-4" />
-					</div>
-					<p className="text-xs font-medium text-amber-800 leading-relaxed">
-						Ensure the photo is high quality and clearly shows the decoration
-						setup. These photos will be visible to potential clients.
-					</p>
-				</div>
+						{unassigned > 0 && (
+							<p className="flex items-center gap-2 text-xs text-amber-700">
+								<ImagePlus className="h-3.5 w-3.5" />
+								{unassigned} photo{unassigned === 1 ? "" : "s"} still need a
+								service before upload.
+							</p>
+						)}
+					</>
+				)}
 			</div>
 		</Modal>
 	);

@@ -124,6 +124,21 @@ const BookingForm: React.FC<BookingFormProps> = ({
 					error={errors.serviceId}
 				/>
 
+				{/* Where the booking came from: only asked when the vendor is
+				    entering one by hand - website and chat stamp themselves. */}
+				{!isEdit && (
+					<Select
+						name="source"
+						label="How did it come in?"
+						options={[
+							{label: "Phone call / WhatsApp", value: "phone"},
+							{label: "Walk-in / entered by me", value: "admin"},
+						]}
+						value={formValue.source || "phone"}
+						onChange={handleChange}
+					/>
+				)}
+
 				<Select
 					name="bookingStatusId"
 					label="Booking Status"

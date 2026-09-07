@@ -28,12 +28,14 @@ import {
 	Filter,
 	ChevronDown,
 	RefreshCw,
+	Receipt,
 	PieChart as PieChartIcon,
 	BarChart3,
 } from "lucide-react";
 import Button from "../ui/Button";
 import Input from "../ui/Input";
 import Select from "../ui/Select";
+import ExpensesPanel from "./ExpensesPanel";
 
 /**
  * Categorical series colours, drawn from the app's own brand scale plus two
@@ -119,6 +121,20 @@ const FinancePage: React.FC = () => {
 			color: "text-amber-600",
 			bgColor: "bg-amber-50",
 		},
+		{
+			label: "Expenses",
+			value: data?.totalExpenses || 0,
+			icon: Receipt,
+			color: "text-rose-600",
+			bgColor: "bg-rose-50",
+		},
+		{
+			label: "Net profit",
+			value: data?.netProfit ?? (data?.totalIncome || 0),
+			icon: ArrowUpRight,
+			color: "text-ink-900",
+			bgColor: "bg-gold-50",
+		},
 	];
 
 	const [isFiltersOpen, setIsFiltersOpen] = useState(false);
@@ -154,7 +170,7 @@ const FinancePage: React.FC = () => {
 			</div>
 
 			{/* Stats Cards */}
-			<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+			<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5 xl:gap-6">
 				{stats.map((stat, idx) => (
 					<div
 						key={idx}
@@ -372,20 +388,12 @@ const FinancePage: React.FC = () => {
 				</div>
 			</div>
 
-			<div className="bg-brand-50 p-6 rounded-3xl text-brand-800 border border-ink-200 flex items-start gap-4">
-				<div className="p-2 bg-white rounded-xl text-brand-600 shadow-sm">
-					<TrendingUp className="w-5 h-5" />
-				</div>
-				<div>
-					<h4 className="font-bold mb-1">Financial Insight</h4>
-					<p className="text-sm text-brand-600/80">
-						Your revenue has increased by 12% compared to last month. Consider
-						allocating more budget to{" "}
-						{data?.serviceWiseData?.[0]?.serviceName || "your top services"} for
-						better ROI.
-					</p>
-				</div>
-			</div>
+			{/* Money going out, in the same window as the money coming in. */}
+			<ExpensesPanel
+				fromDate={filters.fromDate}
+				toDate={filters.toDate}
+				onChange={() => dispatch(fetchFinanceData(filters))}
+			/>
 		</div>
 	);
 };

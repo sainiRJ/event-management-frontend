@@ -108,7 +108,31 @@ export const apiEndpoints = Object.freeze({
 	gallery: {
 		mine: () => "photo/mine",
 		remove: (photoId: string) => `photo/${photoId}`,
+		caption: (photoId: string) => `photo/${photoId}`,
 		upload: () => "photo/upload",
+	},
+
+	packages: {
+		list: () => "packages",
+		create: () => "packages",
+		update: (packageId: string) => `packages/${packageId}`,
+		remove: (packageId: string) => `packages/${packageId}`,
+	},
+
+	attachments: {
+		list: (bookingId: string) => `booking/${bookingId}/attachments`,
+	},
+
+	quotes: {
+		get: (bookingId: string) => `quotes/${bookingId}`,
+		save: (bookingId: string) => `quotes/${bookingId}`,
+		send: (bookingId: string) => `quotes/${bookingId}/send`,
+	},
+
+	reviews: {
+		list: () => "reviews",
+		request: (bookingId: string) => `reviews/request/${bookingId}`,
+		status: (reviewId: string) => `reviews/${reviewId}/status`,
 	},
 
 	notifications: {
@@ -171,6 +195,19 @@ export const apiEndpoints = Object.freeze({
 		changePassword: () => {
 			return "/user/me/password";
 		},
+		/** Telegram alerts: status, start link, verify code, test, unlink. */
+		telegram: () => {
+			return "/user/me/telegram";
+		},
+		telegramLink: () => {
+			return "/user/me/telegram/link";
+		},
+		telegramVerify: () => {
+			return "/user/me/telegram/verify";
+		},
+		telegramTest: () => {
+			return "/user/me/telegram/test";
+		},
 	},
 	service: {
 		/**
@@ -195,7 +232,29 @@ export const apiEndpoints = Object.freeze({
 		},
 	},
 	/** Views that read across bookings rather than listing them. */
+	expenses: {
+		list: () => "expenses",
+		create: () => "expenses",
+		remove: (expenseId: string) => `expenses/${expenseId}`,
+	},
+
+	materials: {
+		service: (serviceId: string) => `materials/service/${serviceId}`,
+		booking: (bookingId: string) => `materials/booking/${bookingId}`,
+		bookingItem: (bookingId: string, materialId: string) =>
+			`materials/booking/${bookingId}/${materialId}`,
+	},
+
+	attendance: {
+		day: () => "attendance/day",
+		month: () => "attendance/month",
+		mark: () => "attendance/mark",
+	},
+
 	insights: {
+		today: () => {
+			return "/insights/today";
+		},
 		money: () => {
 			return "/insights/money";
 		},

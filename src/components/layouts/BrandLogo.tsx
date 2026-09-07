@@ -1,7 +1,7 @@
 import React from "react";
 
 /** Logo assets, copied from the customer site's public/media/brand. */
-export const BRAND_MARK = "/media/brand/logo-mark.png";
+export const BRAND_MARK = "/media/brand/logo-mark-120.png";
 export const BRAND_LOGO = "/media/brand/logo-800.png";
 
 interface iBrandLogoProps {

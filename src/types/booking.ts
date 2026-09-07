@@ -13,6 +13,8 @@ export interface iCreateBookingDTO {
 	bookingStatusId: string;
 	bookedAt: string;
 	assignedEmployeeIds?: string[];
+	/** phone | admin - website and chat stamp their own */
+	source?: string;
 }
 
 export interface iBooking extends iCreateBookingDTO {

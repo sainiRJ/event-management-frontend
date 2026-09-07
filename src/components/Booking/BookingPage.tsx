@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from "react";
+import {useSearchParams} from "react-router-dom";
 import {useAppDispatch, useAppSelector} from "../../store/Hooks";
 import {fetchServices} from "@/store/services/ThunkActions";
 import {fetchStatus} from "@/store/status/ThunkActions";
@@ -22,6 +23,7 @@ import Modal from "../ui/Modal";
 import {showToast} from "@/utils/showToatify";
 
 const initialFormValue: iCreateBookingDTO = {
+	source: "phone",
 	id: "",
 	customerName: "",
 	phoneNumber: "",
@@ -93,9 +95,13 @@ const BookingPage = () => {
 	const [editFormErrors, setEditFormErrors] = useState<BookingFormErrors>({});
 	const [isRefreshing, setIsRefreshing] = useState(false);
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [searchParams, setSearchParams] = useSearchParams();
 
 	const {statusList} = useAppSelector(
 		(state: RootState) => state.statusReducer,
+	);
+	const {bookingList} = useAppSelector(
+		(state: RootState) => state.bookingReducer,
 	);
 	const bookingStatuses = statusList
 		.filter((status) => status.context === "booking")
@@ -165,6 +171,21 @@ const BookingPage = () => {
 		});
 		setShowDetailsModal(true);
 	};
+
+	/**
+	 * Deep link from Today / notifications: /booking?open=<id> opens that
+	 * booking's details once the list has it, then clears the param so a
+	 * refresh does not reopen it.
+	 */
+	const openId = searchParams.get("open");
+	useEffect(() => {
+		if (!openId || bookingList.length === 0) return;
+		const match = bookingList.find((booking) => booking.id === openId);
+		if (match) {
+			handleViewDetails(match);
+			setSearchParams({}, {replace: true});
+		}
+	}, [openId, bookingList]);
 
 	const handleEditBooking = (selected: iBooking) => {
 		setShowDetailsModal(false);

@@ -27,3 +27,6 @@ yarn-error.log*tsconfig.tsbuildinfo
 
 # Local env backups taken during the audit fix
 *.backup-before-audit-fix
+
+.env.development
+.env.production

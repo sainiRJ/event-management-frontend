@@ -16,6 +16,8 @@ export interface ServiceFinanceData {
 export interface FinanceData {
 	totalIncome: number;
 	totalAdvance: number;
+	totalExpenses: number;
+	netProfit: number;
 	serviceWiseData: ServiceFinanceData[];
 }
 
