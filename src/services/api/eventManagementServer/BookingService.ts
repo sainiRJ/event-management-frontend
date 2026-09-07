@@ -51,6 +51,10 @@ function BookingService(apiServer: AxiosInstance) {
 			/** Matched in the database against customer name, phone and event. */
 			search?: string;
 			statusId?: string;
+			serviceId?: string;
+			/** YYYY-MM-DD, inclusive, on the event date. */
+			fromDate?: string;
+			toDate?: string;
 		} = {},
 	): Promise<APIResponse<iPaginatedResult<iCreateBookingDTO>> | null> => {
 		let result = null;

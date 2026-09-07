@@ -86,6 +86,9 @@ const BookingPage = () => {
 		useState<iCreateBookingDTO>(initialFormValue);
 	const [searchQuery, setSearchQuery] = useState("");
 	const [selectedStatus, setSelectedStatus] = useState<string>("");
+	const [selectedService, setSelectedService] = useState<string>("");
+	const [fromDate, setFromDate] = useState<string>("");
+	const [toDate, setToDate] = useState<string>("");
 	const [selectedBooking, setSelectedBooking] = useState<iBooking | null>(null);
 	const [showDetailsModal, setShowDetailsModal] = useState(false);
 	const [showEditModal, setShowEditModal] = useState(false);
@@ -102,6 +105,9 @@ const BookingPage = () => {
 	);
 	const {bookingList} = useAppSelector(
 		(state: RootState) => state.bookingReducer,
+	);
+	const {serviceList} = useAppSelector(
+		(state: RootState) => state.serviceReducer,
 	);
 	const bookingStatuses = statusList
 		.filter((status) => status.context === "booking")
@@ -348,13 +354,73 @@ const BookingPage = () => {
 							))}
 						</select>
 					</div>
+
+					<div className="relative">
+						<Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-400 pointer-events-none" />
+						<select
+							value={selectedService}
+							onChange={(e) => setSelectedService(e.target.value)}
+							aria-label="Filter by service"
+							className="w-full pl-10 pr-4 py-2 bg-gray-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-brand-400 appearance-none transition-all cursor-pointer"
+						>
+							<option value="">All services</option>
+							{serviceList.map((service) => (
+								<option key={service.id} value={service.id}>
+									{service.serviceName}
+								</option>
+							))}
+						</select>
+					</div>
+
+					<div className="flex items-center gap-2">
+						<input
+							type="date"
+							value={fromDate}
+							max={toDate || undefined}
+							onChange={(e) => setFromDate(e.target.value)}
+							aria-label="Event date from"
+							className="w-full min-w-0 px-3 py-2 bg-gray-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-brand-400"
+						/>
+						<span className="text-xs text-ink-400">to</span>
+						<input
+							type="date"
+							value={toDate}
+							min={fromDate || undefined}
+							onChange={(e) => setToDate(e.target.value)}
+							aria-label="Event date to"
+							className="w-full min-w-0 px-3 py-2 bg-gray-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-brand-400"
+						/>
+					</div>
 				</div>
+
+				{(selectedStatus ||
+					selectedService ||
+					fromDate ||
+					toDate ||
+					searchQuery) && (
+					<button
+						type="button"
+						onClick={() => {
+							setSearchQuery("");
+							setSelectedStatus("");
+							setSelectedService("");
+							setFromDate("");
+							setToDate("");
+						}}
+						className="-mt-4 mb-6 text-xs font-semibold text-brand-600 hover:underline"
+					>
+						Clear filters
+					</button>
+				)}
 
 				<div className="rounded-2xl overflow-hidden border border-ink-200/60">
 					<BookingTable
 						onViewDetails={handleViewDetails}
 						searchQuery={searchQuery}
 						selectedStatus={selectedStatus || null}
+						selectedService={selectedService || null}
+						fromDate={fromDate}
+						toDate={toDate}
 					/>
 				</div>
 			</div>
